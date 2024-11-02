@@ -12,50 +12,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - uses: actions/checkout@v4
 
-    - name: Install Docker Compose
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-compose
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
 
-    - name: Create .env File
-      run: |
-        echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > .env
-        echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-        echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-        echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> .env
-        echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> .env
-        echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
-    - name: Start Docker containers with docker-compose
-      run: docker-compose up -d
+      - name: Create .env File
+        run: |
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> .env
+          echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
 
-    - name: Build backend with Maven
-      run: mvn clean install --file backend/pom.xml
-      env:
-        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      
-    - name: Run tests for backend
-      run: mvn test --file backend/pom.xml
+      - name: Start Docker containers with docker-compose
+        run: docker-compose up -d
 
-    - name: Install dependencies for frontend
-      run: npm install
-      working-directory: frontend 
+      - name: Build backend with Maven
+        run: mvn clean install --file backend/pom.xml -DPOSTGRES_DB=${{ secrets.POSTGRES_DB }} -DPOSTGRES_USER=${{ secrets.POSTGRES_USER }} -DPOSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} -DSECRET_KEY=${{ secrets.SECRET_KEY }}
 
-    - name: Build frontend
-      run: npm run build
-      working-directory: frontend
+      - name: Run tests for backend
+        run: mvn test --file backend/pom.xml -DPOSTGRES_DB=${{ secrets.POSTGRES_DB }} -DPOSTGRES_USER=${{ secrets.POSTGRES_USER }} -DPOSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} -DSECRET_KEY=${{ secrets.SECRET_KEY }}
 
-    - name: Stop Docker containers with docker-compose
-      run: docker-compose down
+      - name: Install dependencies for frontend
+        run: npm install
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+      - name: Stop Docker containers with docker-compose
+        run: docker-compose down
