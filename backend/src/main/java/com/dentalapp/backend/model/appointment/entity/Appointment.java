@@ -1,6 +1,6 @@
 package com.dentalapp.backend.model.appointment.entity;
 
-import com.dentalapp.backend.model.patient.entity.User;
+import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
