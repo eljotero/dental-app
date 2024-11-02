@@ -35,6 +35,18 @@ jobs:
         echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> .env
         echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
 
+    - name: Debug Environment Variables
+      run: |
+        echo "POSTGRES_DB=${POSTGRES_DB}"
+        echo "POSTGRES_USER=${POSTGRES_USER}"
+        echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+        echo "SECRET_KEY=${SECRET_KEY}"
+      env:
+        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
     - name: Start Docker containers with docker-compose
       run: docker-compose up -d
 
@@ -44,6 +56,7 @@ jobs:
         POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
       
     - name: Run tests for backend
       run: mvn test --file backend/pom.xml
