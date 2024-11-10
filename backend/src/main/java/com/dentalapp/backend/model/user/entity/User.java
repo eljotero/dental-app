@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,24 +26,39 @@ public class User implements UserDetails {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "phone_number")
-    private String phone;
+    @Column(name = "password")
+    private String password;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "sex")
     private Boolean sex;
 
     @Column(name = "personal_id_number")
     private String personalId;
 
+    @Column(name="country")
     private String country;
 
+    @Column(name="city")
     private String city;
 
+    @Column(name="address_line")
     private String address;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "user_type")
     private UserType userType;
+
+    @Column(name="zip_code")
+    private String zipCode;
+
+    @Column(name="date_of_birth")
+    private LocalDate dateOfBirth;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -51,31 +67,31 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return false;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return false;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return false;
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return false;
     }
 }
