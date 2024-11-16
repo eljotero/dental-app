@@ -1,20 +1,21 @@
 package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.configuration.JwtService;
+import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.user.dtos.CreateUserDto;
 import com.dentalapp.backend.model.user.dtos.LoginUserDto;
+import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
+import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
 import com.dentalapp.backend.model.user.repostitory.UserRepository;
 import com.dentalapp.backend.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -44,6 +45,8 @@ public class UserServiceTests {
 
     private LoginUserDto loginUserDto;
 
+    private UpdateUserDto updateUserDto;
+
     @BeforeEach
     public void setUp() {
         createUserDto = new CreateUserDto();
@@ -64,6 +67,19 @@ public class UserServiceTests {
         loginUserDto = new LoginUserDto();
         loginUserDto.setEmail(createUserDto.getEmail());
         loginUserDto.setPassword(createUserDto.getPassword());
+
+        updateUserDto = new UpdateUserDto();
+        updateUserDto.setFirstName("John");
+        updateUserDto.setLastName("Doe");
+        updateUserDto.setEmail("test@mail.com");
+        updateUserDto.setPhoneNumber("123456789");
+        updateUserDto.setSex(true);
+        updateUserDto.setPersonalIdNumber("123456789");
+        updateUserDto.setCountry("Country");
+        updateUserDto.setCity("City");
+        updateUserDto.setAddressLine("Address");
+        updateUserDto.setZipCode("12345");
+        updateUserDto.setDateOfBirth(LocalDate.of(1990, 1, 1));
     }
 
 
@@ -99,6 +115,85 @@ public class UserServiceTests {
     @Test
     public void testLoginUserDoesNotExist() {
         when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(null);
-        Assertions.assertThrows(UserAlreadyExistsException.class, () -> userService.loginUser(loginUserDto));
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.loginUser(loginUserDto));
+    }
+
+    @Test
+    public void testUpdateUser() {
+        User user = new User();
+        String userEmail = "test@mail.com";
+        when(userRepository.findByEmail(userEmail)).thenReturn(user);
+        userService.updateUser(updateUserDto, userEmail);
+    }
+
+    @Test
+    public void testUpdateUserNotFound() {
+        String userEmail = "test@mail.com";
+        when(userRepository.findByEmail(userEmail)).thenReturn(null);
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.updateUser(updateUserDto, userEmail));
+    }
+
+    @Test
+    public void testGetPatientById() {
+        Long patientId = 1L;
+        User user = new User();
+        user.setUserType(UserType.PATIENT);
+        when(userRepository.findPatientById(patientId)).thenReturn(java.util.Optional.of(user));
+        Assertions.assertEquals(user, userService.getPatientById(patientId));
+    }
+
+    @Test
+    public void testGetPatientByIdNotFound() {
+        Long patientId = 1L;
+        when(userRepository.findPatientById(patientId)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getPatientById(patientId));
+    }
+
+    @Test
+    public void testGetDoctorById() {
+        Long doctorId = 1L;
+        User user = new User();
+        user.setUserType(UserType.DOCTOR);
+        when(userRepository.findDoctorById(doctorId)).thenReturn(java.util.Optional.of(user));
+        Assertions.assertEquals(user, userService.getDoctorById(doctorId));
+    }
+
+    @Test
+    public void testGetDoctorByIdNotFound() {
+        Long doctorId = 1L;
+        when(userRepository.findDoctorById(doctorId)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getDoctorById(doctorId));
+    }
+
+    @Test
+    public void testGetPatientByEmail() {
+        String email = "test@mail.com";
+        User user = new User();
+        user.setUserType(UserType.PATIENT);
+        when(userRepository.findPatientByEmail(email)).thenReturn(java.util.Optional.of(user));
+        Assertions.assertEquals(user, userService.getPatientByEmail(email));
+    }
+
+    @Test
+    public void testGetPatientByEmailNotFound() {
+        String email = "test@mail.com";
+        when(userRepository.findPatientByEmail(email)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getPatientByEmail(email));
+    }
+
+    @Test
+    public void testGetDoctorByEmail() {
+        String email = "test@mail.com";
+        User user = new User();
+        user.setUserType(UserType.DOCTOR);
+        when(userRepository.findDoctorByEmail(email)).thenReturn(java.util.Optional.of(user));
+        Assertions.assertEquals(user, userService.getDoctorByEmail(email));
+    }
+
+    @Test
+    public void testGetDoctorByEmailNotFound() {
+        String email = "test@mail.com";
+        when(userRepository.findDoctorByEmail(email)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getDoctorByEmail(email));
     }
 }

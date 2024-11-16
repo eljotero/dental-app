@@ -62,17 +62,6 @@ public class JwtService {
                 .compact();
     }
 
-    public String generateVotingToken(User user) {
-        return Jwts
-                .builder()
-                .subject(user.getEmail())
-                .claim("role", user.getUserType().name())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15)))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);

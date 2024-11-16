@@ -1,6 +1,5 @@
 package com.dentalapp.backend.model.user.dtos;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,7 +31,7 @@ public class CreateUserDto {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
-    @NotNull(message = "Date of birth is required")
+    @NotNull(message = "Sex is required")
     private Boolean sex;
 
     @NotBlank(message = "Personal ID number is required")

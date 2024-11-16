@@ -4,7 +4,8 @@ import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @Entity
@@ -25,11 +26,20 @@ public class Appointment {
     private User doctor;
 
     @Column(name = "appointment_date")
-    private Date appointmentDate;
+    private LocalDateTime appointmentDate;
+
+    @Column(name = "appointment_duration")
+    private LocalTime appointmentDuration;
 
     @Column(name = "is_confirmed")
     private Boolean isConfirmed;
 
+    @Column(name = "is_cancelled")
+    private Boolean isCancelled = false;
+
     @Column(name = "description")
     private String description;
+
+    @Version
+    private Long version;
 }
