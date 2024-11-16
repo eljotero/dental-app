@@ -1,13 +1,16 @@
 package com.dentalapp.backend.unit.controllers;
 
+import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.UserController;
 import com.dentalapp.backend.model.user.dtos.CreateUserDto;
 import com.dentalapp.backend.model.user.dtos.LoginUserDto;
+import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,12 +29,17 @@ public class UserControllerTests {
     @Mock
     private UserService userService;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private UserController userController;
 
     private CreateUserDto createUserDto;
 
     private LoginUserDto loginUserDto;
+
+    private UpdateUserDto updateUserDto;
 
     private Validator validator;
 
@@ -59,6 +67,19 @@ public class UserControllerTests {
         MockitoAnnotations.openMocks(this);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+
+        updateUserDto = new UpdateUserDto();
+        updateUserDto.setFirstName("John");
+        updateUserDto.setLastName("Doe");
+        updateUserDto.setEmail("test@mail.com");
+        updateUserDto.setPhoneNumber("123456789");
+        updateUserDto.setSex(true);
+        updateUserDto.setPersonalIdNumber("123456789");
+        updateUserDto.setCountry("Country");
+        updateUserDto.setCity("City");
+        updateUserDto.setAddressLine("Address");
+        updateUserDto.setZipCode("12345");
+        updateUserDto.setDateOfBirth(LocalDate.of(1990, 1, 1));
     }
 
     @Test
@@ -66,7 +87,7 @@ public class UserControllerTests {
         doNothing().when(userService).createUser(createUserDto);
         ResponseEntity<?> response = userController.registerUser(createUserDto);
         verify(userService).createUser(createUserDto);
-        assertEquals(ResponseEntity.ok().build(), response);
+        assertEquals(ResponseEntity.ok("User registered successfully"), response);
     }
 
     @Test
@@ -94,5 +115,16 @@ public class UserControllerTests {
         when(userService.loginUser(loginUserDto)).thenReturn("token");
         ResponseEntity<?> response = userController.loginUser(loginUserDto);
         verify(userService).loginUser(loginUserDto);
+    }
+
+    @Test
+    public void testUpdateUser() {
+        String token = "Bearer test@mail.com";
+        String email = token.substring(7);
+        when((jwtService).extractEmail(token)).thenReturn(email);
+        doNothing().when(userService).updateUser(updateUserDto, email);
+        ResponseEntity<?> response = userController.updateUser(token, updateUserDto);
+        assertEquals(ResponseEntity.ok("User updated successfully"), response);
+        Assertions.assertEquals(ResponseEntity.ok("User updated successfully"), response);
     }
 }

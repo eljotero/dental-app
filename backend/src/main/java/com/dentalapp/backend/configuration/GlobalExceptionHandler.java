@@ -1,5 +1,7 @@
 package com.dentalapp.backend.configuration;
 
+import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
+import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
 import com.dentalapp.backend.model.user.exceptions.UserAuthenticationException;
 import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
@@ -39,5 +41,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = UserAuthenticationException.class)
     public ResponseEntity<?> handleUserAuthenticationException(UserAuthenticationException e) {
         return ResponseEntity.status(UNAUTHORIZED).body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = AppointmentNotFoundException.class)
+    public ResponseEntity<?> handleAppointmentNotFoundException(AppointmentNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = IllegalAppointmentDate.class)
+    public ResponseEntity<?> handleIllegalAppointmentDate(IllegalAppointmentDate e) {
+        return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 }
