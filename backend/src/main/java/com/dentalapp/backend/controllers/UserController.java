@@ -39,4 +39,14 @@ public class UserController {
         userService.updateUser(updateUserDto, email);
         return ResponseEntity.ok("User updated successfully");
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
 }

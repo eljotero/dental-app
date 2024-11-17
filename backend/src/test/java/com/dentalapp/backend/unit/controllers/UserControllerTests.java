@@ -5,6 +5,7 @@ import com.dentalapp.backend.controllers.UserController;
 import com.dentalapp.backend.model.user.dtos.CreateUserDto;
 import com.dentalapp.backend.model.user.dtos.LoginUserDto;
 import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
+import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -19,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +44,8 @@ public class UserControllerTests {
     private UpdateUserDto updateUserDto;
 
     private Validator validator;
+
+    private User user;
 
 
     @BeforeEach
@@ -80,6 +84,9 @@ public class UserControllerTests {
         updateUserDto.setAddressLine("Address");
         updateUserDto.setZipCode("12345");
         updateUserDto.setDateOfBirth(LocalDate.of(1990, 1, 1));
+
+        user = new User();
+        user.setUserId(1L);
     }
 
     @Test
@@ -126,5 +133,21 @@ public class UserControllerTests {
         ResponseEntity<?> response = userController.updateUser(token, updateUserDto);
         assertEquals(ResponseEntity.ok("User updated successfully"), response);
         Assertions.assertEquals(ResponseEntity.ok("User updated successfully"), response);
+    }
+
+    @Test
+    public void testGetAllUsers() {
+        when(userService.getAllUsers()).thenReturn(List.of(user));
+        ResponseEntity<?> response = userController.getAllUsers();
+        verify(userService).getAllUsers();
+        Assertions.assertEquals(ResponseEntity.ok(List.of(user)), response);
+    }
+
+    @Test
+    public void testGetUserById() {
+        when(userService.getUserById(1L)).thenReturn(user);
+        ResponseEntity<?> response = userController.getUserById(1L);
+        verify(userService).getUserById(1L);
+        Assertions.assertEquals(ResponseEntity.ok(user), response);
     }
 }

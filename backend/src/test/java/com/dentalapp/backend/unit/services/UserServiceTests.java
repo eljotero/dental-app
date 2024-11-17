@@ -20,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -195,5 +196,27 @@ public class UserServiceTests {
         String email = "test@mail.com";
         when(userRepository.findDoctorByEmail(email)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getDoctorByEmail(email));
+    }
+
+    @Test
+    public void testGetUsers() {
+        User user = new User();
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        Assertions.assertEquals(List.of(user), userService.getAllUsers());
+    }
+
+    @Test
+    public void testGetUserById() {
+        Long userId = 1L;
+        User user = new User();
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+        Assertions.assertEquals(user, userService.getUserById(userId));
+    }
+
+    @Test
+    public void testGetUserByIdNotFound() {
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUserById(userId));
     }
 }
