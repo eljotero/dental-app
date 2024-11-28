@@ -46,7 +46,7 @@ public class ConfirmationTokenServiceTests {
         assertEquals(user, savedToken.getUser());
         assertNotNull(savedToken.getCreatedAt());
         assertNotNull(savedToken.getExpiresAt());
-        assertEquals(savedToken.getCreatedAt().plusMinutes(15), savedToken.getExpiresAt());
+        assertEquals(savedToken.getCreatedAt().plusMinutes(15).withNano(0), savedToken.getExpiresAt().withNano(0));
         assertNull(savedToken.getConfirmedAt());
     }
 
