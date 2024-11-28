@@ -9,6 +9,8 @@ import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
 import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
 import com.dentalapp.backend.model.user.repostitory.UserRepository;
+import com.dentalapp.backend.services.ConfirmationTokenService;
+import com.dentalapp.backend.services.EmailSenderService;
 import com.dentalapp.backend.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +40,12 @@ public class UserServiceTests {
 
     @Mock
     private AuthenticationManager authenticationManager;
+
+    @Mock
+    private ConfirmationTokenService confirmationTokenService;
+
+    @Mock
+    private EmailSenderService emailSenderService;
 
     @InjectMocks
     private UserService userService;
@@ -89,7 +97,24 @@ public class UserServiceTests {
         when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(null);
         when(passwordEncoder.encode(createUserDto.getPassword())).thenReturn("password");
         when(passwordEncoder.encode(createUserDto.getPersonalIdNumber())).thenReturn("123456789");
+        when(confirmationTokenService.saveConfirmationToken(any())).thenReturn("token");
         userService.createUser(createUserDto);
+    }
+
+    @Test
+    public void testEnableUser() {
+        String token = "token";
+        when(confirmationTokenService.confirmToken(token)).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(new User()));
+        userService.enableUser(token);
+    }
+
+    @Test
+    public void testEnableUserNotFound() {
+        String token = "token";
+        when(confirmationTokenService.confirmToken(token)).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.enableUser(token));
     }
 
     @Test

@@ -90,7 +90,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testCreateUser() {
+    public void testRegisterUser() {
         doNothing().when(userService).createUser(createUserDto);
         ResponseEntity<?> response = userController.registerUser(createUserDto);
         verify(userService).createUser(createUserDto);
@@ -149,5 +149,13 @@ public class UserControllerTests {
         ResponseEntity<?> response = userController.getUserById(1L);
         verify(userService).getUserById(1L);
         Assertions.assertEquals(ResponseEntity.ok(user), response);
+    }
+
+    @Test
+    public void testConfirmUser() {
+        doNothing().when(userService).enableUser("token");
+        ResponseEntity<?> response = userController.confirmUser("token");
+        verify(userService).enableUser("token");
+        assertEquals(ResponseEntity.ok("User confirmed successfully"), response);
     }
 }
