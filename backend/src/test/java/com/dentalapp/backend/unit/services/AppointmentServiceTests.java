@@ -13,9 +13,12 @@ import com.dentalapp.backend.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,6 +28,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AppointmentServiceTests {
 
     @Mock
@@ -63,7 +68,6 @@ public class AppointmentServiceTests {
         doctor.setUserId(2L);
         doctor.setUserType(UserType.DOCTOR);
         doctor.setEmail("test2@mail.com");
-        MockitoAnnotations.initMocks(this);
         createAppointmentDto = new CreateAppointmentDto();
         createAppointmentDto.setPatientId(patient.getUserId());
         createAppointmentDto.setDoctorId(doctor.getUserId());

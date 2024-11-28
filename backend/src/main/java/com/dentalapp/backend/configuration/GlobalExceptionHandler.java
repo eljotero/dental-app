@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, String> errorMap = new HashMap<>();
         e.getBindingResult().getFieldErrors().forEach(error -> errorMap.put(error.getField(), error.getDefaultMessage()));
-        String errorMessage = errorMap.values().stream().collect(Collectors.joining(", "));
+        String errorMessage = String.join(", ", errorMap.values());
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(BAD_REQUEST.value(), errorMessage));
     }
 

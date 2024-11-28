@@ -4,7 +4,6 @@ import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.user.dtos.CreateUserDto;
 import com.dentalapp.backend.model.user.dtos.LoginUserDto;
 import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
-import com.dentalapp.backend.services.ConfirmationTokenService;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +17,9 @@ public class UserController {
 
     private final JwtService jwtService;
 
-    private final ConfirmationTokenService confirmationTokenService;
-
-    public UserController(UserService userService, JwtService jwtService, ConfirmationTokenService confirmationTokenService) {
+    public UserController(UserService userService, JwtService jwtService) {
         this.userService = userService;
         this.jwtService = jwtService;
-        this.confirmationTokenService = confirmationTokenService;
     }
 
     @PostMapping("/register")

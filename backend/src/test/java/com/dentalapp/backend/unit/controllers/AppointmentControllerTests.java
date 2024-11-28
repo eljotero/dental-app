@@ -5,20 +5,19 @@ import com.dentalapp.backend.controllers.AppointmentController;
 import com.dentalapp.backend.model.appointment.dtos.CreateAppointmentDto;
 import com.dentalapp.backend.model.appointment.dtos.UpdateAppointmentDto;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
-import com.dentalapp.backend.model.user.dtos.CreateUserDto;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
@@ -29,6 +28,7 @@ import java.util.Set;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class AppointmentControllerTests {
 
     @Mock
@@ -42,22 +42,17 @@ public class AppointmentControllerTests {
 
     private Appointment appointment;
 
-    private User doctor;
-
-    private User patient;
-
     private Validator validator;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
 
-        doctor = new User();
+        User doctor = new User();
         doctor.setUserId(1L);
 
-        patient = new User();
+        User patient = new User();
         patient.setUserId(2L);
 
         appointment = new Appointment();

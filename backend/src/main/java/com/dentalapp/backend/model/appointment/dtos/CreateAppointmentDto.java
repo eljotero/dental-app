@@ -1,7 +1,6 @@
 package com.dentalapp.backend.model.appointment.dtos;
 
 import com.dentalapp.backend.model.user.entity.User;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;

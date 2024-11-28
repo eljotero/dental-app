@@ -14,9 +14,12 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -26,6 +29,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class UserControllerTests {
 
     @Mock
@@ -68,7 +73,6 @@ public class UserControllerTests {
         loginUserDto.setEmail(createUserDto.getEmail());
         loginUserDto.setPassword(createUserDto.getPassword());
 
-        MockitoAnnotations.openMocks(this);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
 
@@ -120,7 +124,7 @@ public class UserControllerTests {
     @Test
     public void testLogin() {
         when(userService.loginUser(loginUserDto)).thenReturn("token");
-        ResponseEntity<?> response = userController.loginUser(loginUserDto);
+        userController.loginUser(loginUserDto);
         verify(userService).loginUser(loginUserDto);
     }
 
