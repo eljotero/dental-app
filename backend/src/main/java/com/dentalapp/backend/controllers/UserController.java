@@ -4,6 +4,7 @@ import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.user.dtos.CreateUserDto;
 import com.dentalapp.backend.model.user.dtos.LoginUserDto;
 import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
+import com.dentalapp.backend.services.ConfirmationTokenService;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
     private final JwtService jwtService;
 
-    public UserController(UserService userService, JwtService jwtService) {
+    private final ConfirmationTokenService confirmationTokenService;
+
+    public UserController(UserService userService, JwtService jwtService, ConfirmationTokenService confirmationTokenService) {
         this.userService = userService;
         this.jwtService = jwtService;
+        this.confirmationTokenService = confirmationTokenService;
     }
 
     @PostMapping("/register")
@@ -48,5 +53,11 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/confirm")
+    public ResponseEntity<?> confirmUser(@RequestParam String token) {
+        userService.enableUser(token);
+        return ResponseEntity.ok("User confirmed successfully");
     }
 }

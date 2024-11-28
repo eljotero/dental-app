@@ -42,24 +42,36 @@ public class User implements UserDetails {
     @Column(name = "personal_id_number")
     private String personalId;
 
-    @Column(name="country")
+    @Column(name = "country")
     private String country;
 
-    @Column(name="city")
+    @Column(name = "city")
     private String city;
 
-    @Column(name="address_line")
+    @Column(name = "address_line")
     private String address;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type")
     private UserType userType;
 
-    @Column(name="zip_code")
+    @Column(name = "zip_code")
     private String zipCode;
 
-    @Column(name="date_of_birth")
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    @Column(name = "is_enabled")
+    private Boolean isEnabled = false;
+
+    @Column(name = "is_non_expired")
+    private Boolean isAccountNonExpired = true;
+
+    @Column(name = "is_non_locked")
+    private Boolean isAccountNonLocked = true;
+
+    @Column(name = "is_credentials_non_expired")
+    private Boolean isCredentialsNonExpired = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -78,21 +90,21 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return isAccountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return isAccountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return isCredentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 }
