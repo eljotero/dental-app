@@ -31,6 +31,8 @@ public class ConfirmationTokenServiceTests {
     @InjectMocks
     private ConfirmationTokenService confirmationTokenService;
 
+    private final String token = "token";
+
     @Test
     public void testSaveConfirmationToken() {
         User user = new User();
@@ -55,7 +57,6 @@ public class ConfirmationTokenServiceTests {
         ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.setExpiresAt(LocalDateTime.of(2025, 1, 1, 1, 1));
         confirmationToken.setUser(new User());
-        String token = "token";
         when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));
         Long userId = confirmationTokenService.confirmToken(token);
         assertEquals(confirmationToken.getUser().getUserId(), userId);
@@ -63,7 +64,6 @@ public class ConfirmationTokenServiceTests {
 
     @Test
     public void testConfirmTokenNotFound() {
-        String token = "token";
         when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.empty());
         Assertions.assertThrows(InvalidTokenException.class, () -> confirmationTokenService.confirmToken(token));
     }
@@ -72,7 +72,6 @@ public class ConfirmationTokenServiceTests {
     public void testConfirmTokenAlreadyConfirmed() {
         ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.setConfirmedAt(LocalDateTime.of(2021, 1, 1, 1, 1));
-        String token = "token";
         when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));
         Assertions.assertThrows(TokenAlreadyUsedException.class, () -> confirmationTokenService.confirmToken(token));
     }
@@ -81,7 +80,6 @@ public class ConfirmationTokenServiceTests {
     public void testConfirmTokenExpired() {
         ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.setExpiresAt(LocalDateTime.of(2022, 1, 1, 1, 1));
-        String token = "token";
         when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));
         Assertions.assertThrows(TokenExpiredException.class, () -> confirmationTokenService.confirmToken(token));
     }

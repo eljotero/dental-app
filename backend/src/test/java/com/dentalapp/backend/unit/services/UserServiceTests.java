@@ -15,9 +15,12 @@ import com.dentalapp.backend.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -27,6 +30,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class UserServiceTests {
 
     @Mock
@@ -56,6 +61,10 @@ public class UserServiceTests {
 
     private UpdateUserDto updateUserDto;
 
+    private final String token = "token";
+
+    private final String getEmail = "test@mail.com";
+
     @BeforeEach
     public void setUp() {
         createUserDto = new CreateUserDto();
@@ -71,7 +80,6 @@ public class UserServiceTests {
         createUserDto.setAddressLine("Address");
         createUserDto.setZipCode("12345");
         createUserDto.setDateOfBirth(LocalDate.of(1990, 1, 1));
-        MockitoAnnotations.openMocks(this);
 
         loginUserDto = new LoginUserDto();
         loginUserDto.setEmail(createUserDto.getEmail());
@@ -103,7 +111,6 @@ public class UserServiceTests {
 
     @Test
     public void testEnableUser() {
-        String token = "token";
         when(confirmationTokenService.confirmToken(token)).thenReturn(1L);
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(new User()));
         userService.enableUser(token);
@@ -111,7 +118,6 @@ public class UserServiceTests {
 
     @Test
     public void testEnableUserNotFound() {
-        String token = "token";
         when(confirmationTokenService.confirmToken(token)).thenReturn(1L);
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.enableUser(token));
@@ -132,10 +138,10 @@ public class UserServiceTests {
         user.setPassword("password");
         when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(user);
         when(authenticationManager.authenticate(any())).thenReturn(null);
-        when(jwtService.generateToken(user)).thenReturn("token");
-        String token = userService.loginUser(loginUserDto);
-        Assertions.assertNotNull(token);
-        Assertions.assertEquals("token", token);
+        when(jwtService.generateToken(user)).thenReturn(token);
+        String dbToken = userService.loginUser(loginUserDto);
+        Assertions.assertNotNull(dbToken);
+        Assertions.assertEquals(token, dbToken);
     }
 
     @Test
@@ -147,16 +153,14 @@ public class UserServiceTests {
     @Test
     public void testUpdateUser() {
         User user = new User();
-        String userEmail = "test@mail.com";
-        when(userRepository.findByEmail(userEmail)).thenReturn(user);
-        userService.updateUser(updateUserDto, userEmail);
+        when(userRepository.findByEmail(getEmail)).thenReturn(user);
+        userService.updateUser(updateUserDto, getEmail);
     }
 
     @Test
     public void testUpdateUserNotFound() {
-        String userEmail = "test@mail.com";
-        when(userRepository.findByEmail(userEmail)).thenReturn(null);
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.updateUser(updateUserDto, userEmail));
+        when(userRepository.findByEmail(getEmail)).thenReturn(null);
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.updateUser(updateUserDto, getEmail));
     }
 
     @Test
@@ -193,34 +197,30 @@ public class UserServiceTests {
 
     @Test
     public void testGetPatientByEmail() {
-        String email = "test@mail.com";
         User user = new User();
         user.setUserType(UserType.PATIENT);
-        when(userRepository.findPatientByEmail(email)).thenReturn(java.util.Optional.of(user));
-        Assertions.assertEquals(user, userService.getPatientByEmail(email));
+        when(userRepository.findPatientByEmail(getEmail)).thenReturn(java.util.Optional.of(user));
+        Assertions.assertEquals(user, userService.getPatientByEmail(getEmail));
     }
 
     @Test
     public void testGetPatientByEmailNotFound() {
-        String email = "test@mail.com";
-        when(userRepository.findPatientByEmail(email)).thenReturn(java.util.Optional.empty());
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getPatientByEmail(email));
+        when(userRepository.findPatientByEmail(getEmail)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getPatientByEmail(getEmail));
     }
 
     @Test
     public void testGetDoctorByEmail() {
-        String email = "test@mail.com";
         User user = new User();
         user.setUserType(UserType.DOCTOR);
-        when(userRepository.findDoctorByEmail(email)).thenReturn(java.util.Optional.of(user));
-        Assertions.assertEquals(user, userService.getDoctorByEmail(email));
+        when(userRepository.findDoctorByEmail(getEmail)).thenReturn(java.util.Optional.of(user));
+        Assertions.assertEquals(user, userService.getDoctorByEmail(getEmail));
     }
 
     @Test
     public void testGetDoctorByEmailNotFound() {
-        String email = "test@mail.com";
-        when(userRepository.findDoctorByEmail(email)).thenReturn(java.util.Optional.empty());
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getDoctorByEmail(email));
+        when(userRepository.findDoctorByEmail(getEmail)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getDoctorByEmail(getEmail));
     }
 
     @Test
