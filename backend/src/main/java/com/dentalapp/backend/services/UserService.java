@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -44,7 +45,7 @@ public class UserService {
 
     @Transactional
     public void createUser(CreateUserDto createUserDto) {
-        if (userRepository.findByEmail(createUserDto.getEmail()) != null) {
+        if (userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException("User with email " + createUserDto.getEmail() + " already exists");
         }
         createUserDto.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
@@ -78,11 +79,11 @@ public class UserService {
     }
 
     public User getUser(String userEmail) {
-        User user = userRepository.findByEmail(userEmail);
-        if (user == null) {
+        Optional<User> user = userRepository.findByEmail(userEmail);
+        if (user.isEmpty()) {
             throw new UserNotFoundException("User with email " + userEmail + " does not exist");
         }
-        return user;
+        return user.orElse(null);
     }
 
     public User getPatientById(Long patientId) {

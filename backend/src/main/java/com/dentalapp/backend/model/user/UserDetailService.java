@@ -1,7 +1,5 @@
 package com.dentalapp.backend.model.user;
 
-import com.dentalapp.backend.model.user.entity.User;
-import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
 import com.dentalapp.backend.model.user.repostitory.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,10 +17,6 @@ public class UserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UserNotFoundException("User not found");
-        }
-        return user;
+        return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

@@ -54,7 +54,7 @@ public class AppointmentService {
     }
 
     @Transactional
-    public Appointment createAppointment(CreateAppointmentDto createAppointmentDto) {
+    public void createAppointment(CreateAppointmentDto createAppointmentDto) {
         User patient = userService.getPatientById(createAppointmentDto.getPatientId());
         User doctor = userService.getDoctorById(createAppointmentDto.getDoctorId());
         List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate().toString());
@@ -66,7 +66,7 @@ public class AppointmentService {
         createAppointmentDto.setPatient(patient);
         createAppointmentDto.setDoctor(doctor);
         Appointment appointment = AppointmentMapper.toAppointment(createAppointmentDto);
-        return appointmentRepository.save(appointment);
+        appointmentRepository.save(appointment);
     }
 
     @Transactional

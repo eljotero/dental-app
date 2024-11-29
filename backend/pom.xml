@@ -81,6 +81,22 @@
             <artifactId>spring-boot-starter-mail</artifactId>
             <version>3.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>5.3.0</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <build>
@@ -89,6 +105,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>3.3.5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <argLine>-Dspring.profiles.active=dev</argLine>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -100,6 +124,7 @@
                         <exclude>**/BackendApplication.class</exclude>
                         <exclude>**/exceptions/*</exclude>
                         <exclude>**/enums/*</exclude>
+                        <exclude>**/model/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
