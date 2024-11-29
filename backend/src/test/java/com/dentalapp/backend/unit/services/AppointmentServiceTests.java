@@ -17,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,7 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class AppointmentServiceTests {
 
     @Mock
@@ -79,6 +76,7 @@ public class AppointmentServiceTests {
         updateAppointmentDto.setDescription("test");
         appointment.setAppointmentDate(LocalDateTime.of(2021, 1, 1, 12, 0));
         appointment.setDoctor(doctor);
+        appointment.setPatient(patient);
     }
 
     @Test
@@ -131,7 +129,6 @@ public class AppointmentServiceTests {
         when(userService.getPatientById(patient.getUserId())).thenReturn(patient);
         when(userService.getDoctorById(doctor.getUserId())).thenReturn(doctor);
         when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate().toString())).thenReturn(List.of());
-        when(appointmentRepository.save(appointment)).thenReturn(appointment);
         appointmentService.createAppointment(createAppointmentDto);
         verify(appointmentRepository).save(any(Appointment.class));
     }
@@ -157,7 +154,6 @@ public class AppointmentServiceTests {
         appointment1.setAppointmentDate(LocalDateTime.of(2021, 1, 1, 12, 0));
         appointment1.setAppointmentId(2L);
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
-        when(userService.getDoctorById(doctor.getUserId())).thenReturn(doctor);
         when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), updateAppointmentDto.getAppointmentDate().toString())).thenReturn(appointments);
         Assertions.assertThrows(IllegalAppointmentDate.class, () -> appointmentService.updateAppointment(updateAppointmentDto, 1L));
     }

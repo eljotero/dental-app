@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -102,7 +103,7 @@ public class UserServiceTests {
 
     @Test
     public void testCreateUser() {
-        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(null);
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(createUserDto.getPassword())).thenReturn("password");
         when(passwordEncoder.encode(createUserDto.getPersonalIdNumber())).thenReturn("123456789");
         when(confirmationTokenService.saveConfirmationToken(any())).thenReturn("token");
@@ -125,7 +126,7 @@ public class UserServiceTests {
 
     @Test
     public void testCreateUserAlreadyExists() {
-        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(new User());
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(new User()));
         when(passwordEncoder.encode(createUserDto.getPassword())).thenReturn("password");
         when(passwordEncoder.encode(createUserDto.getPersonalIdNumber())).thenReturn("123456789");
         Assertions.assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(createUserDto));
@@ -136,7 +137,7 @@ public class UserServiceTests {
         User user = new User();
         user.setEmail(createUserDto.getEmail());
         user.setPassword("password");
-        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(user);
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(user));
         when(authenticationManager.authenticate(any())).thenReturn(null);
         when(jwtService.generateToken(user)).thenReturn(token);
         String dbToken = userService.loginUser(loginUserDto);
@@ -146,20 +147,20 @@ public class UserServiceTests {
 
     @Test
     public void testLoginUserDoesNotExist() {
-        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(null);
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.loginUser(loginUserDto));
     }
 
     @Test
     public void testUpdateUser() {
         User user = new User();
-        when(userRepository.findByEmail(getEmail)).thenReturn(user);
+        when(userRepository.findByEmail(getEmail)).thenReturn(Optional.of(user));
         userService.updateUser(updateUserDto, getEmail);
     }
 
     @Test
     public void testUpdateUserNotFound() {
-        when(userRepository.findByEmail(getEmail)).thenReturn(null);
+        when(userRepository.findByEmail(getEmail)).thenReturn(Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.updateUser(updateUserDto, getEmail));
     }
 

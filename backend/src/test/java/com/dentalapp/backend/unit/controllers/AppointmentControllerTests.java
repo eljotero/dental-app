@@ -133,10 +133,9 @@ public class AppointmentControllerTests {
         createAppointmentDto.setPatientId(2L);
         createAppointmentDto.setAppointmentDate(LocalDateTime.of(2021, 1, 1, 12, 0));
         createAppointmentDto.setAppointmentDuration(LocalTime.of(1, 0));
-        when(appointmentService.createAppointment(createAppointmentDto)).thenReturn(appointment);
         ResponseEntity<?> response = appointmentController.createAppointment(createAppointmentDto);
         verify(appointmentService).createAppointment(createAppointmentDto);
-        Assertions.assertEquals(ResponseEntity.ok(appointment), response);
+        Assertions.assertEquals(ResponseEntity.ok("Appointment created"), response);
     }
 
     @Test

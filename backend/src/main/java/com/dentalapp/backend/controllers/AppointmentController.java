@@ -59,7 +59,8 @@ public class AppointmentController {
 
     @PostMapping("/appointments")
     public ResponseEntity<?> createAppointment(@RequestBody CreateAppointmentDto createAppointmentDto) {
-        return ResponseEntity.ok(appointmentService.createAppointment(createAppointmentDto));
+        appointmentService.createAppointment(createAppointmentDto);
+        return ResponseEntity.ok("Appointment created");
     }
 
     @PatchMapping("/appointments/{id}")
