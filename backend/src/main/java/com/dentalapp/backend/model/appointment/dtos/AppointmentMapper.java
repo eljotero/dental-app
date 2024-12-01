@@ -8,7 +8,8 @@ public class AppointmentMapper {
         appointment.setPatient(createAppointmentDto.getPatient());
         appointment.setDoctor(createAppointmentDto.getDoctor());
         appointment.setAppointmentDate(createAppointmentDto.getAppointmentDate());
-        appointment.setAppointmentDuration(createAppointmentDto.getAppointmentDuration());
+        appointment.setAppointmentStartTime(createAppointmentDto.getAppointmentStartTime());
+        appointment.setAppointmentEndTime(createAppointmentDto.getAppointmentEndTime());
         return appointment;
     }
 }
