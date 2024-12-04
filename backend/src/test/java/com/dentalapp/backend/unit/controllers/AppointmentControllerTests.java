@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
@@ -57,8 +57,9 @@ public class AppointmentControllerTests {
 
         appointment = new Appointment();
         appointment.setAppointmentId(1L);
-        appointment.setAppointmentDate(LocalDateTime.of(2021, 1, 1, 12, 0));
-        appointment.setAppointmentDuration(LocalTime.of(1, 0));
+        appointment.setAppointmentDate(LocalDate.of(2021, 1, 1));
+        appointment.setAppointmentStartTime(LocalTime.of(12, 0));
+        appointment.setAppointmentEndTime(LocalTime.of(13, 0));
         appointment.setDoctor(doctor);
         appointment.setPatient(patient);
     }
@@ -131,8 +132,9 @@ public class AppointmentControllerTests {
         CreateAppointmentDto createAppointmentDto = new CreateAppointmentDto();
         createAppointmentDto.setDoctorId(1L);
         createAppointmentDto.setPatientId(2L);
-        createAppointmentDto.setAppointmentDate(LocalDateTime.of(2021, 1, 1, 12, 0));
-        createAppointmentDto.setAppointmentDuration(LocalTime.of(1, 0));
+        createAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
+        createAppointmentDto.setAppointmentStartTime(LocalTime.of(12, 0));
+        createAppointmentDto.setAppointmentEndTime(LocalTime.of(13, 0));
         ResponseEntity<?> response = appointmentController.createAppointment(createAppointmentDto);
         verify(appointmentService).createAppointment(createAppointmentDto);
         Assertions.assertEquals(ResponseEntity.ok("Appointment created"), response);
@@ -142,7 +144,9 @@ public class AppointmentControllerTests {
     public void testUpdateAppointment() {
         UpdateAppointmentDto updateAppointmentDto = new UpdateAppointmentDto();
         updateAppointmentDto.setDoctorId(1L);
-        updateAppointmentDto.setAppointmentDate(LocalDateTime.of(2021, 1, 1, 12, 0));
+        updateAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
+        updateAppointmentDto.setAppointmentStartTime(LocalTime.of(12, 0));
+        updateAppointmentDto.setAppointmentEndTime(LocalTime.of(13, 0));
         updateAppointmentDto.setDescription("test");
         ResponseEntity<?> response = appointmentController.updateAppointment(1L, updateAppointmentDto);
         verify(appointmentService).updateAppointment(updateAppointmentDto, 1L);
@@ -155,12 +159,13 @@ public class AppointmentControllerTests {
         createAppointmentDto.setPatientId(null);
         createAppointmentDto.setDoctorId(null);
         createAppointmentDto.setAppointmentDate(null);
-        createAppointmentDto.setAppointmentDuration(null);
+        createAppointmentDto.setAppointmentStartTime(null);
+        createAppointmentDto.setAppointmentEndTime(null);
         Set<ConstraintViolation<CreateAppointmentDto>> violations = validator.validate(createAppointmentDto);
-        Assertions.assertEquals(4, violations.size());
-        createAppointmentDto.setAppointmentDate(LocalDateTime.of(2024, 12, 1, 12, 0));
+        Assertions.assertEquals(6, violations.size());
+        createAppointmentDto.setAppointmentDate(LocalDate.of(3000, 12, 1));
         violations = validator.validate(createAppointmentDto);
-        Assertions.assertEquals(4, violations.size());
+        Assertions.assertEquals(6, violations.size());
     }
 
 

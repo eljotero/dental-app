@@ -11,6 +11,8 @@ import com.dentalapp.backend.model.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,9 +23,12 @@ public class AppointmentService {
 
     private final UserService userService;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService) {
+    private final AvailabilityService availabilityService;
+
+    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService) {
         this.appointmentRepository = appointmentRepository;
         this.userService = userService;
+        this.availabilityService = availabilityService;
     }
 
     public List<Appointment> getAppointments() {
@@ -57,12 +62,12 @@ public class AppointmentService {
     public void createAppointment(CreateAppointmentDto createAppointmentDto) {
         User patient = userService.getPatientById(createAppointmentDto.getPatientId());
         User doctor = userService.getDoctorById(createAppointmentDto.getDoctorId());
-        List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate().toString());
-        appointments.forEach(a -> {
-            if (a.getAppointmentDate().equals(createAppointmentDto.getAppointmentDate())) {
-                throw new IllegalAppointmentDate("Doctor already has an appointment at this time");
-            }
-        });
+        if (hasDoctorAppointmentAtTime(doctor, createAppointmentDto.getAppointmentDate(), createAppointmentDto.getAppointmentStartTime(), createAppointmentDto.getAppointmentEndTime())) {
+            throw new IllegalAppointmentDate("Doctor already has an appointment at this time");
+        }
+        if (!availabilityService.isDoctorAvailable(doctor, createAppointmentDto.getAppointmentDate(), createAppointmentDto.getAppointmentStartTime(), createAppointmentDto.getAppointmentEndTime())) {
+            throw new IllegalAppointmentDate("Doctor is not available at this time");
+        }
         createAppointmentDto.setPatient(patient);
         createAppointmentDto.setDoctor(doctor);
         Appointment appointment = AppointmentMapper.toAppointment(createAppointmentDto);
@@ -95,5 +100,15 @@ public class AppointmentService {
         Appointment appointment = getAppointmentById(appointmentId);
         appointment.setIsCancelled(true);
         appointmentRepository.save(appointment);
+    }
+
+    private boolean hasDoctorAppointmentAtTime(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), date.toString());
+        for (Appointment appointment : appointments) {
+            if (appointment.getAppointmentStartTime().isBefore(endTime) && appointment.getAppointmentEndTime().isAfter(startTime)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

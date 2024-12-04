@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +17,11 @@ public class UpdateAppointmentDto {
     private Long doctorId;
 
     @Past(message = "Date of appointment must be in the past")
-    private LocalDateTime appointmentDate;
+    private LocalDate appointmentDate;
+
+    private LocalTime appointmentStartTime;
+
+    private LocalTime appointmentEndTime;
 
     private String description;
 
