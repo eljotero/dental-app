@@ -3,6 +3,7 @@ package com.dentalapp.backend.unit.controllers;
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.AppointmentController;
 import com.dentalapp.backend.model.appointment.dtos.CreateAppointmentDto;
+import com.dentalapp.backend.model.appointment.dtos.UpdateAppointmentDto;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
@@ -139,16 +140,18 @@ public class AppointmentControllerTests {
         Assertions.assertEquals(ResponseEntity.ok("Appointment created"), response);
     }
 
-//    @Test
-//    public void testUpdateAppointment() {
-//        UpdateAppointmentDto updateAppointmentDto = new UpdateAppointmentDto();
-//        updateAppointmentDto.setDoctorId(1L);
-//        updateAppointmentDto.setAppointmentDate(LocalDateTime.of(2021, 1, 1, 12, 0));
-//        updateAppointmentDto.setDescription("test");
-//        ResponseEntity<?> response = appointmentController.updateAppointment(1L, updateAppointmentDto);
-//        verify(appointmentService).updateAppointment(updateAppointmentDto, 1L);
-//        Assertions.assertEquals(ResponseEntity.ok("Appointment updated"), response);
-//    }
+    @Test
+    public void testUpdateAppointment() {
+        UpdateAppointmentDto updateAppointmentDto = new UpdateAppointmentDto();
+        updateAppointmentDto.setDoctorId(1L);
+        updateAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
+        updateAppointmentDto.setAppointmentStartTime(LocalTime.of(12, 0));
+        updateAppointmentDto.setAppointmentEndTime(LocalTime.of(13, 0));
+        updateAppointmentDto.setDescription("test");
+        ResponseEntity<?> response = appointmentController.updateAppointment(1L, updateAppointmentDto);
+        verify(appointmentService).updateAppointment(updateAppointmentDto, 1L);
+        Assertions.assertEquals(ResponseEntity.ok("Appointment updated"), response);
+    }
 
     @Test
     public void testCreateAppointmentValidation() {

@@ -2,6 +2,7 @@ package com.dentalapp.backend.configuration;
 
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
+import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
 import com.dentalapp.backend.model.token.expceptions.InvalidTokenException;
 import com.dentalapp.backend.model.token.expceptions.TokenAlreadyUsedException;
 import com.dentalapp.backend.model.token.expceptions.TokenExpiredException;
@@ -68,5 +69,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = TokenExpiredException.class)
     public ResponseEntity<?> handleTokenExpiredException(TokenExpiredException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = AvailabilityAlreadyExistsException.class)
+    public ResponseEntity<?> handleAvailabilityAlreadyExistsException(AvailabilityAlreadyExistsException e) {
+        return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 }

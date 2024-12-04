@@ -5,12 +5,12 @@ import com.dentalapp.backend.model.availability.dtos.AvailabilityMapper;
 import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
 import com.dentalapp.backend.model.availability.entity.Availability;
+import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
 import com.dentalapp.backend.model.availability.repository.AvailabilityRepository;
 import com.dentalapp.backend.model.user.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -32,6 +32,8 @@ public class AvailabilityService {
             if (!isAvailabilityExists(availabilityDayDto, doctor)) {
                 Availability availability = AvailabilityMapper.toAvailability(availabilityDayDto);
                 availabilityRepository.save(availability);
+            } else {
+                throw new AvailabilityAlreadyExistsException("Availability already exists");
             }
         }
     }
@@ -47,6 +49,6 @@ public class AvailabilityService {
     }
 
     private boolean isAvailabilityExists(AvailabilityDayDto availabilityDayDto, User doctor) {
-        return availabilityRepository.isDeclared(doctor, availabilityDayDto.getDate(), availabilityDayDto.getStartTime(), availabilityDayDto.getEndTime()) && availabilityRepository.hasDoctorBrake(doctor, availabilityDayDto.getDate(), availabilityDayDto.getBrakeTimeStart(), availabilityDayDto.getBrakeTimeEnd());
+        return availabilityRepository.isDeclared(doctor, availabilityDayDto.getDate(), availabilityDayDto.getStartTime(), availabilityDayDto.getEndTime()) || availabilityRepository.hasDoctorBrake(doctor, availabilityDayDto.getDate(), availabilityDayDto.getBrakeTimeStart(), availabilityDayDto.getBrakeTimeEnd());
     }
 }
