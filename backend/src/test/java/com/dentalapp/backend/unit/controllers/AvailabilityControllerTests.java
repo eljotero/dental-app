@@ -73,11 +73,11 @@ public class AvailabilityControllerTests {
         CreateAvailabilityDto createAvailabilityDto = new CreateAvailabilityDto();
         AvailabilityDayDto availabilityDayDto = new AvailabilityDayDto();
         availabilityDayDto.setDate(LocalDate.of(2021, 10, 10));
-        availabilityDayDto.setStartTime(LocalTime.of(9, 0));
-        availabilityDayDto.setEndTime(LocalTime.of(17, 0));
+        availabilityDayDto.setStartTime("09:00");
+        availabilityDayDto.setEndTime("17:00");
         createAvailabilityDto.setAvailabilityDays(List.of(availabilityDayDto));
         when(jwtService.extractEmail("token")).thenReturn(email);
-        ResponseEntity<?> response = availabilityController.addDoctorAvailability(createAvailabilityDto, token);
+        ResponseEntity<?> response = availabilityController.addDoctorAvailability(token,createAvailabilityDto);
         verify(availabilityService).addDoctorAvailability(createAvailabilityDto, email);
         Assertions.assertEquals(ResponseEntity.ok("Availability added successfully"), response);
     }

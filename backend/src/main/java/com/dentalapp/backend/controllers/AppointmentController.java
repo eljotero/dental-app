@@ -63,8 +63,7 @@ public class AppointmentController {
 
     @PostMapping("/add")
     public ResponseEntity<?> createAppointment(@RequestHeader("Authorization") String token, @Valid @RequestBody CreateAppointmentDto createAppointmentDto) {
-        String userEmail = jwtService.extractEmail(token.substring(7));
-        appointmentService.createAppointment(createAppointmentDto, userEmail);
+        appointmentService.createAppointment(createAppointmentDto, jwtService.extractEmail(token.substring(7)));
         return ResponseEntity.ok("Appointment created");
     }
 

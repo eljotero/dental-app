@@ -51,8 +51,10 @@ public class AvailabilityServiceTests {
         createAvailabilityDto = new CreateAvailabilityDto();
         availabilityDayDto = new AvailabilityDayDto();
         availabilityDayDto.setDate(LocalDate.of(2021, 10, 10));
-        availabilityDayDto.setStartTime(LocalTime.of(9, 0));
-        availabilityDayDto.setEndTime(LocalTime.of(17, 0));
+        availabilityDayDto.setStartTime("08:00");
+        availabilityDayDto.setEndTime("16:00");
+        availabilityDayDto.setBrakeTimeStart("12:00");
+        availabilityDayDto.setBrakeTimeEnd("13:00");
         createAvailabilityDto.setAvailabilityDays(List.of(availabilityDayDto));
     }
 
@@ -66,14 +68,14 @@ public class AvailabilityServiceTests {
     @Test
     public void testAddDoctorAvailabilityAlreadyExists() {
         when(userService.getDoctorByEmail(email)).thenReturn(user);
-        when(availabilityRepository.isDeclared(user, availabilityDayDto.getDate(), availabilityDayDto.getStartTime(), availabilityDayDto.getEndTime())).thenReturn(true);
+        when(availabilityRepository.isDeclared(user, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getStartTime()), LocalTime.parse(availabilityDayDto.getEndTime()))).thenReturn(true);
         Assertions.assertThrows(AvailabilityAlreadyExistsException.class, () -> availabilityService.addDoctorAvailability(createAvailabilityDto, email));
     }
 
     @Test
     public void testAddDoctorAvailabilityDoctorHasAlreadyPlannedBreak() {
         when(userService.getDoctorByEmail(email)).thenReturn(user);
-        when(availabilityRepository.hasDoctorBrake(user, availabilityDayDto.getDate(), availabilityDayDto.getBrakeTimeStart(), availabilityDayDto.getBrakeTimeEnd())).thenReturn(true);
+        when(availabilityRepository.hasDoctorBrake(user, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getBrakeTimeStart()), LocalTime.parse(availabilityDayDto.getBrakeTimeEnd()))).thenReturn(true);
         Assertions.assertThrows(AvailabilityAlreadyExistsException.class, () -> availabilityService.addDoctorAvailability(createAvailabilityDto, email));
     }
 
@@ -82,5 +84,11 @@ public class AvailabilityServiceTests {
         when(userService.getDoctorByEmail(email)).thenReturn(user);
         when(availabilityRepository.findByDoctor(user)).thenReturn(List.of());
         Assertions.assertEquals(0, availabilityService.getDoctorAvailability(email).size());
+    }
+
+    @Test
+    public void testIsDoctorAvailable() {
+        when(availabilityRepository.isDeclared(user, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getStartTime()), LocalTime.parse(availabilityDayDto.getEndTime()))).thenReturn(true);
+        Assertions.assertTrue(availabilityService.isDoctorAvailable(user, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getStartTime()), LocalTime.parse(availabilityDayDto.getEndTime())));
     }
 }
