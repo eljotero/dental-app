@@ -8,7 +8,6 @@ import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundExc
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
 import com.dentalapp.backend.model.user.entity.User;
-import org.springframework.cglib.core.Local;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,7 +112,7 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
-    @Scheduled(cron = "0 04 19 * * *")
+    @Scheduled(cron = "0 0 8 * * *")
     public void getNonApprovedAppointments() {
         List<Appointment> appointmentList = appointmentRepository.findUnconfirmedAppointments();
         for (Appointment appointment : appointmentList) {

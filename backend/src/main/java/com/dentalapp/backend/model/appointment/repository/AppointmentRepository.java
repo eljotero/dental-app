@@ -22,6 +22,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("SELECT a FROM Appointment a WHERE a.doctor.userId = ?1 AND a.appointmentDate = ?2 AND a.isCancelled = false")
     List<Appointment> findAllByDoctorIdAndDate(Long doctorId, LocalDate date);
 
-    @Query("SELECT a FROM Appointment a WHERE a.isConfirmed = false AND FUNCTION('timestampdiff', DAY, CURRENT_DATE, a.appointmentDate) <= 5")
+    @Query("SELECT a FROM Appointment a WHERE a.isConfirmed = false AND FUNCTION('timestampdiff', DAY, CURRENT_DATE, a.appointmentDate) <= 1")
     List<Appointment> findUnconfirmedAppointments();
 }
