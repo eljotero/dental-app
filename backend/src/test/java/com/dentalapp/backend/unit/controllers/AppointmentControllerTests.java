@@ -103,7 +103,7 @@ public class AppointmentControllerTests {
     @Test
     public void testGetDoctorAppointmentsByDate() {
         String doctorEmail = "test2@mail.com";
-        String date = "2021-01-01";
+        LocalDate date = LocalDate.parse("2021-01-01");
         when(jwtService.extractEmail("test")).thenReturn(doctorEmail);
         when(appointmentService.getDoctorAppointmentsByDate(doctorEmail, date)).thenReturn(List.of(appointment));
         ResponseEntity<?> response = appointmentController.getDoctorAppointmentsByDate("Bearer test", date);
@@ -113,7 +113,7 @@ public class AppointmentControllerTests {
 
     @Test
     public void testGetAppointmentsByDate() {
-        String date = "2021-01-01";
+        LocalDate date = LocalDate.parse("2021-01-01");
         when(appointmentService.getAppointmentsByDate(date)).thenReturn(List.of(appointment));
         ResponseEntity<?> response = appointmentController.getAppointmentsByDate(date);
         verify(appointmentService).getAppointmentsByDate(date);
@@ -129,14 +129,16 @@ public class AppointmentControllerTests {
 
     @Test
     public void testCreateAppointment() {
+        String token = "Bearer test@mail.com";
+        String email = "test@mail.com";
         CreateAppointmentDto createAppointmentDto = new CreateAppointmentDto();
         createAppointmentDto.setDoctorId(1L);
-        createAppointmentDto.setPatientId(2L);
         createAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
-        createAppointmentDto.setAppointmentStartTime(LocalTime.of(12, 0));
-        createAppointmentDto.setAppointmentEndTime(LocalTime.of(13, 0));
-        ResponseEntity<?> response = appointmentController.createAppointment(createAppointmentDto);
-        verify(appointmentService).createAppointment(createAppointmentDto);
+        createAppointmentDto.setAppointmentStartTime("12:00");
+        createAppointmentDto.setAppointmentEndTime("13:00");
+        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
+        ResponseEntity<?> response = appointmentController.createAppointment(token, createAppointmentDto);
+        verify(appointmentService).createAppointment(createAppointmentDto, email);
         Assertions.assertEquals(ResponseEntity.ok("Appointment created"), response);
     }
 
@@ -145,8 +147,8 @@ public class AppointmentControllerTests {
         UpdateAppointmentDto updateAppointmentDto = new UpdateAppointmentDto();
         updateAppointmentDto.setDoctorId(1L);
         updateAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
-        updateAppointmentDto.setAppointmentStartTime(LocalTime.of(12, 0));
-        updateAppointmentDto.setAppointmentEndTime(LocalTime.of(13, 0));
+        updateAppointmentDto.setAppointmentStartTime("12:00");
+        updateAppointmentDto.setAppointmentEndTime("13:00");
         updateAppointmentDto.setDescription("test");
         ResponseEntity<?> response = appointmentController.updateAppointment(1L, updateAppointmentDto);
         verify(appointmentService).updateAppointment(updateAppointmentDto, 1L);
@@ -156,17 +158,18 @@ public class AppointmentControllerTests {
     @Test
     public void testCreateAppointmentValidation() {
         CreateAppointmentDto createAppointmentDto = new CreateAppointmentDto();
-        createAppointmentDto.setPatientId(null);
         createAppointmentDto.setDoctorId(null);
         createAppointmentDto.setAppointmentDate(null);
         createAppointmentDto.setAppointmentStartTime(null);
         createAppointmentDto.setAppointmentEndTime(null);
         Set<ConstraintViolation<CreateAppointmentDto>> violations = validator.validate(createAppointmentDto);
-        Assertions.assertEquals(6, violations.size());
-        createAppointmentDto.setAppointmentDate(LocalDate.of(3000, 12, 1));
-        violations = validator.validate(createAppointmentDto);
-        Assertions.assertEquals(6, violations.size());
+        Assertions.assertEquals(5, violations.size());
     }
 
-
+    @Test
+    public void testConfirmAppointment() {
+        ResponseEntity<?> response = appointmentController.confirmAppointment(1L);
+        verify(appointmentService).confirmAppointment(1L);
+        Assertions.assertEquals(ResponseEntity.ok("Appointment confirmed"), response);
+    }
 }

@@ -10,6 +10,7 @@ import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.AvailabilityService;
+import com.dentalapp.backend.services.EmailSenderService;
 import com.dentalapp.backend.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AppointmentServiceTests {
@@ -38,6 +37,9 @@ public class AppointmentServiceTests {
 
     @Mock
     private AvailabilityService availabilityService;
+
+    @Mock
+    private EmailSenderService emailSenderService;
 
     @InjectMocks
     private AppointmentService appointmentService;
@@ -56,6 +58,8 @@ public class AppointmentServiceTests {
 
     UpdateAppointmentDto updateAppointmentDto;
 
+    String patientEmail;
+
     @BeforeEach
     public void setUp() {
         appointment = new Appointment();
@@ -69,21 +73,25 @@ public class AppointmentServiceTests {
         doctor.setUserId(2L);
         doctor.setUserType(UserType.DOCTOR);
         doctor.setEmail("test2@mail.com");
+        doctor.setFirstName("test");
+        doctor.setLastName("test");
         createAppointmentDto = new CreateAppointmentDto();
-        createAppointmentDto.setPatientId(patient.getUserId());
         createAppointmentDto.setDoctorId(doctor.getUserId());
         createAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
-        createAppointmentDto.setAppointmentStartTime(LocalTime.of(12, 0));
-        createAppointmentDto.setAppointmentEndTime(LocalTime.of(13, 0));
+        createAppointmentDto.setAppointmentStartTime("12:00");
+        createAppointmentDto.setAppointmentEndTime("13:00");
         updateAppointmentDto = new UpdateAppointmentDto();
         updateAppointmentDto.setDoctorId(doctor.getUserId());
         updateAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
         updateAppointmentDto.setDescription("test");
+        updateAppointmentDto.setAppointmentStartTime("12:00");
+        updateAppointmentDto.setAppointmentEndTime("13:00");
         appointment.setAppointmentDate(LocalDate.of(2021, 1, 1));
         appointment.setAppointmentStartTime(LocalTime.of(12, 0));
         appointment.setAppointmentEndTime(LocalTime.of(13, 0));
         appointment.setDoctor(doctor);
         appointment.setPatient(patient);
+        patientEmail = "test@mail.com";
     }
 
     @Test
@@ -108,9 +116,10 @@ public class AppointmentServiceTests {
 
     @Test
     public void testGetDoctorAppointmentsByDate() {
+        LocalDate date = LocalDate.of(2021, 1, 1);
         when(userService.getDoctorByEmail(doctor.getEmail())).thenReturn(doctor);
-        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), "2021-01-01")).thenReturn(appointments);
-        Assertions.assertEquals(appointments, appointmentService.getDoctorAppointmentsByDate(doctor.getEmail(), "2021-01-01"));
+        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), date)).thenReturn(appointments);
+        Assertions.assertEquals(appointments, appointmentService.getDoctorAppointmentsByDate(doctor.getEmail(), date));
     }
 
     @Test
@@ -127,35 +136,36 @@ public class AppointmentServiceTests {
 
     @Test
     public void testGetAppointmentsByDate() {
-        when(appointmentRepository.findByDate("2021-01-01")).thenReturn(appointments);
-        Assertions.assertEquals(appointments, appointmentService.getAppointmentsByDate("2021-01-01"));
+        LocalDate date = LocalDate.of(2021, 1, 1);
+        when(appointmentRepository.findByDate(date)).thenReturn(appointments);
+        Assertions.assertEquals(appointments, appointmentService.getAppointmentsByDate(date));
     }
 
     @Test
     public void testCreateAppointment() {
-        when(userService.getPatientById(patient.getUserId())).thenReturn(patient);
+        when(userService.getPatientByEmail(patientEmail)).thenReturn(patient);
         when(userService.getDoctorById(doctor.getUserId())).thenReturn(doctor);
-        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate().toString())).thenReturn(List.of());
-        when(availabilityService.isDoctorAvailable(doctor, createAppointmentDto.getAppointmentDate(), createAppointmentDto.getAppointmentStartTime(), createAppointmentDto.getAppointmentEndTime())).thenReturn(true);
-        appointmentService.createAppointment(createAppointmentDto);
+        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate())).thenReturn(List.of());
+        when(availabilityService.isDoctorAvailable(doctor, createAppointmentDto.getAppointmentDate(), LocalTime.parse(createAppointmentDto.getAppointmentStartTime()), LocalTime.parse(createAppointmentDto.getAppointmentEndTime()))).thenReturn(true);
+        appointmentService.createAppointment(createAppointmentDto, patientEmail);
         verify(appointmentRepository).save(any(Appointment.class));
     }
 
     @Test
     public void testCreateAppointmentDoctorHasAppointment() {
-        when(userService.getPatientById(patient.getUserId())).thenReturn(patient);
+        when(userService.getPatientByEmail(patientEmail)).thenReturn(patient);
         when(userService.getDoctorById(doctor.getUserId())).thenReturn(doctor);
-        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate().toString())).thenReturn(appointments);
-        Assertions.assertThrows(IllegalAppointmentDate.class, () -> appointmentService.createAppointment(createAppointmentDto));
+        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate())).thenReturn(appointments);
+        Assertions.assertThrows(IllegalAppointmentDate.class, () -> appointmentService.createAppointment(createAppointmentDto, patientEmail));
     }
 
     @Test
     public void testCreateAppointmentDoctorIsNotAvailable() {
-        when(userService.getPatientById(patient.getUserId())).thenReturn(patient);
+        when(userService.getPatientByEmail(patientEmail)).thenReturn(patient);
         when(userService.getDoctorById(doctor.getUserId())).thenReturn(doctor);
-        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate().toString())).thenReturn(List.of());
-        when(availabilityService.isDoctorAvailable(doctor, createAppointmentDto.getAppointmentDate(), createAppointmentDto.getAppointmentStartTime(), createAppointmentDto.getAppointmentEndTime())).thenReturn(false);
-        Assertions.assertThrows(IllegalAppointmentDate.class, () -> appointmentService.createAppointment(createAppointmentDto));
+        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), createAppointmentDto.getAppointmentDate())).thenReturn(List.of());
+        when(availabilityService.isDoctorAvailable(doctor, createAppointmentDto.getAppointmentDate(), LocalTime.parse(createAppointmentDto.getAppointmentStartTime()), LocalTime.parse(createAppointmentDto.getAppointmentEndTime()))).thenReturn(false);
+        Assertions.assertThrows(IllegalAppointmentDate.class, () -> appointmentService.createAppointment(createAppointmentDto, patientEmail));
     }
 
     @Test
@@ -173,7 +183,7 @@ public class AppointmentServiceTests {
         appointment1.setAppointmentEndTime(LocalTime.of(13, 0));
         appointment1.setAppointmentId(2L);
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
-        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), updateAppointmentDto.getAppointmentDate().toString())).thenReturn(appointments);
+        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), updateAppointmentDto.getAppointmentDate())).thenReturn(appointments);
         Assertions.assertThrows(IllegalAppointmentDate.class, () -> appointmentService.updateAppointment(updateAppointmentDto, 1L));
     }
 
@@ -182,6 +192,20 @@ public class AppointmentServiceTests {
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
         appointmentService.cancelAppointment(1L);
         Assertions.assertEquals(true, appointment.getIsCancelled());
+    }
+
+    @Test
+    public void testGetNonApprovedAppointments() {
+        when(appointmentRepository.findUnconfirmedAppointments()).thenReturn(List.of(appointment));
+        appointmentService.getNonApprovedAppointments();
+        verify(appointmentRepository).findUnconfirmedAppointments();
+    }
+
+    @Test
+    public void testConfirmAppointment() {
+        when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
+        appointmentService.confirmAppointment(1L);
+        Assertions.assertEquals(true, appointment.getIsConfirmed());
     }
 
 }

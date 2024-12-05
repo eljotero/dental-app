@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -19,9 +18,9 @@ public class UpdateAppointmentDto {
     @Past(message = "Date of appointment must be in the past")
     private LocalDate appointmentDate;
 
-    private LocalTime appointmentStartTime;
+    private String appointmentStartTime;
 
-    private LocalTime appointmentEndTime;
+    private String appointmentEndTime;
 
     private String description;
 

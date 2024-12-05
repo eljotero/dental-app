@@ -8,6 +8,7 @@ import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundExc
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
 import com.dentalapp.backend.model.user.entity.User;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +26,13 @@ public class AppointmentService {
 
     private final AvailabilityService availabilityService;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService) {
+    private final EmailSenderService emailSenderService;
+
+    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService) {
         this.appointmentRepository = appointmentRepository;
         this.userService = userService;
         this.availabilityService = availabilityService;
+        this.emailSenderService = emailSenderService;
     }
 
     public List<Appointment> getAppointments() {
@@ -45,7 +49,7 @@ public class AppointmentService {
         return appointmentRepository.findAllByDoctorId(doctorId);
     }
 
-    public List<Appointment> getDoctorAppointmentsByDate(String doctorEmail, String date) {
+    public List<Appointment> getDoctorAppointmentsByDate(String doctorEmail, LocalDate date) {
         Long doctorId = userService.getDoctorByEmail(doctorEmail).getUserId();
         return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date);
     }
@@ -54,18 +58,18 @@ public class AppointmentService {
         return appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
     }
 
-    public List<Appointment> getAppointmentsByDate(String date) {
+    public List<Appointment> getAppointmentsByDate(LocalDate date) {
         return appointmentRepository.findByDate(date);
     }
 
     @Transactional
-    public void createAppointment(CreateAppointmentDto createAppointmentDto) {
-        User patient = userService.getPatientById(createAppointmentDto.getPatientId());
+    public void createAppointment(CreateAppointmentDto createAppointmentDto, String patientEmail) {
+        User patient = userService.getPatientByEmail(patientEmail);
         User doctor = userService.getDoctorById(createAppointmentDto.getDoctorId());
-        if (hasDoctorAppointmentAtTime(doctor, createAppointmentDto.getAppointmentDate(), createAppointmentDto.getAppointmentStartTime(), createAppointmentDto.getAppointmentEndTime())) {
+        if (hasDoctorAppointmentAtTime(doctor, createAppointmentDto.getAppointmentDate(), LocalTime.parse(createAppointmentDto.getAppointmentStartTime()), LocalTime.parse(createAppointmentDto.getAppointmentEndTime()))) {
             throw new IllegalAppointmentDate("Doctor already has an appointment at this time");
         }
-        if (!availabilityService.isDoctorAvailable(doctor, createAppointmentDto.getAppointmentDate(), createAppointmentDto.getAppointmentStartTime(), createAppointmentDto.getAppointmentEndTime())) {
+        if (!availabilityService.isDoctorAvailable(doctor, createAppointmentDto.getAppointmentDate(), LocalTime.parse(createAppointmentDto.getAppointmentStartTime()), LocalTime.parse(createAppointmentDto.getAppointmentEndTime()))) {
             throw new IllegalAppointmentDate("Doctor is not available at this time");
         }
         createAppointmentDto.setPatient(patient);
@@ -78,7 +82,7 @@ public class AppointmentService {
     public void updateAppointment(UpdateAppointmentDto updateAppointmentDto, Long appointmentId) {
         Appointment appointment = getAppointmentById(appointmentId);
         if (updateAppointmentDto.getDoctorId() != null) {
-            List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndDate(appointment.getDoctor().getUserId(), appointment.getAppointmentDate().toString());
+            List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndDate(appointment.getDoctor().getUserId(), appointment.getAppointmentDate());
             appointments.stream().filter(a -> !Objects.equals(a.getAppointmentId(), appointment.getAppointmentId())).forEach(a -> {
                 if (a.getAppointmentDate().equals(updateAppointmentDto.getAppointmentDate())) {
                     throw new IllegalAppointmentDate("Doctor already has an appointment at this time");
@@ -92,6 +96,12 @@ public class AppointmentService {
         if (updateAppointmentDto.getDescription() != null) {
             appointment.setDescription(updateAppointmentDto.getDescription());
         }
+        if (updateAppointmentDto.getAppointmentStartTime() != null) {
+            appointment.setAppointmentStartTime(LocalTime.parse(updateAppointmentDto.getAppointmentStartTime()));
+        }
+        if (updateAppointmentDto.getAppointmentEndTime() != null) {
+            appointment.setAppointmentEndTime(LocalTime.parse(updateAppointmentDto.getAppointmentEndTime()));
+        }
         appointmentRepository.save(appointment);
     }
 
@@ -102,8 +112,25 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+    @Scheduled(cron = "0 0 8 * * *")
+    public void getNonApprovedAppointments() {
+        List<Appointment> appointmentList = appointmentRepository.findUnconfirmedAppointments();
+        for (Appointment appointment : appointmentList) {
+            String appointmentDetails = "Appointment with " + appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName() + " on " + appointment.getAppointmentDate() + " at " + appointment.getAppointmentStartTime();
+            String confirmationLink = "http://localhost:8080/api/appointments/confirm/" + appointment.getAppointmentId();
+            emailSenderService.sendAppointmentConfirmationEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointmentDetails, confirmationLink);
+        }
+    }
+
+    @Transactional
+    public void confirmAppointment(Long appointmentId) {
+        Appointment appointment = getAppointmentById(appointmentId);
+        appointment.setIsConfirmed(true);
+        appointmentRepository.save(appointment);
+    }
+
     private boolean hasDoctorAppointmentAtTime(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), date.toString());
+        List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), date);
         for (Appointment appointment : appointments) {
             if (appointment.getAppointmentStartTime().isBefore(endTime) && appointment.getAppointmentEndTime().isAfter(startTime)) {
                 return true;

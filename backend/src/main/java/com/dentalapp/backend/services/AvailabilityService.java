@@ -28,6 +28,7 @@ public class AvailabilityService {
 
     public void addDoctorAvailability(CreateAvailabilityDto createAvailabilityDto, String email) {
         User doctor = userService.getDoctorByEmail(email);
+        createAvailabilityDto.setDoctor(doctor);
         for (AvailabilityDayDto availabilityDayDto : createAvailabilityDto.getAvailabilityDays()) {
             if (!isAvailabilityExists(availabilityDayDto, doctor)) {
                 Availability availability = AvailabilityMapper.toAvailability(availabilityDayDto);
@@ -49,6 +50,23 @@ public class AvailabilityService {
     }
 
     private boolean isAvailabilityExists(AvailabilityDayDto availabilityDayDto, User doctor) {
-        return availabilityRepository.isDeclared(doctor, availabilityDayDto.getDate(), availabilityDayDto.getStartTime(), availabilityDayDto.getEndTime()) || availabilityRepository.hasDoctorBrake(doctor, availabilityDayDto.getDate(), availabilityDayDto.getBrakeTimeStart(), availabilityDayDto.getBrakeTimeEnd());
+        boolean isDeclared = availabilityRepository.isDeclared(
+                doctor,
+                availabilityDayDto.getDate(),
+                LocalTime.parse(availabilityDayDto.getStartTime()),
+                LocalTime.parse(availabilityDayDto.getEndTime())
+        );
+
+        boolean hasDoctorBrake = false;
+        if (availabilityDayDto.getBrakeTimeStart() != null && availabilityDayDto.getBrakeTimeEnd() != null) {
+            hasDoctorBrake = availabilityRepository.hasDoctorBrake(
+                    doctor,
+                    availabilityDayDto.getDate(),
+                    LocalTime.parse(availabilityDayDto.getBrakeTimeStart()),
+                    LocalTime.parse(availabilityDayDto.getBrakeTimeEnd())
+            );
+        }
+
+        return isDeclared || hasDoctorBrake;
     }
 }

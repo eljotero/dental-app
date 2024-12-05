@@ -35,7 +35,7 @@ public class Appointment {
     private LocalTime appointmentEndTime;
 
     @Column(name = "is_confirmed")
-    private Boolean isConfirmed;
+    private Boolean isConfirmed = false;
 
     @Column(name = "is_cancelled")
     private Boolean isCancelled = false;

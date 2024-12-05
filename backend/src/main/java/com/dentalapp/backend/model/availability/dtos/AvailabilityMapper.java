@@ -2,15 +2,18 @@ package com.dentalapp.backend.model.availability.dtos;
 
 import com.dentalapp.backend.model.availability.entity.Availability;
 
+import java.time.LocalTime;
+
 public class AvailabilityMapper {
     public static Availability toAvailability(AvailabilityDayDto availabilityDayDto) {
         Availability availability = new Availability();
         availability.setAvailabilityDate(availabilityDayDto.getDate());
-        availability.setAvailabilityStartTime(availabilityDayDto.getStartTime());
-        availability.setAvailabilityEndTime(availabilityDayDto.getEndTime());
+        availability.setAvailabilityStartTime(LocalTime.parse(availabilityDayDto.getStartTime()));
+        availability.setAvailabilityEndTime(LocalTime.parse(availabilityDayDto.getEndTime()));
+        availability.setDoctor(availability.getDoctor());
         if(availabilityDayDto.getBrakeTimeStart() != null && availabilityDayDto.getBrakeTimeEnd() != null) {
-            availability.setBrakeTimeStart(availabilityDayDto.getBrakeTimeStart());
-            availability.setBrakeTimeEnd(availabilityDayDto.getBrakeTimeEnd());
+            availability.setBrakeTimeStart(LocalTime.parse(availabilityDayDto.getBrakeTimeStart()));
+            availability.setBrakeTimeEnd(LocalTime.parse(availabilityDayDto.getBrakeTimeEnd()));
         }
         return availability;
     }
