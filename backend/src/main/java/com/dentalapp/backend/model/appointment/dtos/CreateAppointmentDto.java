@@ -1,6 +1,7 @@
 package com.dentalapp.backend.model.appointment.dtos;
 
 import com.dentalapp.backend.model.user.entity.User;
+import com.dentalapp.backend.utils.constraints.CreateAppointmentTimesConstraint;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,11 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@CreateAppointmentTimesConstraint(
+        startTime = "appointmentStartTime",
+        endTime = "appointmentEndTime",
+        message = "Appointment start time must be before end time"
+)
 public class CreateAppointmentDto {
 
     @NotNull(message = "Doctor ID is required")
@@ -22,16 +28,8 @@ public class CreateAppointmentDto {
     @NotNull(message = "Appointment start time is required")
     private String appointmentStartTime;
 
-    @NotNull(message = "Appointment duration is required")
+    @NotNull(message = "Appointment end time is required")
     private String appointmentEndTime;
-
-//    @AssertTrue
-//    public boolean isEndTimeValid() {
-//        if(appointmentStartTime == null || appointmentEndTime == null) {
-//            return false;
-//        }
-//        return appointmentEndTime.isAfter(appointmentStartTime);
-//    }
 
     private User patient;
 

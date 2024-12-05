@@ -19,9 +19,9 @@ public class UpdateAppointmentDto {
     @Past(message = "Date of appointment must be in the past")
     private LocalDate appointmentDate;
 
-    private LocalTime appointmentStartTime;
+    private String appointmentStartTime;
 
-    private LocalTime appointmentEndTime;
+    private String appointmentEndTime;
 
     private String description;
 
