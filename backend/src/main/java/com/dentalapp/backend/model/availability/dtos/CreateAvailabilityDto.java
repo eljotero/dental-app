@@ -1,5 +1,6 @@
 package com.dentalapp.backend.model.availability.dtos;
 
+import com.dentalapp.backend.model.user.entity.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,4 +15,6 @@ public class CreateAvailabilityDto {
 
     @NotNull(message = "Availability is required")
     List<AvailabilityDayDto> availabilityDays;
+
+    User doctor;
 }

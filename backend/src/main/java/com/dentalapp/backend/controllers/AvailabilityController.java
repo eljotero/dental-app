@@ -5,12 +5,10 @@ import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
 import com.dentalapp.backend.services.AvailabilityService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/availability")
+@RestController
+@RequestMapping("/api/availability")
 public class AvailabilityController {
 
     private final AvailabilityService availabilityService;
@@ -23,7 +21,7 @@ public class AvailabilityController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addDoctorAvailability(@Valid CreateAvailabilityDto createAvailabilityDto, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> addDoctorAvailability(@RequestHeader("Authorization") String token, @RequestBody @Valid CreateAvailabilityDto createAvailabilityDto) {
         availabilityService.addDoctorAvailability(createAvailabilityDto, jwtService.extractEmail(token.substring(7)));
         return ResponseEntity.ok("Availability added successfully");
     }
