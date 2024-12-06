@@ -12,6 +12,8 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class GetAvailabilityDto {
 
+    Long availabilityId;
+
     LocalDate date;
 
     LocalTime startTime;

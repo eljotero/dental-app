@@ -20,6 +20,7 @@ public class AvailabilityMapper {
 
     public static GetAvailabilityDto toDto(Availability availability) {
         GetAvailabilityDto availabilityDayDto = new GetAvailabilityDto();
+        availability.setAvailabilityId(availability.getAvailabilityId());
         availabilityDayDto.setDate(availability.getAvailabilityDate());
         availabilityDayDto.setStartTime(availability.getAvailabilityStartTime());
         availabilityDayDto.setEndTime(availability.getAvailabilityEndTime());
