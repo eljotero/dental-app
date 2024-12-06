@@ -2,6 +2,7 @@ package com.dentalapp.backend.model.appointment.dtos;
 
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.utils.constraints.CreateAppointmentTimesConstraint;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class CreateAppointmentDto {
     private Long doctorId;
 
     @NotNull(message = "Appointment date is required")
+    @Future(message = "Appointment date must be in the future")
     private LocalDate appointmentDate;
 
     @NotNull(message = "Appointment start time is required")
