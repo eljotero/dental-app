@@ -6,6 +6,8 @@ import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyEx
 import com.dentalapp.backend.model.token.expceptions.InvalidTokenException;
 import com.dentalapp.backend.model.token.expceptions.TokenAlreadyUsedException;
 import com.dentalapp.backend.model.token.expceptions.TokenExpiredException;
+import com.dentalapp.backend.model.treatment.exceptions.TreatmentNameAlreadyExistsException;
+import com.dentalapp.backend.model.treatment.exceptions.TreatmentNotFoundException;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
 import com.dentalapp.backend.model.user.exceptions.UserAuthenticationException;
 import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
@@ -79,6 +81,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = AvailabilityAlreadyExistsException.class)
     public ResponseEntity<?> handleAvailabilityAlreadyExistsException(AvailabilityAlreadyExistsException e) {
+        return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = TreatmentNotFoundException.class)
+    public ResponseEntity<?> handleTreatmentNotFoundException(TreatmentNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = TreatmentNameAlreadyExistsException.class)
+    public ResponseEntity<?> handleTreatmentAlreadyExistsException(TreatmentNameAlreadyExistsException e) {
         return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 }
