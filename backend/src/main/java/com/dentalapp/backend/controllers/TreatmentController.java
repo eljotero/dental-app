@@ -21,7 +21,7 @@ public class TreatmentController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Treatment>> getTreatments() {
-        return ResponseEntity.ok(treatmentService.getTreatments());
+        return ResponseEntity.ok(treatmentService.getAllTreatments());
     }
 
     @GetMapping("/{id}")
@@ -30,19 +30,19 @@ public class TreatmentController {
     }
 
     @GetMapping("/create")
-    public ResponseEntity<?> addTreatment(@RequestBody CreateTreatmentDto createTreatmentDto) {
-        treatmentService.addTreatment(createTreatmentDto);
+    public ResponseEntity<String> addTreatment(@RequestBody CreateTreatmentDto createTreatmentDto) {
+        treatmentService.createTreatment(createTreatmentDto);
         return ResponseEntity.ok("Treatment added successfully");
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateTreatment(@PathVariable Long id, @RequestBody UpdateTreatmentDto updateTreatmentDto) {
+    public ResponseEntity<String> updateTreatment(@PathVariable Long id, @RequestBody UpdateTreatmentDto updateTreatmentDto) {
         treatmentService.updateTreatment(id, updateTreatmentDto);
         return ResponseEntity.ok("Treatment updated successfully");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTreatment(@PathVariable Long id) {
+    public ResponseEntity<String> deleteTreatment(@PathVariable Long id) {
         treatmentService.deleteTreatment(id);
         return ResponseEntity.ok("Treatment deleted successfully");
     }
