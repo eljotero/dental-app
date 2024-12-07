@@ -70,6 +70,7 @@ public class AppointmentControllerTests {
         ResponseEntity<?> response = appointmentController.getAppointments();
         verify(appointmentService).getAppointments();
         Assertions.assertEquals(List.of(appointment), response.getBody());
+        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -78,6 +79,7 @@ public class AppointmentControllerTests {
         ResponseEntity<?> response = appointmentController.getAppointmentById(1L);
         verify(appointmentService).getAppointmentById(1L);
         Assertions.assertEquals(appointment, response.getBody());
+        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -88,6 +90,7 @@ public class AppointmentControllerTests {
         ResponseEntity<?> response = appointmentController.getPatientAppointments("Bearer test");
         verify(appointmentService).getPatientAppointments(patientEmail);
         Assertions.assertEquals(List.of(appointment), response.getBody());
+        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -98,6 +101,7 @@ public class AppointmentControllerTests {
         ResponseEntity<?> response = appointmentController.getDoctorAppointments("Bearer test");
         verify(appointmentService).getDoctorAppointments(doctorEmail);
         Assertions.assertEquals(List.of(appointment), response.getBody());
+        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -109,6 +113,7 @@ public class AppointmentControllerTests {
         ResponseEntity<?> response = appointmentController.getDoctorAppointmentsByDate("Bearer test", date);
         verify(appointmentService).getDoctorAppointmentsByDate(doctorEmail, date);
         Assertions.assertEquals(List.of(appointment), response.getBody());
+        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -118,13 +123,15 @@ public class AppointmentControllerTests {
         ResponseEntity<?> response = appointmentController.getAppointmentsByDate(date);
         verify(appointmentService).getAppointmentsByDate(date);
         Assertions.assertEquals(List.of(appointment), response.getBody());
+        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
     public void testCancelAppointment() {
         ResponseEntity<?> response = appointmentController.cancelAppointment(1L);
         verify(appointmentService).cancelAppointment(1L);
-        Assertions.assertEquals(ResponseEntity.ok("Appointment cancelled"), response);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals("Appointment cancelled", response.getBody());
     }
 
     @Test
@@ -139,7 +146,8 @@ public class AppointmentControllerTests {
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
         ResponseEntity<?> response = appointmentController.createAppointment(token, createAppointmentDto);
         verify(appointmentService).createAppointment(createAppointmentDto, email);
-        Assertions.assertEquals(ResponseEntity.ok("Appointment created"), response);
+        Assertions.assertEquals(201, response.getStatusCode().value());
+        Assertions.assertEquals("Appointment created", response.getBody());
     }
 
     @Test

@@ -8,10 +8,7 @@ import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
 import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.user.entity.User;
-import com.dentalapp.backend.services.AppointmentService;
-import com.dentalapp.backend.services.AvailabilityService;
-import com.dentalapp.backend.services.EmailSenderService;
-import com.dentalapp.backend.services.UserService;
+import com.dentalapp.backend.services.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +37,9 @@ public class AppointmentServiceTests {
 
     @Mock
     private EmailSenderService emailSenderService;
+
+    @Mock
+    private InvoiceService invoiceService;
 
     @InjectMocks
     private AppointmentService appointmentService;

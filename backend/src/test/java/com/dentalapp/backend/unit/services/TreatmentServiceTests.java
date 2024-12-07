@@ -69,9 +69,7 @@ public class TreatmentServiceTests {
     @Test
     public void testGetTreatmentByIdNotFound(){
         when(treatmentRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-        Assertions.assertThrows(TreatmentNotFoundException.class, () -> {
-            treatmentService.getTreatmentById(1L);
-        });
+        Assertions.assertThrows(TreatmentNotFoundException.class, () -> treatmentService.getTreatmentById(1L));
     }
 
     @Test
@@ -87,9 +85,7 @@ public class TreatmentServiceTests {
     @Test
     public void testGetTreatmentByNameNotFound() {
         when(treatmentRepository.findByName("Treatment 1")).thenReturn(Optional.empty());
-        Assertions.assertThrows(TreatmentNotFoundException.class, () -> {
-            treatmentService.getTreatmentByName("Treatment 1");
-        });
+        Assertions.assertThrows(TreatmentNotFoundException.class, () -> treatmentService.getTreatmentByName("Treatment 1"));
     }
 
     @Test
@@ -108,9 +104,7 @@ public class TreatmentServiceTests {
     @Test
     public void testCreateTreatmentAlreadyExists() {
         when(treatmentRepository.findByName(createTreatmentDto.getName())).thenReturn(Optional.of(treatment));
-        Assertions.assertThrows(TreatmentAlreadyExistsException.class, () -> {
-            treatmentService.createTreatment(createTreatmentDto);
-        });
+        Assertions.assertThrows(TreatmentAlreadyExistsException.class, () -> treatmentService.createTreatment(createTreatmentDto));
     }
 
     @Test
@@ -123,9 +117,7 @@ public class TreatmentServiceTests {
     @Test
     public void testUpdateTreatmentNotFound() {
         when(treatmentRepository.findById(1L)).thenReturn(Optional.empty());
-        Assertions.assertThrows(TreatmentNotFoundException.class, () -> {
-            treatmentService.updateTreatment(1L, updateTreatmentDto);
-        });
+        Assertions.assertThrows(TreatmentNotFoundException.class, () -> treatmentService.updateTreatment(1L, updateTreatmentDto));
     }
 
     @Test
@@ -138,8 +130,6 @@ public class TreatmentServiceTests {
     @Test
     public void testDeleteTreatmentNotFound() {
         when(treatmentRepository.findById(1L)).thenReturn(Optional.empty());
-        Assertions.assertThrows(TreatmentNotFoundException.class, () -> {
-            treatmentService.deleteTreatment(1L);
-        });
+        Assertions.assertThrows(TreatmentNotFoundException.class, () -> treatmentService.deleteTreatment(1L));
     }
 }

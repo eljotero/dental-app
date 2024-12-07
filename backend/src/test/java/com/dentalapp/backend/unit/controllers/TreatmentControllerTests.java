@@ -75,6 +75,7 @@ public class TreatmentControllerTests {
         ResponseEntity<String> response = treatmentController.addTreatment(createTreatmentDto);
         verify(treatmentService).createTreatment(createTreatmentDto);
         Assertions.assertEquals("Treatment added successfully", response.getBody());
+        Assertions.assertEquals(201, response.getStatusCode().value());
     }
 
     @Test

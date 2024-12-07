@@ -78,7 +78,7 @@ public class AvailabilityControllerTests {
         when(jwtService.extractEmail("token")).thenReturn(email);
         ResponseEntity<?> response = availabilityController.addDoctorAvailability(token,createAvailabilityDto);
         verify(availabilityService).addDoctorAvailability(createAvailabilityDto, email);
-        Assertions.assertEquals(ResponseEntity.ok("Availability added successfully"), response);
+        Assertions.assertEquals(ResponseEntity.status(201).body("Availability added successfully"), response);
     }
 
     @Test

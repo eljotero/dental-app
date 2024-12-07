@@ -32,7 +32,7 @@ public class TreatmentController {
     @GetMapping("/create")
     public ResponseEntity<String> addTreatment(@RequestBody CreateTreatmentDto createTreatmentDto) {
         treatmentService.createTreatment(createTreatmentDto);
-        return ResponseEntity.ok("Treatment added successfully");
+        return ResponseEntity.status(201).body("Treatment added successfully");
     }
 
     @PatchMapping("/{id}")
