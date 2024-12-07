@@ -7,6 +7,7 @@ import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
+import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.user.entity.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -28,11 +29,14 @@ public class AppointmentService {
 
     private final EmailSenderService emailSenderService;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService) {
+    private final InvoiceService invoiceService;
+
+    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService, InvoiceService invoiceService) {
         this.appointmentRepository = appointmentRepository;
         this.userService = userService;
         this.availabilityService = availabilityService;
         this.emailSenderService = emailSenderService;
+        this.invoiceService = invoiceService;
     }
 
     public List<Appointment> getAppointments() {
@@ -75,6 +79,8 @@ public class AppointmentService {
         createAppointmentDto.setPatient(patient);
         createAppointmentDto.setDoctor(doctor);
         Appointment appointment = AppointmentMapper.toAppointment(createAppointmentDto);
+        Invoice invoice = invoiceService.createInvoice();
+        appointment.setInvoice(invoice);
         appointmentRepository.save(appointment);
     }
 

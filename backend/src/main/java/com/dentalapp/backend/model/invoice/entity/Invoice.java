@@ -2,9 +2,11 @@ package com.dentalapp.backend.model.invoice.entity;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.enums.PaymentStatus;
+import com.dentalapp.backend.model.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -17,23 +19,20 @@ public class Invoice {
     @Column(name = "invoice_id")
     private Long invoiceId;
 
-    @OneToOne
-    @JoinColumn(name = "appointment_id")
-    private Appointment appointment;
-
     @Column(name = "price")
-    private Double price;
+    private Long price = 0L;
 
     @Column(name = "is_paid")
-    private Boolean isPaid;
+    private Boolean isPaid = false;
 
     @Column(name = "payment_method")
-    private String paymentMethod;
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType = PaymentType.NONE;
 
     @Column(name = "payment_date")
-    private Date paymentDate;
+    private LocalDate paymentDate = null;
 
     @Column(name = "payment_status")
     @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
 }

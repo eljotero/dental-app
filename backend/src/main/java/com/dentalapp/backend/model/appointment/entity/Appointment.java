@@ -1,5 +1,6 @@
 package com.dentalapp.backend.model.appointment.entity;
 
+import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -42,6 +43,10 @@ public class Appointment {
 
     @Column(name = "description")
     private String description;
+
+    @OneToOne
+    @JoinColumn(name = "invoice_id")
+    private Invoice invoice;
 
     @Version
     private Long version;
