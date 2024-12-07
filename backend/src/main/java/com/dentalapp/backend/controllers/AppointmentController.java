@@ -6,6 +6,7 @@ import com.dentalapp.backend.model.appointment.dtos.UpdateAppointmentDto;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.services.AppointmentService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,7 +68,7 @@ public class AppointmentController {
     @PostMapping("/add")
     public ResponseEntity<String> createAppointment(@RequestHeader("Authorization") String token, @Valid @RequestBody CreateAppointmentDto createAppointmentDto) {
         appointmentService.createAppointment(createAppointmentDto, jwtService.extractEmail(token.substring(7)));
-        return ResponseEntity.ok("Appointment created");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Appointment created");
     }
 
     @PatchMapping("/{id}")
