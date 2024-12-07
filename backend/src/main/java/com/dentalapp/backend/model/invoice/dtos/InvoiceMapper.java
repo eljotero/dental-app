@@ -8,12 +8,14 @@ import java.time.LocalDate;
 
 public class InvoiceMapper {
 
-    public static Invoice toDto(Invoice invoice, PayForAppointmentDto payForAppointmentDto) {
+    public static Invoice toDto(Invoice invoice, PayForAppointmentDto payForAppointmentDto, boolean isPriceSet) {
         invoice.setPaymentType(PaymentType.valueOf(payForAppointmentDto.getPaymentType()));
         invoice.setPaymentDate(LocalDate.parse(payForAppointmentDto.getPaymentDate()));
         invoice.setPaymentStatus(PaymentStatus.PAID);
+        if(!isPriceSet) {
+            invoice.setPrice(payForAppointmentDto.getPrice());
+        }
         invoice.setIsPaid(true);
-        invoice.setPrice(payForAppointmentDto.getPrice());
         return invoice;
     }
 }

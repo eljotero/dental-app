@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/appointments")
 public class AppointmentController {
+
     private final AppointmentService appointmentService;
 
     private final JwtService jwtService;

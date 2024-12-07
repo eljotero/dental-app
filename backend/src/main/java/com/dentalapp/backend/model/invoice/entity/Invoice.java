@@ -1,13 +1,11 @@
 package com.dentalapp.backend.model.invoice.entity;
 
-import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.enums.PaymentStatus;
 import com.dentalapp.backend.model.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @Entity

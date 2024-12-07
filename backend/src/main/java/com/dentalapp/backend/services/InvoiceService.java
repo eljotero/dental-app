@@ -14,11 +14,8 @@ public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
 
-    private final AppointmentService appointmentService;
-
-    public InvoiceService(InvoiceRepository invoiceRepository, AppointmentService appointmentService) {
+    public InvoiceService(InvoiceRepository invoiceRepository) {
         this.invoiceRepository = invoiceRepository;
-        this.appointmentService = appointmentService;
     }
 
     @Transactional
@@ -29,15 +26,13 @@ public class InvoiceService {
     }
 
     @Transactional
-    public void setAppointmentPrice(Long id, SetAppointmentPriceDto setAppointmentPriceDto) {
-        Appointment appointment = appointmentService.getAppointmentById(id);
+    public void setAppointmentPrice(Appointment appointment, SetAppointmentPriceDto setAppointmentPriceDto) {
         appointment.getInvoice().setPrice(setAppointmentPriceDto.getPrice());
         invoiceRepository.save(appointment.getInvoice());
     }
 
     @Transactional
-    public void updateAppointmentPrice(Long id, SetAppointmentPriceDto setAppointmentPriceDto) {
-        Appointment appointment = appointmentService.getAppointmentById(id);
+    public void updateAppointmentPrice(Appointment appointment, SetAppointmentPriceDto setAppointmentPriceDto) {
         appointment.getInvoice().setPrice(setAppointmentPriceDto.getPrice());
         invoiceRepository.save(appointment.getInvoice());
     }
@@ -45,7 +40,8 @@ public class InvoiceService {
     @Transactional
     public void payInvoice(Long id, PayForAppointmentDto payForAppointmentDto) {
         Invoice invoice = invoiceRepository.findById(id).orElseThrow();
-        Invoice invoiceDB = InvoiceMapper.toDto(invoice, payForAppointmentDto);
+        boolean isPriceSet = invoice.getPrice() != null;
+        Invoice invoiceDB = InvoiceMapper.toDto(invoice, payForAppointmentDto, isPriceSet);
         invoiceRepository.save(invoiceDB);
     }
 
