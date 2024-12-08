@@ -3,6 +3,7 @@ package com.dentalapp.backend.configuration;
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
+import com.dentalapp.backend.model.prescription.exceptions.PrescriptionNotFoundException;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyAlreadyExistsException;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyNotFoundException;
 import com.dentalapp.backend.model.token.expceptions.InvalidTokenException;
@@ -103,6 +104,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = SupplyNotFoundException.class)
     public ResponseEntity<?> handleSupplyNotFoundException(SupplyNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = PrescriptionNotFoundException.class)
+    public ResponseEntity<?> handlePrescriptionNotFoundException(PrescriptionNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 }
