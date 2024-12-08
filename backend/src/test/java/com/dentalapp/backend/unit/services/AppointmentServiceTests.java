@@ -7,6 +7,9 @@ import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundExc
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
 import com.dentalapp.backend.model.enums.UserType;
+import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
+import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
+import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.*;
 import org.junit.jupiter.api.Assertions;
@@ -40,6 +43,9 @@ public class AppointmentServiceTests {
 
     @Mock
     private InvoiceService invoiceService;
+
+    @Mock
+    private PrescriptionService prescriptionService;
 
     @InjectMocks
     private AppointmentService appointmentService;
@@ -206,6 +212,20 @@ public class AppointmentServiceTests {
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
         appointmentService.confirmAppointment(1L);
         Assertions.assertEquals(true, appointment.getIsConfirmed());
+    }
+
+    @Test
+    public void testAddPrescriptionsToAppointment() {
+        CreatePrescriptionsDto createPrescriptionsDto = new CreatePrescriptionsDto();
+        CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
+        createPrescriptionDto.setMedicine("Medicine");
+        createPrescriptionDto.setDosage("Dosage");
+        createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
+        Prescription prescription = new Prescription();
+        when(prescriptionService.addPrescriptions(createPrescriptionsDto)).thenReturn(List.of(prescription));
+        when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
+        appointmentService.addPrescriptionsToAppointment(1L, createPrescriptionsDto);
+        verify(appointmentRepository).save(any(Appointment.class));
     }
 
 }

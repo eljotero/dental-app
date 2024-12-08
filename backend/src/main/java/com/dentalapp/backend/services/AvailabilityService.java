@@ -9,6 +9,7 @@ import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyEx
 import com.dentalapp.backend.model.availability.repository.AvailabilityRepository;
 import com.dentalapp.backend.model.user.entity.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,6 +27,7 @@ public class AvailabilityService {
         this.userService = userService;
     }
 
+    @Transactional
     public void addDoctorAvailability(CreateAvailabilityDto createAvailabilityDto, String email) {
         User doctor = userService.getDoctorByEmail(email);
         createAvailabilityDto.setDoctor(doctor);
@@ -45,6 +47,7 @@ public class AvailabilityService {
         return availabilities.stream().map(AvailabilityMapper::toDto).toList();
     }
 
+    @Transactional
     public boolean isDoctorAvailable(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return availabilityRepository.isDeclared(doctor, date, startTime, endTime);
     }

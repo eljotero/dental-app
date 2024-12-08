@@ -1,12 +1,14 @@
 package com.dentalapp.backend.model.appointment.entity;
 
 import com.dentalapp.backend.model.invoice.entity.Invoice;
+import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -47,6 +49,9 @@ public class Appointment {
     @OneToOne
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
+
+    @OneToMany(mappedBy = "appointment")
+    private List<Prescription> prescriptions;
 
     @Version
     private Long version;

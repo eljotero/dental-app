@@ -7,7 +7,6 @@ import com.dentalapp.backend.model.token.expceptions.TokenExpiredException;
 import com.dentalapp.backend.model.token.repository.ConfirmationTokenRepository;
 import com.dentalapp.backend.model.user.entity.User;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -35,7 +34,7 @@ public class ConfirmationTokenService {
         return tokenCode;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     public Long confirmToken(String token) {
         ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Token not found"));

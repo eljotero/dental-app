@@ -8,6 +8,8 @@ import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundExc
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
+import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
+import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.user.entity.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -31,12 +33,15 @@ public class AppointmentService {
 
     private final InvoiceService invoiceService;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService, InvoiceService invoiceService) {
+    private final PrescriptionService prescriptionService;
+
+    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService, InvoiceService invoiceService, PrescriptionService prescriptionService) {
         this.appointmentRepository = appointmentRepository;
         this.userService = userService;
         this.availabilityService = availabilityService;
         this.emailSenderService = emailSenderService;
         this.invoiceService = invoiceService;
+        this.prescriptionService = prescriptionService;
     }
 
     public List<Appointment> getAppointments() {
@@ -121,6 +126,14 @@ public class AppointmentService {
     public void confirmAppointment(Long appointmentId) {
         Appointment appointment = getAppointmentById(appointmentId);
         appointment.setIsConfirmed(true);
+        appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public void addPrescriptionsToAppointment(Long appointmentId, CreatePrescriptionsDto createPrescriptionsDto) {
+        List<Prescription> prescriptionList = prescriptionService.addPrescriptions(createPrescriptionsDto);
+        Appointment appointment = getAppointmentById(appointmentId);
+        appointment.setPrescriptions(prescriptionList);
         appointmentRepository.save(appointment);
     }
 
