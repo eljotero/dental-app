@@ -1,7 +1,7 @@
 package com.dentalapp.backend.model.appointment.dtos;
 
 import com.dentalapp.backend.model.user.entity.User;
-import com.dentalapp.backend.utils.constraints.CreateAppointmentTimesConstraint;
+import com.dentalapp.backend.utils.constraints.CreateTimesConstraint;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@CreateAppointmentTimesConstraint(
+@CreateTimesConstraint(
         startTime = "appointmentStartTime",
         endTime = "appointmentEndTime",
         message = "Appointment start time must be before end time"

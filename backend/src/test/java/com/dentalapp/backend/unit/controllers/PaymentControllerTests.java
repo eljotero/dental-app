@@ -6,6 +6,9 @@ import com.dentalapp.backend.model.invoice.dtos.PayForAppointmentDto;
 import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.InvoiceService;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +35,11 @@ public class PaymentControllerTests {
 
     private SetAppointmentPriceDto setAppointmentPriceDto;
 
+    private PayForAppointmentDto payForAppointmentDto;
+
     private Appointment appointment;
+
+    private Validator validator;
 
     @BeforeEach
     public void setUp() {
@@ -40,6 +47,23 @@ public class PaymentControllerTests {
         setAppointmentPriceDto.setPrice(100L);
 
         appointment = new Appointment();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+
+        payForAppointmentDto = new PayForAppointmentDto();
+        payForAppointmentDto.setPrice(-5L);
+        payForAppointmentDto.setPaymentType("");
+        payForAppointmentDto.setPaymentDate("");
+    }
+
+    @Test
+    public void testValidation() {
+        setAppointmentPriceDto.setPrice(-100L);
+        Assertions.assertEquals(1, validator.validate(setAppointmentPriceDto).size());
+        Assertions.assertEquals(3, validator.validate(payForAppointmentDto).size());
+        payForAppointmentDto.setPaymentDate("123123123123");
+        Assertions.assertEquals(3, validator.validate(payForAppointmentDto).size());
     }
 
     @Test
@@ -62,10 +86,9 @@ public class PaymentControllerTests {
 
     @Test
     public void testPayForAppointment() {
-        PayForAppointmentDto payForAppointmentDto = new PayForAppointmentDto();
         payForAppointmentDto.setPaymentDate("2021-01-01");
         payForAppointmentDto.setPrice(100L);
-        payForAppointmentDto.setPaymentDate("2021-01-01");
+        payForAppointmentDto.setPaymentType("CASH");
         ResponseEntity<String> response = paymentController.payInvoice(1L, payForAppointmentDto);
         verify(invoiceService).payInvoice(1L, payForAppointmentDto);
         Assertions.assertEquals(200, response.getStatusCode().value());

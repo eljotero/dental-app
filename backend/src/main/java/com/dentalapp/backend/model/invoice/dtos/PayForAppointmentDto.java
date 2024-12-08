@@ -1,6 +1,7 @@
 package com.dentalapp.backend.model.invoice.dtos;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,9 +15,9 @@ public class PayForAppointmentDto {
     @Positive
     private Long price;
 
-    @NotNull
+    @NotBlank
     private String paymentType;
 
-    @NotNull
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Date must be in the format yyyy-MM-dd")
     private String paymentDate;
 }

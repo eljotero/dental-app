@@ -7,7 +7,6 @@ import com.dentalapp.backend.model.user.dtos.LoginUserDto;
 import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.UserService;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -24,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -114,11 +112,9 @@ public class UserControllerTests {
         createUserDto.setAddressLine("");
         createUserDto.setZipCode("");
         createUserDto.setDateOfBirth(LocalDate.now().plusDays(1));
-        Set<ConstraintViolation<CreateUserDto>> violations = validator.validate(createUserDto);
-        assertEquals(11, violations.size());
+        assertEquals(11, validator.validate(createUserDto).size());
         createUserDto.setEmail("test");
-        violations = validator.validate(createUserDto);
-        assertEquals(11, violations.size());
+        assertEquals(11, validator.validate(createUserDto).size());
     }
 
     @Test

@@ -96,19 +96,8 @@ public class AppointmentService {
             });
         }
         appointment.setDoctor(userService.getDoctorById(updateAppointmentDto.getDoctorId()));
-        if (updateAppointmentDto.getAppointmentDate() != null) {
-            appointment.setAppointmentDate(updateAppointmentDto.getAppointmentDate());
-        }
-        if (updateAppointmentDto.getDescription() != null) {
-            appointment.setDescription(updateAppointmentDto.getDescription());
-        }
-        if (updateAppointmentDto.getAppointmentStartTime() != null) {
-            appointment.setAppointmentStartTime(LocalTime.parse(updateAppointmentDto.getAppointmentStartTime()));
-        }
-        if (updateAppointmentDto.getAppointmentEndTime() != null) {
-            appointment.setAppointmentEndTime(LocalTime.parse(updateAppointmentDto.getAppointmentEndTime()));
-        }
-        appointmentRepository.save(appointment);
+        Appointment appointmentDB = AppointmentMapper.toUpdateAppointment(appointment, updateAppointmentDto);
+        appointmentRepository.save(appointmentDB);
     }
 
     @Transactional
