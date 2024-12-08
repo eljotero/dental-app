@@ -3,6 +3,8 @@ package com.dentalapp.backend.configuration;
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
+import com.dentalapp.backend.model.supplies.exceptions.SupplyAlreadyExistsException;
+import com.dentalapp.backend.model.supplies.exceptions.SupplyNotFoundException;
 import com.dentalapp.backend.model.token.expceptions.InvalidTokenException;
 import com.dentalapp.backend.model.token.expceptions.TokenAlreadyUsedException;
 import com.dentalapp.backend.model.token.expceptions.TokenExpiredException;
@@ -92,5 +94,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = TreatmentAlreadyExistsException.class)
     public ResponseEntity<?> handleTreatmentAlreadyExistsException(TreatmentAlreadyExistsException e) {
         return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = SupplyAlreadyExistsException.class)
+    public ResponseEntity<?> handleSupplyAlreadyExistsException(SupplyAlreadyExistsException e) {
+        return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = SupplyNotFoundException.class)
+    public ResponseEntity<?> handleSupplyNotFoundException(SupplyNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 }

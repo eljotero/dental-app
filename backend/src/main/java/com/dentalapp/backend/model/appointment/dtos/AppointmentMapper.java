@@ -14,4 +14,20 @@ public class AppointmentMapper {
         appointment.setAppointmentEndTime(LocalTime.parse(createAppointmentDto.getAppointmentEndTime()));
         return appointment;
     }
+
+    public static Appointment toUpdateAppointment(Appointment appointment, UpdateAppointmentDto updateAppointmentDto) {
+        if (updateAppointmentDto.getAppointmentDate() != null) {
+            appointment.setAppointmentDate(updateAppointmentDto.getAppointmentDate());
+        }
+        if (updateAppointmentDto.getDescription() != null) {
+            appointment.setDescription(updateAppointmentDto.getDescription());
+        }
+        if (updateAppointmentDto.getAppointmentStartTime() != null) {
+            appointment.setAppointmentStartTime(LocalTime.parse(updateAppointmentDto.getAppointmentStartTime()));
+        }
+        if (updateAppointmentDto.getAppointmentEndTime() != null) {
+            appointment.setAppointmentEndTime(LocalTime.parse(updateAppointmentDto.getAppointmentEndTime()));
+        }
+        return appointment;
+    }
 }

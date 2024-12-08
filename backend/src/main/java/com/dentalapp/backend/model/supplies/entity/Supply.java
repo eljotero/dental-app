@@ -17,8 +17,8 @@ public class Supply {
     private String name;
 
     @Column(name = "quantity")
-    private Integer quantity;
+    private Double quantity;
 
-    @Column(name = "price")
-    private Double price;
+    @Column(name = "link")
+    private String link;
 }

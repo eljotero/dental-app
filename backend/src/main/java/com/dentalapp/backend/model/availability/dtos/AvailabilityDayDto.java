@@ -1,5 +1,6 @@
 package com.dentalapp.backend.model.availability.dtos;
 
+import com.dentalapp.backend.utils.constraints.CreateTimesConstraint;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,10 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@CreateTimesConstraint(
+        startTime = "startTime",
+        endTime = "endTime",
+        message = "Start time must be before end time")
 public class AvailabilityDayDto {
 
     @NotNull(message = "Date is required")
