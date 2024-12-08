@@ -5,6 +5,9 @@ import com.dentalapp.backend.model.treatment.dtos.CreateTreatmentDto;
 import com.dentalapp.backend.model.treatment.dtos.UpdateTreatmentDto;
 import com.dentalapp.backend.model.treatment.entity.Treatment;
 import com.dentalapp.backend.services.TreatmentService;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +37,8 @@ public class TreatmentControllerTests {
 
     UpdateTreatmentDto updateTreatmentDto;
 
+    private Validator validator;
+
     @BeforeEach
     public void setUp() {
         treatment = new Treatment();
@@ -51,6 +56,23 @@ public class TreatmentControllerTests {
         updateTreatmentDto.setName("Treatment 3");
         updateTreatmentDto.setPrice(100L);
         updateTreatmentDto.setDescription("Treatment 3 Description");
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    @Test
+    public void testValidation() {
+        createTreatmentDto.setName(null);
+        createTreatmentDto.setDescription(null);
+        createTreatmentDto.setPrice(-100L);
+        Assertions.assertEquals(3, validator.validate(createTreatmentDto).size());
+        createTreatmentDto.setName("");
+        createTreatmentDto.setDescription("");
+        Assertions.assertEquals(3, validator.validate(createTreatmentDto).size());
+
+        updateTreatmentDto.setPrice(-100L);
+        Assertions.assertEquals(1, validator.validate(updateTreatmentDto).size());
     }
 
 

@@ -6,7 +6,6 @@ import com.dentalapp.backend.model.availability.dtos.AvailabilityDayDto;
 import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
 import com.dentalapp.backend.services.AvailabilityService;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,15 +54,13 @@ public class AvailabilityControllerTests {
     public void testAddDoctorAvailabilityValidation() {
         CreateAvailabilityDto createAvailabilityDto = new CreateAvailabilityDto();
         createAvailabilityDto.setAvailabilityDays(null);
-        Set<ConstraintViolation<CreateAvailabilityDto>> violations = validator.validate(createAvailabilityDto);
-        Assertions.assertEquals(1, violations.size());
+        Assertions.assertEquals(1, validator.validate(createAvailabilityDto).size());
         AvailabilityDayDto availabilityDayDto = new AvailabilityDayDto();
         availabilityDayDto.setDate(null);
         availabilityDayDto.setStartTime(null);
         availabilityDayDto.setEndTime(null);
         createAvailabilityDto.setAvailabilityDays(List.of(availabilityDayDto));
-        violations = validator.validate(createAvailabilityDto);
-        Assertions.assertEquals(0, violations.size());
+        Assertions.assertEquals(0, validator.validate(createAvailabilityDto).size());
     }
 
     @Test
