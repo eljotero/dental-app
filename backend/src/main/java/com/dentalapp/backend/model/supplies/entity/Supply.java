@@ -5,7 +5,9 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "supplies")
+@Table(name = "supplies", indexes = {
+        @Index(name = "idx_name", columnList = "name")
+})
 public class Supply {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supply_id_seq")
@@ -13,10 +15,10 @@ public class Supply {
     @Column(name = "supply_id")
     private Long supplyId;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "quantity")
+    @Column(name = "quantity", nullable = false)
     private Double quantity;
 
     @Column(name = "link")

@@ -1,4 +1,4 @@
-package com.dentalapp.backend.model.token.expceptions;
+package com.dentalapp.backend.model.token.exceptions;
 
 public class InvalidTokenException extends RuntimeException {
     public InvalidTokenException(String message) {

@@ -6,9 +6,9 @@ import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyEx
 import com.dentalapp.backend.model.prescription.exceptions.PrescriptionNotFoundException;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyAlreadyExistsException;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyNotFoundException;
-import com.dentalapp.backend.model.token.expceptions.InvalidTokenException;
-import com.dentalapp.backend.model.token.expceptions.TokenAlreadyUsedException;
-import com.dentalapp.backend.model.token.expceptions.TokenExpiredException;
+import com.dentalapp.backend.model.token.exceptions.InvalidTokenException;
+import com.dentalapp.backend.model.token.exceptions.TokenAlreadyUsedException;
+import com.dentalapp.backend.model.token.exceptions.TokenExpiredException;
 import com.dentalapp.backend.model.treatment.exceptions.TreatmentAlreadyExistsException;
 import com.dentalapp.backend.model.treatment.exceptions.TreatmentNotFoundException;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;

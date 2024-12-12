@@ -14,10 +14,10 @@ public class Prescription {
     @Column(name = "prescription_id")
     private Long prescriptionId;
 
-    @Column(nullable = false, name = "medicine")
+    @Column(name = "medicine", nullable = false)
     private String medicine;
 
-    @Column(nullable = false, name = "dosage")
+    @Column(name = "dosage", nullable = false)
     private String dosage;
 
     @ManyToOne
