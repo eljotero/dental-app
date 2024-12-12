@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "treatments")
+@Table(name = "treatments", indexes = {
+        @Index(name = "idx_name", columnList = "treatment_name")
+})
 @Data
 public class Treatment {
     @Id
@@ -13,15 +15,15 @@ public class Treatment {
     @Column(name = "treatment_id")
     private Long treatmentId;
 
-    @Column(name = "treatment_name")
+    @Column(name = "treatment_name", nullable = false)
     private String treatmentName;
 
-    @Column(name = "treatment_description")
+    @Column(name = "treatment_description", nullable = false)
     private String treatmentDescription;
 
-    @Column(name = "treatment_price")
+    @Column(name = "treatment_price", nullable = false)
     private Long treatmentPrice;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 }

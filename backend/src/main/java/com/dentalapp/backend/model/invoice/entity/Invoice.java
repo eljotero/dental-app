@@ -20,17 +20,17 @@ public class Invoice {
     @Column(name = "price")
     private Long price = 0L;
 
-    @Column(name = "is_paid")
+    @Column(name = "is_paid", nullable = false)
     private Boolean isPaid = false;
 
-    @Column(name = "payment_method")
+    @Column(name = "payment_method", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType = PaymentType.NONE;
 
     @Column(name = "payment_date")
     private LocalDate paymentDate = null;
 
-    @Column(name = "payment_status")
+    @Column(name = "payment_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
 }

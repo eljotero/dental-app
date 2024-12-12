@@ -13,7 +13,11 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_email", columnList = "email"),
+        @Index(name = "idx_user_type", columnList = "user_type"),
+        @Index(name = "idx_email_user_type", columnList = "email, user_type")
+})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
@@ -21,56 +25,56 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @Column(name = "sex")
+    @Column(name = "sex", nullable = false)
     private Boolean sex;
 
-    @Column(name = "personal_id_number")
+    @Column(name = "personal_id_number", nullable = false)
     private String personalId;
 
-    @Column(name = "country")
+    @Column(name = "country", nullable = false)
     private String country;
 
-    @Column(name = "city")
+    @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "address_line")
+    @Column(name = "address_line", nullable = false)
     private String address;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_type")
+    @Column(name = "user_type", nullable = false)
     private UserType userType;
 
-    @Column(name = "zip_code")
+    @Column(name = "zip_code", nullable = false)
     private String zipCode;
 
-    @Column(name = "date_of_birth")
+    @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    @Column(name = "is_enabled")
+    @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled = false;
 
-    @Column(name = "is_non_expired")
+    @Column(name = "is_non_expired", nullable = false)
     private Boolean isAccountNonExpired = true;
 
-    @Column(name = "is_non_locked")
+    @Column(name = "is_non_locked", nullable = false)
     private Boolean isAccountNonLocked = true;
 
-    @Column(name = "is_credentials_non_expired")
+    @Column(name = "is_credentials_non_expired", nullable = false)
     private Boolean isCredentialsNonExpired = true;
 
     @Override

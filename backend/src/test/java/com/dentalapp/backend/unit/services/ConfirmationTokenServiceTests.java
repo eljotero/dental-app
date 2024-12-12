@@ -1,9 +1,9 @@
 package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.token.entity.ConfirmationToken;
-import com.dentalapp.backend.model.token.expceptions.InvalidTokenException;
-import com.dentalapp.backend.model.token.expceptions.TokenAlreadyUsedException;
-import com.dentalapp.backend.model.token.expceptions.TokenExpiredException;
+import com.dentalapp.backend.model.token.exceptions.InvalidTokenException;
+import com.dentalapp.backend.model.token.exceptions.TokenAlreadyUsedException;
+import com.dentalapp.backend.model.token.exceptions.TokenExpiredException;
 import com.dentalapp.backend.model.token.repository.ConfirmationTokenRepository;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.ConfirmationTokenService;

@@ -7,7 +7,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Table(name = "tokens")
+@Table(name = "tokens", indexes = {
+        @Index(name = "idx_token", columnList = "token")
+})
 @Entity
 public class ConfirmationToken {
     @Id
@@ -29,6 +31,6 @@ public class ConfirmationToken {
     private LocalDateTime confirmedAt;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name="user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

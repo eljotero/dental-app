@@ -12,7 +12,13 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "appointments")
+@Table(name = "appointments", indexes = {
+        @Index(name = "idx_patient_id_is_cancelled", columnList = "patient_id, is_cancelled"),
+        @Index(name = "idx_doctor_id_is_cancelled", columnList = "doctor_id, is_cancelled"),
+        @Index(name = "idx_date_is_cancelled", columnList = "appointment_date, is_cancelled"),
+        @Index(name="idx_doctor_id_date_is_cancelled", columnList = "doctor_id, appointment_date, is_cancelled"),
+        @Index(name = "idx_is_confirmed_date", columnList = "is_confirmed, appointment_date"),
+})
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointment_id_seq")
@@ -21,26 +27,26 @@ public class Appointment {
     private Long appointmentId;
 
     @OneToOne
-    @JoinColumn(name = "patient_id")
+    @JoinColumn(name = "patient_id", nullable = false)
     private User patient;
 
     @OneToOne
-    @JoinColumn(name = "doctor_id")
+    @JoinColumn(name = "doctor_id", nullable = false)
     private User doctor;
 
-    @Column(name = "appointment_date")
+    @Column(name = "appointment_date", nullable = false)
     private LocalDate appointmentDate;
 
-    @Column(name = "appointment_start_time")
+    @Column(name = "appointment_start_time", nullable = false)
     private LocalTime appointmentStartTime;
 
-    @Column(name = "appointment_end_time")
+    @Column(name = "appointment_end_time", nullable = false)
     private LocalTime appointmentEndTime;
 
-    @Column(name = "is_confirmed")
+    @Column(name = "is_confirmed", nullable = false)
     private Boolean isConfirmed = false;
 
-    @Column(name = "is_cancelled")
+    @Column(name = "is_cancelled", nullable = false)
     private Boolean isCancelled = false;
 
     @Column(name = "description")
