@@ -3,11 +3,13 @@ package com.dentalapp.backend.model.prescription.entity;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 @Entity
 @Table(name = "prescriptions")
+@Getter
+@Setter
 public class Prescription {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "prescription_id_seq")

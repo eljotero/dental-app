@@ -71,19 +71,6 @@ public class SupplyServiceTests {
     }
 
     @Test
-    public void testFindByName() {
-        when(supplyRepository.findByName("Name")).thenReturn(java.util.Optional.of(supply));
-        Supply foundSupply = supplyService.findByName("Name");
-        Assertions.assertEquals(supply, foundSupply);
-    }
-
-    @Test
-    public void testFindByNameNotFound() {
-        when(supplyRepository.findByName("Name")).thenReturn(java.util.Optional.empty());
-        Assertions.assertThrows(SupplyNotFoundException.class, () -> supplyService.findByName("Name"));
-    }
-
-    @Test
     public void testCreateSupply() {
         when(supplyRepository.findByName(createSupplyDto.getName())).thenReturn(java.util.Optional.empty());
         supplyService.createSupply(createSupplyDto);

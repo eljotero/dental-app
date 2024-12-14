@@ -112,8 +112,16 @@ public class UserControllerTests {
         createUserDto.setAddressLine("");
         createUserDto.setZipCode("");
         createUserDto.setDateOfBirth(LocalDate.now().plusDays(1));
-        assertEquals(11, validator.validate(createUserDto).size());
+        assertEquals(15, validator.validate(createUserDto).size());
         createUserDto.setEmail("test");
+        assertEquals(15, validator.validate(createUserDto).size());
+        createUserDto.setPassword("pass");
+        assertEquals(14, validator.validate(createUserDto).size());
+        createUserDto.setPhoneNumber("123");
+        assertEquals(13, validator.validate(createUserDto).size());
+        createUserDto.setPersonalIdNumber("123");
+        assertEquals(12, validator.validate(createUserDto).size());
+        createUserDto.setZipCode("123");
         assertEquals(11, validator.validate(createUserDto).size());
     }
 

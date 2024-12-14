@@ -3,11 +3,13 @@ package com.dentalapp.backend.model.referral.entity;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 @Entity
 @Table(name = "referrals")
+@Getter
+@Setter
 public class Referral {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "referral_id_seq")

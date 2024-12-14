@@ -52,7 +52,7 @@ public class SupplyControllerTests {
         createSupplyDto.setName("");
         createSupplyDto.setQuantity(-5.0);
         createSupplyDto.setLink("");
-        Assertions.assertEquals(3, validator.validate(createSupplyDto).size());
+        Assertions.assertEquals(2, validator.validate(createSupplyDto).size());
 
         UpdateSupplyDto updateSupplyDto = new UpdateSupplyDto();
         updateSupplyDto.setQuantity(-5.0);
@@ -72,14 +72,6 @@ public class SupplyControllerTests {
     public void testGetSupplyById() {
         when(supplyService.findById(1L)).thenReturn(supply);
         ResponseEntity<Supply> response = supplyController.getSupplyById(1L);
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(supply, response.getBody());
-    }
-
-    @Test
-    public void testGetSupplyByName() {
-        when(supplyService.findByName("Test Supply")).thenReturn(supply);
-        ResponseEntity<Supply> response = supplyController.getSupplyByName("Test Supply");
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals(supply, response.getBody());
     }

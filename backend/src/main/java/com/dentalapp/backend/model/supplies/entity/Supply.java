@@ -1,13 +1,15 @@
 package com.dentalapp.backend.model.supplies.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 @Entity
 @Table(name = "supplies", indexes = {
         @Index(name = "idx_name", columnList = "name")
 })
+@Getter
+@Setter
 public class Supply {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supply_id_seq")

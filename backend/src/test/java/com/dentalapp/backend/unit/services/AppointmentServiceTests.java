@@ -103,7 +103,7 @@ public class AppointmentServiceTests {
     @Test
     public void testGetAppointments() {
         when(appointmentRepository.findAll()).thenReturn(appointments);
-        Assertions.assertEquals(appointments, appointmentService.getAppointments());
+        Assertions.assertEquals(appointments, appointmentService.getAppointments(null));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class AppointmentServiceTests {
     public void testGetDoctorAppointments() {
         when(userService.getDoctorByEmail(doctor.getEmail())).thenReturn(doctor);
         when(appointmentRepository.findAllByDoctorId(doctor.getUserId())).thenReturn(appointments);
-        Assertions.assertEquals(appointments, appointmentService.getDoctorAppointments(doctor.getEmail()));
+        Assertions.assertEquals(appointments, appointmentService.getDoctorAppointments(doctor.getEmail(), null));
     }
 
     @Test
@@ -222,7 +222,7 @@ public class AppointmentServiceTests {
         createPrescriptionDto.setDosage("Dosage");
         createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
         Prescription prescription = new Prescription();
-        when(prescriptionService.addPrescriptions(createPrescriptionsDto)).thenReturn(List.of(prescription));
+        when(prescriptionService.addPrescriptions(createPrescriptionsDto, appointment)).thenReturn(List.of(prescription));
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
         appointmentService.addPrescriptionsToAppointment(1L, createPrescriptionsDto);
         verify(appointmentRepository).save(any(Appointment.class));

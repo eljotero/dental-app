@@ -6,13 +6,13 @@ import com.dentalapp.backend.model.referral.entity.Referral;
 import com.dentalapp.backend.model.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-@Data
 @Entity
 @Table(name = "appointments", indexes = {
         @Index(name = "idx_patient_id_is_cancelled", columnList = "patient_id, is_cancelled"),
@@ -21,6 +21,8 @@ import java.util.List;
         @Index(name="idx_doctor_id_date_is_cancelled", columnList = "doctor_id, appointment_date, is_cancelled"),
         @Index(name = "idx_is_confirmed_date", columnList = "is_confirmed, appointment_date"),
 })
+@Getter
+@Setter
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointment_id_seq")

@@ -3,13 +3,15 @@ package com.dentalapp.backend.model.invoice.entity;
 import com.dentalapp.backend.model.enums.PaymentStatus;
 import com.dentalapp.backend.model.enums.PaymentType;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
 @Entity
 @Table(name = "invoices")
+@Getter
+@Setter
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "invoice_id_seq")

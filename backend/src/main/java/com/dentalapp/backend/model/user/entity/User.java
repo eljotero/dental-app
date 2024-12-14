@@ -3,7 +3,8 @@ package com.dentalapp.backend.model.user.entity;
 import com.dentalapp.backend.model.enums.UserType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,13 +13,14 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-@Data
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_email", columnList = "email"),
         @Index(name = "idx_user_type", columnList = "user_type"),
         @Index(name = "idx_email_user_type", columnList = "email, user_type")
 })
+@Getter
+@Setter
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")

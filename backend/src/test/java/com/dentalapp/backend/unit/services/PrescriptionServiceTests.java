@@ -1,5 +1,6 @@
 package com.dentalapp.backend.unit.services;
 
+import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
@@ -34,7 +35,7 @@ public class PrescriptionServiceTests {
         createPrescriptionDto.setMedicine("Medicine");
         createPrescriptionDto.setDosage("Dosage");
         createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
-        List<Prescription> result = prescriptionService.addPrescriptions(createPrescriptionsDto);
+        List<Prescription> result = prescriptionService.addPrescriptions(createPrescriptionsDto, new Appointment());
         verify(prescriptionRepository, times(1)).save(any(Prescription.class));
         Assertions.assertEquals(1, result.size());
     }
