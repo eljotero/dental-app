@@ -3,7 +3,10 @@ package com.dentalapp.backend.configuration;
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
+import com.dentalapp.backend.model.availability.exceptions.AvailabilityNotFoundException;
+import com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException;
 import com.dentalapp.backend.model.prescription.exceptions.PrescriptionNotFoundException;
+import com.dentalapp.backend.model.referral.exception.ReferralNotFoundException;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyAlreadyExistsException;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyNotFoundException;
 import com.dentalapp.backend.model.token.exceptions.InvalidTokenException;
@@ -16,6 +19,7 @@ import com.dentalapp.backend.model.user.exceptions.UserAuthenticationException;
 import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -109,6 +113,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = PrescriptionNotFoundException.class)
     public ResponseEntity<?> handlePrescriptionNotFoundException(PrescriptionNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = ReferralNotFoundException.class)
+    public ResponseEntity<?> handleReferralNotFoundException(ReferralNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = InvoiceNotFoundException.class)
+    public ResponseEntity<?> handleInvoiceNotFoundException(InvoiceNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = AvailabilityNotFoundException.class)
+    public ResponseEntity<?> handleAvailabilityNotFoundException(AvailabilityNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = UsernameNotFoundException.class)
+    public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 }

@@ -29,13 +29,13 @@ public class TreatmentController {
         return ResponseEntity.ok(treatmentService.getTreatmentById(id));
     }
 
-    @GetMapping("/create")
+    @PostMapping("/create")
     public ResponseEntity<String> addTreatment(@RequestBody CreateTreatmentDto createTreatmentDto) {
         treatmentService.createTreatment(createTreatmentDto);
         return ResponseEntity.status(201).body("Treatment added successfully");
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateTreatment(@PathVariable Long id, @RequestBody UpdateTreatmentDto updateTreatmentDto) {
         treatmentService.updateTreatment(id, updateTreatmentDto);
         return ResponseEntity.ok("Treatment updated successfully");

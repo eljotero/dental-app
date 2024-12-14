@@ -1,6 +1,7 @@
 package com.dentalapp.backend.model.prescription.entity;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,5 +23,6 @@ public class Prescription {
 
     @ManyToOne
     @JoinColumn(name = "appointment_id", nullable = false)
+    @JsonIgnore
     private Appointment appointment;
 }

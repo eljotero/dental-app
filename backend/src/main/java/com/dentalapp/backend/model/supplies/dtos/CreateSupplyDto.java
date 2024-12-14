@@ -19,7 +19,5 @@ public class CreateSupplyDto {
     @Positive(message = "Quantity must be positive")
     private Double quantity;
 
-    @NotBlank(message = "Link is required")
     private String link;
-
 }

@@ -21,7 +21,7 @@ public class Availability {
     @Column(name = "availability_id")
     private Long availabilityId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private User doctor;
 

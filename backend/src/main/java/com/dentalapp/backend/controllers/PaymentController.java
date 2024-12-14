@@ -1,37 +1,47 @@
 package com.dentalapp.backend.controllers;
 
-import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.invoice.dtos.PayForAppointmentDto;
 import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
-import com.dentalapp.backend.services.AppointmentService;
+import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.services.InvoiceService;
+import com.dentalapp.backend.services.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
 
-    private final AppointmentService appointmentService;
-
     private final InvoiceService invoiceService;
 
-    public PaymentController(AppointmentService appointmentService, InvoiceService invoiceService) {
-        this.appointmentService = appointmentService;
+    private final PaymentService paymentService;
+
+    public PaymentController(InvoiceService invoiceService, PaymentService paymentService) {
         this.invoiceService = invoiceService;
+        this.paymentService = paymentService;
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Invoice>> getAllInvoices() {
+        return ResponseEntity.ok(invoiceService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Invoice> getInvoice(@PathVariable Long id) {
+        return ResponseEntity.ok(invoiceService.findById(id));
     }
 
     @PostMapping("/{id}/price")
     public ResponseEntity<String> createInvoice(@PathVariable Long id, @RequestBody SetAppointmentPriceDto setAppointmentPriceDto) {
-        Appointment appointment = appointmentService.getAppointmentById(id);
-        invoiceService.setAppointmentPrice(appointment, setAppointmentPriceDto);
+        paymentService.setAppointmentPrice(id, setAppointmentPriceDto);
         return ResponseEntity.ok("Price set successfully");
     }
 
-    @PatchMapping("/{id}/price/update")
+    @PatchMapping("/{id}/price")
     public ResponseEntity<String> updateInvoice(@PathVariable Long id, @RequestBody SetAppointmentPriceDto setAppointmentPriceDto) {
-        Appointment appointment = appointmentService.getAppointmentById(id);
-        invoiceService.updateAppointmentPrice(appointment, setAppointmentPriceDto);
+        paymentService.updateAppointmentPrice(id, setAppointmentPriceDto);
         return ResponseEntity.ok("Price updated successfully");
     }
 

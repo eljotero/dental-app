@@ -29,10 +29,6 @@ public class SupplyService {
         return supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException("Supply with id " + id + " not found"));
     }
 
-    public Supply findByName(String name) {
-        return supplyRepository.findByName(name).orElseThrow(() -> new SupplyNotFoundException("Supply with name " + name + " not found"));
-    }
-
     @Transactional
     public void createSupply(CreateSupplyDto createSupplyDto) {
         if (supplyRepository.findByName(createSupplyDto.getName()).isPresent()) {

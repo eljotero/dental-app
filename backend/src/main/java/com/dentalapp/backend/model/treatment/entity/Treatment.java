@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Table(name = "treatments", indexes = {
-        @Index(name = "idx_name", columnList = "treatment_name")
+        @Index(name = "idx_treatment_name", columnList = "treatment_name")
 })
 @Data
 public class Treatment {

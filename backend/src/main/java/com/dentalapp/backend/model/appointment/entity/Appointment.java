@@ -2,7 +2,9 @@ package com.dentalapp.backend.model.appointment.entity;
 
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
+import com.dentalapp.backend.model.referral.entity.Referral;
 import com.dentalapp.backend.model.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,11 +28,11 @@ public class Appointment {
     @Column(name = "appointment_id")
     private Long appointmentId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private User patient;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private User doctor;
 
@@ -59,6 +61,10 @@ public class Appointment {
     @OneToMany(mappedBy = "appointment")
     private List<Prescription> prescriptions;
 
+    @OneToMany(mappedBy = "appointment")
+    private List<Referral> referrals;
+
     @Version
+    @JsonIgnore
     private Long version;
 }

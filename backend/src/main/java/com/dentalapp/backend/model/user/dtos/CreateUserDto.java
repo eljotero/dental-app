@@ -1,9 +1,6 @@
 package com.dentalapp.backend.model.user.dtos;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,15 +23,18 @@ public class CreateUserDto {
     private String email;
 
     @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
     @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^(\\+\\d{1,3})?(\\d{3})?\\d{3}\\d{3}$", message = "Phone number is not valid")
     private String phoneNumber;
 
     @NotNull(message = "Sex is required")
     private Boolean sex;
 
     @NotBlank(message = "Personal ID number is required")
+    @Pattern(regexp = "^\\d{11}$", message = "Personal ID number is not valid")
     private String personalIdNumber;
 
     @NotBlank(message = "Country is required")
@@ -47,6 +47,7 @@ public class CreateUserDto {
     private String addressLine;
 
     @NotBlank(message = "Zip code is required")
+    @Pattern(regexp = "^\\d{5}$", message = "Zip code is not valid")
     private String zipCode;
 
     @NotNull(message = "Date of birth is required")
