@@ -2,18 +2,20 @@ package com.dentalapp.backend.model.availability.entity;
 
 import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Data
 @Entity
 @Table(name = "availabilities", indexes = {
         @Index(name = "idx_doctor_id_date_start_time_end_time", columnList = "doctor_id, availability_date, availability_start_time, availability_end_time"),
         @Index(name = "idx_doctor_id_date_start_time_end_time_brake_time", columnList = "doctor_id, availability_date, availability_start_time, availability_end_time, brake_time_start, brake_time_end"),
         @Index(name = "idx_doctor_id", columnList = "doctor_id")
 })
+@Getter
+@Setter
 public class Availability {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "availability_id_seq")
@@ -21,7 +23,7 @@ public class Availability {
     @Column(name = "availability_id")
     private Long availabilityId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private User doctor;
 

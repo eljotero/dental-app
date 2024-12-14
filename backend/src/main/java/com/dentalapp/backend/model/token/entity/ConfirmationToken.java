@@ -2,15 +2,17 @@ package com.dentalapp.backend.model.token.entity;
 
 import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
 @Table(name = "tokens", indexes = {
         @Index(name = "idx_token", columnList = "token")
 })
 @Entity
+@Getter
+@Setter
 public class ConfirmationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "token_id_seq")

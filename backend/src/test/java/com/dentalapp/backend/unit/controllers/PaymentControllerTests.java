@@ -1,11 +1,12 @@
 package com.dentalapp.backend.unit.controllers;
 
 import com.dentalapp.backend.controllers.PaymentController;
-import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.invoice.dtos.PayForAppointmentDto;
 import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
+import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.InvoiceService;
+import com.dentalapp.backend.services.PaymentService;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -17,6 +18,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+import java.util.Objects;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +34,9 @@ public class PaymentControllerTests {
     @Mock
     private InvoiceService invoiceService;
 
+    @Mock
+    private PaymentService paymentService;
+
     @InjectMocks
     private PaymentController paymentController;
 
@@ -37,16 +44,14 @@ public class PaymentControllerTests {
 
     private PayForAppointmentDto payForAppointmentDto;
 
-    private Appointment appointment;
-
     private Validator validator;
+
+    private Invoice invoice;
 
     @BeforeEach
     public void setUp() {
         setAppointmentPriceDto = new SetAppointmentPriceDto();
         setAppointmentPriceDto.setPrice(100L);
-
-        appointment = new Appointment();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -55,6 +60,8 @@ public class PaymentControllerTests {
         payForAppointmentDto.setPrice(-5L);
         payForAppointmentDto.setPaymentType("");
         payForAppointmentDto.setPaymentDate("");
+
+        invoice = new Invoice();
     }
 
     @Test
@@ -67,19 +74,33 @@ public class PaymentControllerTests {
     }
 
     @Test
+    public void testGetAllInvoices() {
+        when(invoiceService.findAll()).thenReturn(List.of(invoice));
+        ResponseEntity<List<Invoice>> response = paymentController.getAllInvoices();
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
+    }
+
+    @Test
+    public void testGetInvoiceById() {
+        when(invoiceService.findById(1L)).thenReturn(invoice);
+        ResponseEntity<Invoice> response = paymentController.getInvoice(1L);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(invoice, response.getBody());
+    }
+
+    @Test
     public void testCreateInvoice() {
-        when(appointmentService.getAppointmentById(1L)).thenReturn(appointment);
         ResponseEntity<String> response = paymentController.createInvoice(1L, setAppointmentPriceDto);
-        verify(invoiceService).setAppointmentPrice(appointment, setAppointmentPriceDto);
+        verify(paymentService).setAppointmentPrice(1L, setAppointmentPriceDto);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals("Price set successfully", response.getBody());
     }
 
     @Test
     public void testUpdateInvoice() {
-        when(appointmentService.getAppointmentById(1L)).thenReturn(appointment);
         ResponseEntity<String> response = paymentController.updateInvoice(1L, setAppointmentPriceDto);
-        verify(invoiceService).updateAppointmentPrice(appointment, setAppointmentPriceDto);
+        verify(paymentService).updateAppointmentPrice(1L, setAppointmentPriceDto);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals("Price updated successfully", response.getBody());
     }

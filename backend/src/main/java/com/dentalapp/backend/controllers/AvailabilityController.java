@@ -3,6 +3,7 @@ package com.dentalapp.backend.controllers;
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
+import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
 import com.dentalapp.backend.services.AvailabilityService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,18 @@ public class AvailabilityController {
     public ResponseEntity<String> addDoctorAvailability(@RequestHeader("Authorization") String token, @RequestBody @Valid CreateAvailabilityDto createAvailabilityDto) {
         availabilityService.addDoctorAvailability(createAvailabilityDto, jwtService.extractEmail(token.substring(7)));
         return ResponseEntity.status(HttpStatus.CREATED).body("Availability added successfully");
+    }
+
+    @PostMapping("/confirm/{id}")
+    public ResponseEntity<String> confirmAvailability(@PathVariable Long id) {
+        availabilityService.confirmAvailability(id);
+        return ResponseEntity.ok("Availability confirmed successfully");
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateAvailability(@PathVariable Long id, @RequestBody @Valid UpdateAvailabilityDto updateAvailabilityDto) {
+        availabilityService.updateAvailability(id, updateAvailabilityDto);
+        return ResponseEntity.ok("Availability updated successfully");
     }
 
     @GetMapping("/get")

@@ -2,6 +2,8 @@ package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.availability.dtos.AvailabilityDayDto;
 import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
+import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
+import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
 import com.dentalapp.backend.model.availability.repository.AvailabilityRepository;
 import com.dentalapp.backend.model.enums.UserType;
@@ -19,7 +21,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,17 +71,24 @@ public class AvailabilityServiceTests {
     }
 
     @Test
-    public void testAddDoctorAvailabilityAlreadyExists() {
+    public void testAddDoctorAvailabilityDoctorHasAlreadyPlannedBreak() {
         when(userService.getDoctorByEmail(email)).thenReturn(user);
-        when(availabilityRepository.isDeclared(user, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getStartTime()), LocalTime.parse(availabilityDayDto.getEndTime()))).thenReturn(true);
+        when(availabilityRepository.hasDoctorAvailability(user, availabilityDayDto.getDate())).thenReturn(true);
         Assertions.assertThrows(AvailabilityAlreadyExistsException.class, () -> availabilityService.addDoctorAvailability(createAvailabilityDto, email));
     }
 
     @Test
-    public void testAddDoctorAvailabilityDoctorHasAlreadyPlannedBreak() {
-        when(userService.getDoctorByEmail(email)).thenReturn(user);
-        when(availabilityRepository.hasDoctorBrake(user, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getBrakeTimeStart()), LocalTime.parse(availabilityDayDto.getBrakeTimeEnd()))).thenReturn(true);
-        Assertions.assertThrows(AvailabilityAlreadyExistsException.class, () -> availabilityService.addDoctorAvailability(createAvailabilityDto, email));
+    public void testConfirmAvailability() {
+        when(availabilityRepository.findById(1L)).thenReturn(Optional.of(new Availability()));
+        availabilityService.confirmAvailability(1L);
+    }
+
+    @Test
+    public void testUpdateAvailability() {
+        UpdateAvailabilityDto updateAvailabilityDto = new UpdateAvailabilityDto();
+        when(availabilityRepository.findById(1L)).thenReturn(Optional.of(new Availability()));
+        availabilityService.updateAvailability(1L, updateAvailabilityDto);
+        verify(availabilityRepository).save(any(Availability.class));
     }
 
     @Test

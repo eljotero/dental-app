@@ -27,8 +27,8 @@ public class AppointmentController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Appointment>> getAppointments() {
-        return ResponseEntity.ok(appointmentService.getAppointments());
+    public ResponseEntity<List<Appointment>> getAppointments(@RequestParam(required = false) LocalDate date) {
+        return ResponseEntity.ok(appointmentService.getAppointments(date));
     }
 
     @GetMapping("/{id}")
@@ -38,25 +38,12 @@ public class AppointmentController {
 
     @GetMapping("/patient")
     public ResponseEntity<List<Appointment>> getPatientAppointments(@RequestHeader("Authorization") String token) {
-        String email = jwtService.extractEmail(token.substring(7));
-        return ResponseEntity.ok(appointmentService.getPatientAppointments(email));
+        return ResponseEntity.ok(appointmentService.getPatientAppointments(jwtService.extractEmail(token.substring(7))));
     }
 
     @GetMapping("/doctor")
-    public ResponseEntity<List<Appointment>> getDoctorAppointments(@RequestHeader("Authorization") String token) {
-        String email = jwtService.extractEmail(token.substring(7));
-        return ResponseEntity.ok(appointmentService.getDoctorAppointments(email));
-    }
-
-    @GetMapping("/doctor/date")
-    public ResponseEntity<List<Appointment>> getDoctorAppointmentsByDate(@RequestHeader("Authorization") String token, LocalDate date) {
-        String email = jwtService.extractEmail(token.substring(7));
-        return ResponseEntity.ok(appointmentService.getDoctorAppointmentsByDate(email, date));
-    }
-
-    @GetMapping("/date")
-    public ResponseEntity<List<Appointment>> getAppointmentsByDate(LocalDate date) {
-        return ResponseEntity.ok(appointmentService.getAppointmentsByDate(date));
+    public ResponseEntity<List<Appointment>> getDoctorAppointments(@RequestHeader("Authorization") String token, @RequestParam(required = false) LocalDate date) {
+        return ResponseEntity.ok(appointmentService.getDoctorAppointments(jwtService.extractEmail(token.substring(7)), date));
     }
 
     @PostMapping("/cancel/{id}")

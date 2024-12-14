@@ -10,6 +10,9 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+    @Query("SELECT a FROM Appointment a WHERE a.appointmentDate = ?1 AND a.isCancelled = false")
+    List<Appointment> findAllByDate(LocalDate date);
+
     @Query("SELECT a FROM Appointment a WHERE a.patient.userId = ?1 AND a.isCancelled = false")
     List<Appointment> findAllByPatientId(Long patientId);
 

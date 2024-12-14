@@ -1,9 +1,7 @@
 package com.dentalapp.backend.services;
 
-import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
-import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
-import com.dentalapp.backend.model.prescription.dtos.PrescriptionMapper;
-import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
+import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.prescription.dtos.*;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.prescription.exceptions.PrescriptionNotFoundException;
 import com.dentalapp.backend.model.prescription.repository.PrescriptionRepository;
@@ -21,11 +19,15 @@ public class PrescriptionService {
         this.prescriptionRepository = prescriptionRepository;
     }
 
+    public List<GetPrescriptionDto> findAll() {
+        return prescriptionRepository.findAll().stream().map(PrescriptionMapper::toGetPrescriptionDto).toList();
+    }
+
     @Transactional
-    public List<Prescription> addPrescriptions(CreatePrescriptionsDto createPrescriptionsDto) {
+    public List<Prescription> addPrescriptions(CreatePrescriptionsDto createPrescriptionsDto, Appointment appointment) {
         List<Prescription> prescriptions = new ArrayList<>();
         for (CreatePrescriptionDto createPrescription : createPrescriptionsDto.getCreatePrescriptionsDtoList()) {
-            Prescription prescription = PrescriptionMapper.toEntity(createPrescription);
+            Prescription prescription = PrescriptionMapper.toEntity(createPrescription, appointment);
             prescriptionRepository.save(prescription);
             prescriptions.add(prescription);
         }

@@ -67,3 +67,5 @@ next-env.d.ts
 .idea
 frontend/node_modules
 backend/target
+
+*.iml

@@ -5,9 +5,12 @@ import com.dentalapp.backend.model.invoice.dtos.InvoiceMapper;
 import com.dentalapp.backend.model.invoice.dtos.PayForAppointmentDto;
 import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
+import com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException;
 import com.dentalapp.backend.model.invoice.repository.InvoiceRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class InvoiceService {
@@ -16,6 +19,14 @@ public class InvoiceService {
 
     public InvoiceService(InvoiceRepository invoiceRepository) {
         this.invoiceRepository = invoiceRepository;
+    }
+
+    public List<Invoice> findAll() {
+        return invoiceRepository.findAll();
+    }
+
+    public Invoice findById(Long id) {
+        return invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
     }
 
     @Transactional
@@ -39,10 +50,15 @@ public class InvoiceService {
 
     @Transactional
     public void payInvoice(Long id, PayForAppointmentDto payForAppointmentDto) {
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         boolean isPriceSet = invoice.getPrice() != null;
         Invoice invoiceDB = InvoiceMapper.toDto(invoice, payForAppointmentDto, isPriceSet);
         invoiceRepository.save(invoiceDB);
+    }
+
+    @Transactional
+    public void saveInvoice(Invoice invoice) {
+        invoiceRepository.save(invoice);
     }
 
 }

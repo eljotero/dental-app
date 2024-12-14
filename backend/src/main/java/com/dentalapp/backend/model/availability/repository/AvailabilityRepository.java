@@ -12,11 +12,11 @@ import java.util.List;
 
 @Repository
 public interface AvailabilityRepository extends JpaRepository<Availability, Long> {
-    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END FROM Availability a WHERE a.doctor = ?1 AND a.availabilityDate = ?2 AND a.availabilityStartTime <= ?3 AND a.availabilityEndTime >= ?4")
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END FROM Availability a WHERE a.doctor = ?1 AND a.availabilityDate = ?2 AND a.availabilityStartTime <= ?3 AND a.availabilityEndTime >= ?4 AND (a.brakeTimeStart IS NULL OR a.brakeTimeStart >= ?4 OR a.brakeTimeEnd <= ?3)")
     boolean isDeclared(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime);
 
-    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END FROM Availability a WHERE a.doctor = ?1 AND a.availabilityDate = ?2 AND a.availabilityStartTime <= ?3 AND a.availabilityEndTime >= ?4 AND a.brakeTimeStart <= ?5 AND a.brakeTimeEnd >= ?6")
-    boolean hasDoctorBrake(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime);
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END FROM Availability a WHERE a.doctor = ?1 AND a.availabilityDate = ?2")
+    boolean hasDoctorAvailability(User doctor, LocalDate date);
 
     @Query("SELECT a FROM Availability a WHERE a.doctor = ?1")
     List<Availability> findByDoctor(User doctor);

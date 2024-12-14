@@ -3,6 +3,7 @@ package com.dentalapp.backend.unit.controllers;
 import com.dentalapp.backend.controllers.PrescriptionController;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
+import com.dentalapp.backend.model.prescription.dtos.GetPrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.PrescriptionService;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Objects;
 
 @ExtendWith(MockitoExtension.class)
 public class PrescriptionControllerTests {
@@ -37,6 +39,13 @@ public class PrescriptionControllerTests {
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
         createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
         Assertions.assertEquals(2, validator.validate(createPrescriptionDto).size());
+    }
+
+    @Test
+    public void testGetAllPrescriptions() {
+        ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptions();
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(0, Objects.requireNonNull(response.getBody()).size());
     }
 
     @Test

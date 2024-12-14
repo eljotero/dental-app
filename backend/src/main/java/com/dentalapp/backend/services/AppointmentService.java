@@ -44,8 +44,11 @@ public class AppointmentService {
         this.prescriptionService = prescriptionService;
     }
 
-    public List<Appointment> getAppointments() {
-        return appointmentRepository.findAll();
+    public List<Appointment> getAppointments(LocalDate date) {
+        if (date == null) {
+            return appointmentRepository.findAll();
+        }
+        return appointmentRepository.findAllByDate(date);
     }
 
     public List<Appointment> getPatientAppointments(String patientEmail) {
@@ -53,9 +56,12 @@ public class AppointmentService {
         return appointmentRepository.findAllByPatientId(patientId);
     }
 
-    public List<Appointment> getDoctorAppointments(String doctorEmail) {
+    public List<Appointment> getDoctorAppointments(String doctorEmail, LocalDate date) {
         Long doctorId = userService.getDoctorByEmail(doctorEmail).getUserId();
-        return appointmentRepository.findAllByDoctorId(doctorId);
+        if(date == null) {
+            return appointmentRepository.findAllByDoctorId(doctorId);
+        }
+        return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date);
     }
 
     public List<Appointment> getDoctorAppointmentsByDate(String doctorEmail, LocalDate date) {
@@ -131,9 +137,14 @@ public class AppointmentService {
 
     @Transactional
     public void addPrescriptionsToAppointment(Long appointmentId, CreatePrescriptionsDto createPrescriptionsDto) {
-        List<Prescription> prescriptionList = prescriptionService.addPrescriptions(createPrescriptionsDto);
         Appointment appointment = getAppointmentById(appointmentId);
+        List<Prescription> prescriptionList = prescriptionService.addPrescriptions(createPrescriptionsDto, appointment);
         appointment.setPrescriptions(prescriptionList);
+        appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public void saveAppointment(Appointment appointment) {
         appointmentRepository.save(appointment);
     }
 

@@ -30,11 +30,6 @@ public class SupplyController {
         return ResponseEntity.ok(supplyService.findById(id));
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<Supply> getSupplyByName(@PathVariable String name) {
-        return ResponseEntity.ok(supplyService.findByName(name));
-    }
-
     @PostMapping("/add")
     public ResponseEntity<String> addSupply(@Valid @RequestBody CreateSupplyDto createSupplyDto) {
         supplyService.createSupply(createSupplyDto);
