@@ -33,6 +33,8 @@ public class InvoiceServiceTests {
 
     private SetAppointmentPriceDto setAppointmentPriceDto;
 
+    private PayForAppointmentDto payForAppointmentDto;
+
     @BeforeEach
     public void setUp() {
         invoice = new Invoice();
@@ -42,6 +44,11 @@ public class InvoiceServiceTests {
 
         appointment = new Appointment();
         appointment.setInvoice(invoice);
+
+        payForAppointmentDto = new PayForAppointmentDto();
+        payForAppointmentDto.setPaymentDate("2021-01-01");
+        payForAppointmentDto.setPrice(100L);
+        payForAppointmentDto.setPaymentType("CASH");
     }
 
     @Test
@@ -89,12 +96,22 @@ public class InvoiceServiceTests {
 
     @Test
     public void testPayInvoice() {
-        PayForAppointmentDto payForAppointmentDto = new PayForAppointmentDto();
-        payForAppointmentDto.setPaymentDate("2021-01-01");
-        payForAppointmentDto.setPrice(100L);
-        payForAppointmentDto.setPaymentType("CASH");
         when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.of(invoice));
         when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
         invoiceService.payInvoice(1L, payForAppointmentDto);
+    }
+
+    @Test
+    public void testPayInvoiceNotFound() {
+        when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException.class, () ->
+                invoiceService.payInvoice(1L, payForAppointmentDto)
+        );
+    }
+
+    @Test
+    public void testSaveInvoice() {
+        when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
+        invoiceService.saveInvoice(invoice);
     }
 }

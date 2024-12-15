@@ -1,5 +1,6 @@
 package com.dentalapp.backend.unit.controllers;
 
+import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.PrescriptionController;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
@@ -9,6 +10,7 @@ import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.PrescriptionService;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.Objects;
 
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 public class PrescriptionControllerTests {
     @Mock
@@ -28,12 +32,22 @@ public class PrescriptionControllerTests {
     @Mock
     private AppointmentService appointmentService;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private PrescriptionController prescriptionController;
 
+    private final String token = "Bearer test@mail.com";
+
+    private final String email = "test@mail.com";
+
     @Test
     public void testValidation() {
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
         CreatePrescriptionsDto createPrescriptionsDto = new CreatePrescriptionsDto();
         Assertions.assertEquals(2, validator.validate(createPrescriptionsDto).size());
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
@@ -44,6 +58,24 @@ public class PrescriptionControllerTests {
     @Test
     public void testGetAllPrescriptions() {
         ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptions();
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(0, Objects.requireNonNull(response.getBody()).size());
+    }
+
+    @Test
+    public void testGetAllPrescriptionsByPatient() {
+        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
+        when(prescriptionService.findAllByPatient(email)).thenReturn(List.of());
+        ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptionsByPatient(token);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(0, Objects.requireNonNull(response.getBody()).size());
+    }
+
+    @Test
+    public void testGetAllPrescriptionsByDoctor() {
+        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
+        when(prescriptionService.findAllByDoctor(email)).thenReturn(List.of());
+        ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptionsByDoctor(token);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals(0, Objects.requireNonNull(response.getBody()).size());
     }

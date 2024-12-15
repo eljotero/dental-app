@@ -6,6 +6,7 @@ import com.dentalapp.backend.model.availability.dtos.AvailabilityDayDto;
 import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
+import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.services.AvailabilityService;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -17,13 +18,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AvailabilityControllerTests {
@@ -52,8 +54,9 @@ public class AvailabilityControllerTests {
 
     @BeforeEach
     public void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
         email = "test@mail.com";
         token = "Bearer token";
 
@@ -69,6 +72,42 @@ public class AvailabilityControllerTests {
         updateAvailabilityDto.setEndTime("17:00");
         updateAvailabilityDto.setBrakeTimeStart("12:00");
         updateAvailabilityDto.setBrakeTimeEnd("13:00");
+    }
+
+    @Test
+    public void testGetAllDoctorAvailability() {
+        LocalDate date = LocalDate.of(2021, 10, 10);
+        Long id = 1L;
+        List<GetAvailabilityDto> availabilityList = List.of(new GetAvailabilityDto());
+
+        Specification<Availability> specification = Specification.where(null);
+        specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("availabilityDate"), date))
+                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("doctor").get("id"), id));
+
+        when(availabilityService.getAllDoctorsAvailability(any(Specification.class))).thenReturn(availabilityList);
+
+        ResponseEntity<List<GetAvailabilityDto>> response = availabilityController.getAllDoctorAvailability(date, id);
+
+        verify(availabilityService, times(1)).getAllDoctorsAvailability(any(Specification.class));
+        Assertions.assertEquals(ResponseEntity.ok(availabilityList), response);
+    }
+
+    @Test
+    public void testGetDoctorAvailability() {
+        LocalDate date = LocalDate.of(2021, 10, 10);
+        String token = "Bearer token";
+        List<GetAvailabilityDto> availabilityList = List.of(new GetAvailabilityDto());
+
+        Specification<Availability> specification = Specification.where(null);
+        specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("doctor").get("email"), "doctor@example.com"))
+                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("availabilityDate"), date));
+
+        when(availabilityService.getDoctorAvailability(any(Specification.class))).thenReturn(availabilityList);
+
+        ResponseEntity<List<GetAvailabilityDto>> response = availabilityController.getDoctorAvailability(token, date);
+
+        verify(availabilityService, times(1)).getDoctorAvailability(any(Specification.class));
+        Assertions.assertEquals(ResponseEntity.ok(availabilityList), response);
     }
 
     @Test
@@ -90,7 +129,7 @@ public class AvailabilityControllerTests {
     @Test
     public void testAddDoctorAvailability() {
         when(jwtService.extractEmail("token")).thenReturn(email);
-        ResponseEntity<?> response = availabilityController.addDoctorAvailability(token,createAvailabilityDto);
+        ResponseEntity<?> response = availabilityController.addDoctorAvailability(token, createAvailabilityDto);
         verify(availabilityService).addDoctorAvailability(createAvailabilityDto, email);
         Assertions.assertEquals(ResponseEntity.status(201).body("Availability added successfully"), response);
     }
@@ -109,15 +148,5 @@ public class AvailabilityControllerTests {
         verify(availabilityService).updateAvailability(1L, updateAvailabilityDto);
         Assertions.assertEquals(ResponseEntity.ok("Availability updated successfully"), response);
         Assertions.assertEquals(200, response.getStatusCode().value());
-    }
-
-    @Test
-    public void testGetDoctorAvailability() {
-        GetAvailabilityDto availabilityDto = new GetAvailabilityDto();
-        when(jwtService.extractEmail("token")).thenReturn(email);
-        when(availabilityService.getDoctorAvailability(email, null)).thenReturn(List.of(availabilityDto));
-        ResponseEntity<?> response = availabilityController.getDoctorAvailability(token, null);
-        verify(availabilityService).getDoctorAvailability(email, null);
-        Assertions.assertEquals(ResponseEntity.ok(List.of(availabilityDto)), response);
     }
 }

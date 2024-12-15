@@ -36,6 +36,8 @@ public class ReferralServiceTests {
 
     private Referral referral;
 
+    private final String email = "test@mail.com";
+
     @BeforeEach
     public void setUp() {
         referral = new Referral();
@@ -54,6 +56,20 @@ public class ReferralServiceTests {
         when(referralRepository.findById(1L)).thenReturn(java.util.Optional.of(referral));
         Referral foundReferral = referralService.findById(1L);
         Assertions.assertEquals(referral, foundReferral);
+    }
+
+    @Test
+    public void testFindAllByPatient() {
+        when(referralRepository.findAllByPatientEmail(email)).thenReturn(List.of(referral));
+        List<Referral> referrals = referralService.findAllByPatient(email);
+        Assertions.assertEquals(1, referrals.size());
+    }
+
+    @Test
+    public void testFindAllByDoctor() {
+        when(referralRepository.findAllByDoctorEmail(email)).thenReturn(List.of(referral));
+        List<Referral> referrals = referralService.findAllByDoctor(email);
+        Assertions.assertEquals(1, referrals.size());
     }
 
     @Test

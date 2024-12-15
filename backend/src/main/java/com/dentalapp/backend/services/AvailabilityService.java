@@ -30,12 +30,8 @@ public class AvailabilityService {
         return availabilityRepository.findAll(spec).stream().map(AvailabilityMapper::toDto).toList();
     }
 
-    public List<GetAvailabilityDto> getDoctorAvailability(String email, LocalDate date) {
-        User doctor = userService.getDoctorByEmail(email);
-        if (date != null) {
-            return getAllDoctorsAvailabilityByDate(doctor, date);
-        }
-        return availabilityRepository.findByDoctor(doctor).stream().map(AvailabilityMapper::toDto).toList();
+    public List<GetAvailabilityDto> getDoctorAvailability(Specification<Availability> spec) {
+        return availabilityRepository.findAll(spec).stream().map(AvailabilityMapper::toDto).toList();
     }
 
 
@@ -74,10 +70,5 @@ public class AvailabilityService {
 
     private boolean isAvailabilityExists(AvailabilityDayDto availabilityDayDto, User doctor) {
         return availabilityRepository.hasDoctorAvailability(doctor, availabilityDayDto.getDate());
-    }
-
-    private List<GetAvailabilityDto> getAllDoctorsAvailabilityByDate(User doctor, LocalDate date) {
-        List<Availability> availabilities = availabilityRepository.findByDoctorAndDate(doctor, date);
-        return availabilities.stream().map(AvailabilityMapper::toDto).toList();
     }
 }

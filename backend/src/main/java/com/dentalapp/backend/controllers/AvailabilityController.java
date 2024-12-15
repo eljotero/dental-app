@@ -42,7 +42,12 @@ public class AvailabilityController {
 
     @GetMapping("/doctor")
     public ResponseEntity<List<GetAvailabilityDto>> getDoctorAvailability(@RequestHeader("Authorization") String token, @RequestParam(required = false) LocalDate date) {
-        return ResponseEntity.ok(availabilityService.getDoctorAvailability(jwtService.extractEmail(token.substring(7)), date));
+        Specification<Availability> specification = Specification.where(null);
+        specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("doctor").get("email"), jwtService.extractEmail(token.substring(7))));
+        if (date != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("availabilityDate"), date));
+        }
+        return ResponseEntity.ok(availabilityService.getDoctorAvailability(specification));
     }
 
     @PostMapping("/add")

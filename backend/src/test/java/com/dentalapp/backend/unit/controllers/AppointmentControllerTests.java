@@ -44,8 +44,9 @@ public class AppointmentControllerTests {
 
     @BeforeEach
     public void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         User doctor = new User();
         doctor.setUserId(1L);
@@ -121,18 +122,6 @@ public class AppointmentControllerTests {
         Assertions.assertEquals(List.of(appointment), response.getBody());
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
-
-//    @Test
-//    public void testGetDoctorAppointmentsByDate() {
-//        String doctorEmail = "test2@mail.com";
-//        LocalDate date = LocalDate.parse("2021-01-01");
-//        when(jwtService.extractEmail("test")).thenReturn(doctorEmail);
-//        when(appointmentService.getDoctorAppointmentsByDate(doctorEmail, date)).thenReturn(List.of(appointment));
-//        ResponseEntity<?> response = appointmentController.getDoctorAppointments("Bearer test", date);
-//        verify(appointmentService).getDoctorAppointmentsByDate(doctorEmail, date);
-//        Assertions.assertEquals(List.of(appointment), response.getBody());
-//        Assertions.assertEquals(200, response.getStatusCode().value());
-//    }
 
     @Test
     public void testCancelAppointment() {
