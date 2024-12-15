@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.Objects;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,8 +76,8 @@ public class PaymentControllerTests {
 
     @Test
     public void testGetAllInvoices() {
-        when(invoiceService.findAll()).thenReturn(List.of(invoice));
-        ResponseEntity<List<Invoice>> response = paymentController.getAllInvoices();
+        when(invoiceService.findAllByQueryParams(any())).thenReturn(List.of(invoice));
+        ResponseEntity<List<Invoice>> response = paymentController.getAllInvoices(null, null, null);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
     }

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -45,8 +46,8 @@ public class InvoiceServiceTests {
 
     @Test
     public void testFindAll() {
-        when(invoiceRepository.findAll()).thenReturn(java.util.List.of(invoice));
-        Assertions.assertEquals(1, invoiceService.findAll().size());
+        when(invoiceRepository.findAll((Specification<Invoice>) any())).thenReturn(java.util.List.of(invoice));
+        Assertions.assertEquals(1, invoiceService.findAllByQueryParams(null).size());
     }
 
     @Test
@@ -69,7 +70,7 @@ public class InvoiceServiceTests {
         Invoice createdInvoice = invoiceService.createInvoice();
         Assertions.assertEquals(invoice.getPrice(), createdInvoice.getPrice());
         Assertions.assertEquals(invoice.getIsPaid(), createdInvoice.getIsPaid());
-        Assertions.assertEquals(invoice.getPaymentType(), createdInvoice.getPaymentType());
+        Assertions.assertEquals(invoice.getPaymentMethod(), createdInvoice.getPaymentMethod());
         Assertions.assertEquals(invoice.getPaymentDate(), createdInvoice.getPaymentDate());
         Assertions.assertEquals(invoice.getPaymentStatus(), createdInvoice.getPaymentStatus());
     }

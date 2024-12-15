@@ -1,6 +1,6 @@
 package com.dentalapp.backend.model.enums;
 
-public enum PaymentType {
+public enum PaymentMethod {
     NONE,
     CASH,
     CARD

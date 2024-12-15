@@ -1,7 +1,7 @@
 package com.dentalapp.backend.model.invoice.entity;
 
 import com.dentalapp.backend.model.enums.PaymentStatus;
-import com.dentalapp.backend.model.enums.PaymentType;
+import com.dentalapp.backend.model.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +27,7 @@ public class Invoice {
 
     @Column(name = "payment_method", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentType paymentType = PaymentType.NONE;
+    private PaymentMethod paymentMethod = PaymentMethod.NONE;
 
     @Column(name = "payment_date")
     private LocalDate paymentDate = null;

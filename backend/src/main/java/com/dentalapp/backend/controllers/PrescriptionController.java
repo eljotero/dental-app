@@ -1,5 +1,6 @@
 package com.dentalapp.backend.controllers;
 
+import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.dtos.GetPrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
@@ -16,15 +17,27 @@ import java.util.List;
 public class PrescriptionController {
     private final PrescriptionService prescriptionService;
     private final AppointmentService appointmentService;
+    private final JwtService jwtService;
 
-    public PrescriptionController(PrescriptionService prescriptionService, AppointmentService appointmentService) {
+    public PrescriptionController(PrescriptionService prescriptionService, AppointmentService appointmentService, JwtService jwtService) {
         this.prescriptionService = prescriptionService;
         this.appointmentService = appointmentService;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<GetPrescriptionDto>> getAllPrescriptions() {
         return ResponseEntity.ok(prescriptionService.findAll());
+    }
+
+    @GetMapping("/patient")
+    public ResponseEntity<List<GetPrescriptionDto>> getAllPrescriptionsByPatient(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(prescriptionService.findAllByPatient(jwtService.extractEmail(token.substring(7))));
+    }
+
+    @GetMapping("/doctor")
+    public ResponseEntity<List<GetPrescriptionDto>> getAllPrescriptionsByDoctor(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(prescriptionService.findAllByDoctor(jwtService.extractEmail(token.substring(7))));
     }
 
     @PostMapping("/add")

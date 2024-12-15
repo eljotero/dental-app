@@ -4,6 +4,8 @@ import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundExc
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityNotFoundException;
+import com.dentalapp.backend.model.enums.exceptions.PaymentMethodNotFoundException;
+import com.dentalapp.backend.model.enums.exceptions.PaymentStatusNotFoundException;
 import com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException;
 import com.dentalapp.backend.model.prescription.exceptions.PrescriptionNotFoundException;
 import com.dentalapp.backend.model.referral.exception.ReferralNotFoundException;
@@ -133,6 +135,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = UsernameNotFoundException.class)
     public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = PaymentStatusNotFoundException.class)
+    public ResponseEntity<?> handlePaymentStatusNotFoundException(PaymentStatusNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = PaymentMethodNotFoundException.class)
+    public ResponseEntity<?> handlePaymentMethodNotFoundException(PaymentMethodNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 }

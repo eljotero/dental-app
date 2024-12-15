@@ -6,6 +6,7 @@ import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyEx
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityNotFoundException;
 import com.dentalapp.backend.model.availability.repository.AvailabilityRepository;
 import com.dentalapp.backend.model.user.entity.User;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,19 @@ public class AvailabilityService {
         this.availabilityRepository = availabilityRepository;
         this.userService = userService;
     }
+
+    public List<GetAvailabilityDto> getAllDoctorsAvailability(Specification<Availability> spec) {
+        return availabilityRepository.findAll(spec).stream().map(AvailabilityMapper::toDto).toList();
+    }
+
+    public List<GetAvailabilityDto> getDoctorAvailability(String email, LocalDate date) {
+        User doctor = userService.getDoctorByEmail(email);
+        if (date != null) {
+            return getAllDoctorsAvailabilityByDate(doctor, date);
+        }
+        return availabilityRepository.findByDoctor(doctor).stream().map(AvailabilityMapper::toDto).toList();
+    }
+
 
     @Transactional
     public void addDoctorAvailability(CreateAvailabilityDto createAvailabilityDto, String email) {
@@ -53,12 +67,6 @@ public class AvailabilityService {
         availabilityRepository.save(updatedAvailability);
     }
 
-    public List<GetAvailabilityDto> getDoctorAvailability(String email) {
-        User doctor = userService.getDoctorByEmail(email);
-        List<Availability> availabilities = availabilityRepository.findByDoctor(doctor);
-        return availabilities.stream().map(AvailabilityMapper::toDto).toList();
-    }
-
     @Transactional
     public boolean isDoctorAvailable(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return availabilityRepository.isDeclared(doctor, date, startTime, endTime);
@@ -66,5 +74,10 @@ public class AvailabilityService {
 
     private boolean isAvailabilityExists(AvailabilityDayDto availabilityDayDto, User doctor) {
         return availabilityRepository.hasDoctorAvailability(doctor, availabilityDayDto.getDate());
+    }
+
+    private List<GetAvailabilityDto> getAllDoctorsAvailabilityByDate(User doctor, LocalDate date) {
+        List<Availability> availabilities = availabilityRepository.findByDoctorAndDate(doctor, date);
+        return availabilities.stream().map(AvailabilityMapper::toDto).toList();
     }
 }

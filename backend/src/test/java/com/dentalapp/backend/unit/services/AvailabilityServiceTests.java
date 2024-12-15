@@ -95,7 +95,7 @@ public class AvailabilityServiceTests {
     public void testGetDoctorAvailability() {
         when(userService.getDoctorByEmail(email)).thenReturn(user);
         when(availabilityRepository.findByDoctor(user)).thenReturn(List.of());
-        Assertions.assertEquals(0, availabilityService.getDoctorAvailability(email).size());
+        Assertions.assertEquals(0, availabilityService.getDoctorAvailability(email,null).size());
     }
 
     @Test

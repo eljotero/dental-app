@@ -115,9 +115,9 @@ public class AvailabilityControllerTests {
     public void testGetDoctorAvailability() {
         GetAvailabilityDto availabilityDto = new GetAvailabilityDto();
         when(jwtService.extractEmail("token")).thenReturn(email);
-        when(availabilityService.getDoctorAvailability(email)).thenReturn(List.of(availabilityDto));
-        ResponseEntity<?> response = availabilityController.getDoctorAvailability(token);
-        verify(availabilityService).getDoctorAvailability(email);
+        when(availabilityService.getDoctorAvailability(email, null)).thenReturn(List.of(availabilityDto));
+        ResponseEntity<?> response = availabilityController.getDoctorAvailability(token, null);
+        verify(availabilityService).getDoctorAvailability(email, null);
         Assertions.assertEquals(ResponseEntity.ok(List.of(availabilityDto)), response);
     }
 }

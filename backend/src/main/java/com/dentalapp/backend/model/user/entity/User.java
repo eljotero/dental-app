@@ -62,6 +62,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
+    @JsonIgnore
     private UserType userType;
 
     @Column(name = "zip_code", nullable = false)
