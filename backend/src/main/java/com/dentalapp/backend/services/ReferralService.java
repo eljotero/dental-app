@@ -33,6 +33,14 @@ public class ReferralService {
         return referralRepository.findById(id).orElseThrow(ReferralNotFoundException::new);
     }
 
+    public List<Referral> findAllByPatient(String patientEmail) {
+        return referralRepository.findAllByPatientEmail(patientEmail);
+    }
+
+    public List<Referral> findAllByDoctor(String doctorEmail) {
+        return referralRepository.findAllByDoctorEmail(doctorEmail);
+    }
+
     @Transactional
     public void createReferral(CreateReferralsDto createReferralsDto) {
         Appointment appointment = appointmentService.getAppointmentById(createReferralsDto.getAppointmentId());

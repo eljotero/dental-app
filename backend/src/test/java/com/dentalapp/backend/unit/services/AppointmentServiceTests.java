@@ -107,6 +107,14 @@ public class AppointmentServiceTests {
     }
 
     @Test
+    public void testGetAppointmentsDateNotNull() {
+        LocalDate date = LocalDate.of(2021, 1, 1);
+        when(appointmentRepository.findAllByDate(date)).thenReturn(appointments);
+        List<Appointment> result = appointmentService.getAppointments(date);
+        Assertions.assertEquals(appointments, result);
+    }
+
+    @Test
     public void testGetPatientAppointments() {
         when(userService.getPatientByEmail(patient.getEmail())).thenReturn(patient);
         when(appointmentRepository.findAllByPatientId(patient.getUserId())).thenReturn(appointments);
@@ -118,6 +126,14 @@ public class AppointmentServiceTests {
         when(userService.getDoctorByEmail(doctor.getEmail())).thenReturn(doctor);
         when(appointmentRepository.findAllByDoctorId(doctor.getUserId())).thenReturn(appointments);
         Assertions.assertEquals(appointments, appointmentService.getDoctorAppointments(doctor.getEmail(), null));
+    }
+
+    @Test
+    public void testGetDoctorAppointmentsDateNotNull() {
+        LocalDate date = LocalDate.of(2021, 1, 1);
+        when(userService.getDoctorByEmail(doctor.getEmail())).thenReturn(doctor);
+        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), date)).thenReturn(appointments);
+        Assertions.assertEquals(appointments, appointmentService.getDoctorAppointments(doctor.getEmail(), date));
     }
 
     @Test
@@ -226,6 +242,12 @@ public class AppointmentServiceTests {
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
         appointmentService.addPrescriptionsToAppointment(1L, createPrescriptionsDto);
         verify(appointmentRepository).save(any(Appointment.class));
+    }
+
+    @Test
+    public void testSaveAppointment() {
+        appointmentService.saveAppointment(appointment);
+        verify(appointmentRepository).save(appointment);
     }
 
 }

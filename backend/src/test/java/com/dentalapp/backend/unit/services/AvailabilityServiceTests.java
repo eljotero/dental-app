@@ -5,6 +5,7 @@ import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
 import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
+import com.dentalapp.backend.model.availability.exceptions.AvailabilityNotFoundException;
 import com.dentalapp.backend.model.availability.repository.AvailabilityRepository;
 import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.user.entity.User;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -39,13 +41,13 @@ public class AvailabilityServiceTests {
     @InjectMocks
     private AvailabilityService availabilityService;
 
-    CreateAvailabilityDto createAvailabilityDto;
+    private CreateAvailabilityDto createAvailabilityDto;
 
-    AvailabilityDayDto availabilityDayDto;
+    private AvailabilityDayDto availabilityDayDto;
 
-    User user;
+    private User user;
 
-    String email;
+    private String email;
 
     @BeforeEach
     public void setUp() {
@@ -63,6 +65,17 @@ public class AvailabilityServiceTests {
         createAvailabilityDto.setAvailabilityDays(List.of(availabilityDayDto));
     }
 
+    @Test
+    public void testGetAllDoctorsAvailability() {
+        when(availabilityRepository.findAll((Specification<Availability>) any())).thenReturn(List.of());
+        Assertions.assertEquals(0, availabilityService.getAllDoctorsAvailability(null).size());
+    }
+
+    @Test
+    public void testGetDoctorAvailability() {
+        when(availabilityRepository.findAll((Specification<Availability>) any())).thenReturn(List.of());
+        Assertions.assertEquals(0, availabilityService.getDoctorAvailability(null).size());
+    }
 
     @Test
     public void testAddDoctorAvailability() {
@@ -84,6 +97,12 @@ public class AvailabilityServiceTests {
     }
 
     @Test
+    public void testConfirmAvailabilityAvailabilityNotFound() {
+        when(availabilityRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThrows(AvailabilityNotFoundException.class, () -> availabilityService.confirmAvailability(1L));
+    }
+
+    @Test
     public void testUpdateAvailability() {
         UpdateAvailabilityDto updateAvailabilityDto = new UpdateAvailabilityDto();
         when(availabilityRepository.findById(1L)).thenReturn(Optional.of(new Availability()));
@@ -92,10 +111,10 @@ public class AvailabilityServiceTests {
     }
 
     @Test
-    public void testGetDoctorAvailability() {
-        when(userService.getDoctorByEmail(email)).thenReturn(user);
-        when(availabilityRepository.findByDoctor(user)).thenReturn(List.of());
-        Assertions.assertEquals(0, availabilityService.getDoctorAvailability(email).size());
+    public void testUpdateAvailabilityAvailabilityNotFound() {
+        UpdateAvailabilityDto updateAvailabilityDto = new UpdateAvailabilityDto();
+        when(availabilityRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThrows(AvailabilityNotFoundException.class, () -> availabilityService.updateAvailability(1L, updateAvailabilityDto));
     }
 
     @Test

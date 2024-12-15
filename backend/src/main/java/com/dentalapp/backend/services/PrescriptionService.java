@@ -23,6 +23,14 @@ public class PrescriptionService {
         return prescriptionRepository.findAll().stream().map(PrescriptionMapper::toGetPrescriptionDto).toList();
     }
 
+    public List<GetPrescriptionDto> findAllByPatient(String email) {
+        return prescriptionRepository.findAllByPatient(email).stream().map(PrescriptionMapper::toGetPrescriptionDto).toList();
+    }
+
+    public List<GetPrescriptionDto> findAllByDoctor(String email) {
+        return prescriptionRepository.findAllByDoctor(email).stream().map(PrescriptionMapper::toGetPrescriptionDto).toList();
+    }
+
     @Transactional
     public List<Prescription> addPrescriptions(CreatePrescriptionsDto createPrescriptionsDto, Appointment appointment) {
         List<Prescription> prescriptions = new ArrayList<>();

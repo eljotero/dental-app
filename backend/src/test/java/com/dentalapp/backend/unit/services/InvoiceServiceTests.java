@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -32,6 +33,8 @@ public class InvoiceServiceTests {
 
     private SetAppointmentPriceDto setAppointmentPriceDto;
 
+    private PayForAppointmentDto payForAppointmentDto;
+
     @BeforeEach
     public void setUp() {
         invoice = new Invoice();
@@ -41,12 +44,17 @@ public class InvoiceServiceTests {
 
         appointment = new Appointment();
         appointment.setInvoice(invoice);
+
+        payForAppointmentDto = new PayForAppointmentDto();
+        payForAppointmentDto.setPaymentDate("2021-01-01");
+        payForAppointmentDto.setPrice(100L);
+        payForAppointmentDto.setPaymentType("CASH");
     }
 
     @Test
     public void testFindAll() {
-        when(invoiceRepository.findAll()).thenReturn(java.util.List.of(invoice));
-        Assertions.assertEquals(1, invoiceService.findAll().size());
+        when(invoiceRepository.findAll((Specification<Invoice>) any())).thenReturn(java.util.List.of(invoice));
+        Assertions.assertEquals(1, invoiceService.findAllByQueryParams(null).size());
     }
 
     @Test
@@ -69,7 +77,7 @@ public class InvoiceServiceTests {
         Invoice createdInvoice = invoiceService.createInvoice();
         Assertions.assertEquals(invoice.getPrice(), createdInvoice.getPrice());
         Assertions.assertEquals(invoice.getIsPaid(), createdInvoice.getIsPaid());
-        Assertions.assertEquals(invoice.getPaymentType(), createdInvoice.getPaymentType());
+        Assertions.assertEquals(invoice.getPaymentMethod(), createdInvoice.getPaymentMethod());
         Assertions.assertEquals(invoice.getPaymentDate(), createdInvoice.getPaymentDate());
         Assertions.assertEquals(invoice.getPaymentStatus(), createdInvoice.getPaymentStatus());
     }
@@ -88,12 +96,22 @@ public class InvoiceServiceTests {
 
     @Test
     public void testPayInvoice() {
-        PayForAppointmentDto payForAppointmentDto = new PayForAppointmentDto();
-        payForAppointmentDto.setPaymentDate("2021-01-01");
-        payForAppointmentDto.setPrice(100L);
-        payForAppointmentDto.setPaymentType("CASH");
         when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.of(invoice));
         when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
         invoiceService.payInvoice(1L, payForAppointmentDto);
+    }
+
+    @Test
+    public void testPayInvoiceNotFound() {
+        when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException.class, () ->
+                invoiceService.payInvoice(1L, payForAppointmentDto)
+        );
+    }
+
+    @Test
+    public void testSaveInvoice() {
+        when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
+        invoiceService.saveInvoice(invoice);
     }
 }

@@ -1,5 +1,6 @@
 package com.dentalapp.backend.unit.controllers;
 
+import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.ReferralController;
 import com.dentalapp.backend.model.referral.dtos.CreateReferralDto;
 import com.dentalapp.backend.model.referral.dtos.CreateReferralsDto;
@@ -28,6 +29,9 @@ public class ReferralControllerTests {
     @Mock
     private ReferralService referralService;
 
+    @Mock
+    public JwtService jwtService;
+
     @InjectMocks
     private ReferralController referralController;
 
@@ -35,11 +39,15 @@ public class ReferralControllerTests {
 
     private Validator validator;
 
-    CreateReferralsDto createReferralsDto;
+    private CreateReferralsDto createReferralsDto;
 
-    CreateReferralDto createReferralDto;
+    private CreateReferralDto createReferralDto;
 
-    UpdateReferralDto updateReferralDto;
+    private UpdateReferralDto updateReferralDto;
+
+    private final String token = "Bearer test@mail.com";
+
+    private final String email = "test@mail.com";
 
     @BeforeEach
     public void setUp() {
@@ -55,15 +63,16 @@ public class ReferralControllerTests {
         createReferralsDto.setCreateReferralDtoList(List.of(createReferralDto));
         createReferralsDto.setAppointmentId(1L);
 
-        UpdateReferralDto updateReferralDto = new UpdateReferralDto();
+        updateReferralDto = new UpdateReferralDto();
         updateReferralDto.setProcedureName("Procedure Name");
         updateReferralDto.setProcedureDescription("Procedure Description");
         updateReferralDto.setDoctorName("Doctor Name");
         updateReferralDto.setClinicName("Clinic Name");
         updateReferralDto.setClinicAddress("Clinic Address");
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
     }
 
     @Test
@@ -94,6 +103,24 @@ public class ReferralControllerTests {
         ResponseEntity<Referral> response = referralController.getReferralById(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals(referral, response.getBody());
+    }
+
+    @Test
+    public void testGetAllReferralsByPatient() {
+        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
+        when(referralService.findAllByPatient(email)).thenReturn(List.of(referral));
+        ResponseEntity<List<Referral>> response = referralController.getAllReferralsByPatient(token);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
+    }
+
+    @Test
+    public void testGetAllReferralsByDoctor() {
+        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
+        when(referralService.findAllByDoctor(email)).thenReturn(List.of(referral));
+        ResponseEntity<List<Referral>> response = referralController.getAllReferralsByDoctor(token);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyEx
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityNotFoundException;
 import com.dentalapp.backend.model.availability.repository.AvailabilityRepository;
 import com.dentalapp.backend.model.user.entity.User;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,15 @@ public class AvailabilityService {
         this.availabilityRepository = availabilityRepository;
         this.userService = userService;
     }
+
+    public List<GetAvailabilityDto> getAllDoctorsAvailability(Specification<Availability> spec) {
+        return availabilityRepository.findAll(spec).stream().map(AvailabilityMapper::toDto).toList();
+    }
+
+    public List<GetAvailabilityDto> getDoctorAvailability(Specification<Availability> spec) {
+        return availabilityRepository.findAll(spec).stream().map(AvailabilityMapper::toDto).toList();
+    }
+
 
     @Transactional
     public void addDoctorAvailability(CreateAvailabilityDto createAvailabilityDto, String email) {
@@ -51,12 +61,6 @@ public class AvailabilityService {
         Availability availability = availabilityRepository.findById(id).orElseThrow(() -> new AvailabilityNotFoundException("Availability not found"));
         Availability updatedAvailability = AvailabilityMapper.updateAvailability(availability, updateAvailabilityDto);
         availabilityRepository.save(updatedAvailability);
-    }
-
-    public List<GetAvailabilityDto> getDoctorAvailability(String email) {
-        User doctor = userService.getDoctorByEmail(email);
-        List<Availability> availabilities = availabilityRepository.findByDoctor(doctor);
-        return availabilities.stream().map(AvailabilityMapper::toDto).toList();
     }
 
     @Transactional

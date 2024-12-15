@@ -17,13 +17,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PaymentControllerTests {
@@ -53,8 +54,9 @@ public class PaymentControllerTests {
         setAppointmentPriceDto = new SetAppointmentPriceDto();
         setAppointmentPriceDto.setPrice(100L);
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         payForAppointmentDto = new PayForAppointmentDto();
         payForAppointmentDto.setPrice(-5L);
@@ -75,10 +77,22 @@ public class PaymentControllerTests {
 
     @Test
     public void testGetAllInvoices() {
-        when(invoiceService.findAll()).thenReturn(List.of(invoice));
-        ResponseEntity<List<Invoice>> response = paymentController.getAllInvoices();
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
+        String status = "PAID";
+        String method = "CREDIT_CARD";
+        LocalDate date = LocalDate.of(2021, 10, 10);
+        List<Invoice> invoiceList = List.of(new Invoice());
+
+        Specification<Invoice> specification = Specification.where(null);
+        specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentStatus"), status))
+                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentMethod"), method))
+                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentDate"), date));
+
+        when(invoiceService.findAllByQueryParams(any(Specification.class))).thenReturn(invoiceList);
+
+        ResponseEntity<List<Invoice>> response = paymentController.getAllInvoices(status, method, date);
+
+        verify(invoiceService, times(1)).findAllByQueryParams(any(Specification.class));
+        Assertions.assertEquals(ResponseEntity.ok(invoiceList), response);
     }
 
     @Test

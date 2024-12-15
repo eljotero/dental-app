@@ -7,6 +7,7 @@ import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException;
 import com.dentalapp.backend.model.invoice.repository.InvoiceRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +22,8 @@ public class InvoiceService {
         this.invoiceRepository = invoiceRepository;
     }
 
-    public List<Invoice> findAll() {
-        return invoiceRepository.findAll();
+    public List<Invoice> findAllByQueryParams(Specification<Invoice> spec) {
+        return invoiceRepository.findAll(spec);
     }
 
     public Invoice findById(Long id) {
