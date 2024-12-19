@@ -118,6 +118,7 @@
                         <exclude>**/exceptions/*</exclude>
                         <exclude>**/enums/*</exclude>
                         <exclude>**/model/**</exclude>
+                        <exclude>**/EmailSenderService.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

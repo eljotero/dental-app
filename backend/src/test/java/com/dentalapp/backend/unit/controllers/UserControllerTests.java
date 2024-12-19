@@ -2,9 +2,7 @@ package com.dentalapp.backend.unit.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.UserController;
-import com.dentalapp.backend.model.user.dtos.CreateUserDto;
-import com.dentalapp.backend.model.user.dtos.LoginUserDto;
-import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
+import com.dentalapp.backend.model.user.dtos.*;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.Validation;
@@ -71,8 +69,9 @@ public class UserControllerTests {
         loginUserDto.setEmail(createUserDto.getEmail());
         loginUserDto.setPassword(createUserDto.getPassword());
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         updateUserDto = new UpdateUserDto();
         updateUserDto.setFirstName("John");
@@ -165,5 +164,27 @@ public class UserControllerTests {
         ResponseEntity<?> response = userController.confirmUser("token");
         verify(userService).enableUser("token");
         assertEquals(ResponseEntity.ok("User confirmed successfully"), response);
+    }
+
+    @Test
+    public void testResetPassword() {
+        ResetPasswordDto resetPasswordDto = new ResetPasswordDto();
+        resetPasswordDto.setMail("test@mail.com");
+        doNothing().when(userService).resetPassword(resetPasswordDto.getMail());
+        ResponseEntity<?> response = userController.resetPassword(resetPasswordDto);
+        verify(userService).resetPassword(resetPasswordDto.getMail());
+        assertEquals(ResponseEntity.ok("Password reset link sent to your email"), response);
+        assertEquals(200, response.getStatusCode().value());
+    }
+
+    @Test
+    public void testChangePassword() {
+        UpdatePasswordDto updatePasswordDto = new UpdatePasswordDto();
+        updatePasswordDto.setPassword("password");
+        doNothing().when(userService).changePassword("token", updatePasswordDto.getPassword());
+        ResponseEntity<?> response = userController.changePassword("token", updatePasswordDto);
+        verify(userService).changePassword("token", updatePasswordDto.getPassword());
+        assertEquals(ResponseEntity.ok("Password changed successfully"), response);
+        assertEquals(200, response.getStatusCode().value());
     }
 }

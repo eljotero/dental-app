@@ -66,6 +66,8 @@ public class UserServiceTests {
 
     private final String getEmail = "test@mail.com";
 
+    private User user;
+
     @BeforeEach
     public void setUp() {
         createUserDto = new CreateUserDto();
@@ -98,6 +100,11 @@ public class UserServiceTests {
         updateUserDto.setAddressLine("Address");
         updateUserDto.setZipCode("12345");
         updateUserDto.setDateOfBirth(LocalDate.of(1990, 1, 1));
+
+        user = new User();
+        user.setEmail(createUserDto.getEmail());
+        user.setPassword("password");
+        user.setEmail("test@mail.com");
     }
 
 
@@ -113,7 +120,7 @@ public class UserServiceTests {
     @Test
     public void testEnableUser() {
         when(confirmationTokenService.confirmToken(token)).thenReturn(1L);
-        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(new User()));
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
         userService.enableUser(token);
     }
 
@@ -126,7 +133,7 @@ public class UserServiceTests {
 
     @Test
     public void testCreateUserAlreadyExists() {
-        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(new User()));
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.encode(createUserDto.getPassword())).thenReturn("password");
         when(passwordEncoder.encode(createUserDto.getPersonalIdNumber())).thenReturn("123456789");
         Assertions.assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(createUserDto));
@@ -134,9 +141,6 @@ public class UserServiceTests {
 
     @Test
     public void testLoginUser() {
-        User user = new User();
-        user.setEmail(createUserDto.getEmail());
-        user.setPassword("password");
         when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(user));
         when(authenticationManager.authenticate(any())).thenReturn(null);
         when(jwtService.generateToken(user)).thenReturn(token);
@@ -153,7 +157,6 @@ public class UserServiceTests {
 
     @Test
     public void testUpdateUser() {
-        User user = new User();
         when(userRepository.findByEmail(getEmail)).thenReturn(Optional.of(user));
         userService.updateUser(updateUserDto, getEmail);
     }
@@ -167,7 +170,6 @@ public class UserServiceTests {
     @Test
     public void testGetPatientById() {
         Long patientId = 1L;
-        User user = new User();
         user.setUserType(UserType.PATIENT);
         when(userRepository.findPatientById(patientId)).thenReturn(java.util.Optional.of(user));
         Assertions.assertEquals(user, userService.getPatientById(patientId));
@@ -183,7 +185,6 @@ public class UserServiceTests {
     @Test
     public void testGetDoctorById() {
         Long doctorId = 1L;
-        User user = new User();
         user.setUserType(UserType.DOCTOR);
         when(userRepository.findDoctorById(doctorId)).thenReturn(java.util.Optional.of(user));
         Assertions.assertEquals(user, userService.getDoctorById(doctorId));
@@ -198,7 +199,6 @@ public class UserServiceTests {
 
     @Test
     public void testGetPatientByEmail() {
-        User user = new User();
         user.setUserType(UserType.PATIENT);
         when(userRepository.findPatientByEmail(getEmail)).thenReturn(java.util.Optional.of(user));
         Assertions.assertEquals(user, userService.getPatientByEmail(getEmail));
@@ -212,7 +212,6 @@ public class UserServiceTests {
 
     @Test
     public void testGetDoctorByEmail() {
-        User user = new User();
         user.setUserType(UserType.DOCTOR);
         when(userRepository.findDoctorByEmail(getEmail)).thenReturn(java.util.Optional.of(user));
         Assertions.assertEquals(user, userService.getDoctorByEmail(getEmail));
@@ -226,23 +225,46 @@ public class UserServiceTests {
 
     @Test
     public void testGetUsers() {
-        User user = new User();
         when(userRepository.findAll()).thenReturn(List.of(user));
         Assertions.assertEquals(List.of(user), userService.getAllUsers());
     }
 
     @Test
     public void testGetUserById() {
-        Long userId = 1L;
-        User user = new User();
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
-        Assertions.assertEquals(user, userService.getUserById(userId));
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
+        Assertions.assertEquals(user, userService.getUserById(1L));
     }
 
     @Test
     public void testGetUserByIdNotFound() {
-        Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUserById(userId));
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUserById(1L));
+    }
+
+    @Test
+    public void testResetPassword() {
+        user.setEmail(createUserDto.getEmail());
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(user));
+        when(confirmationTokenService.saveConfirmationToken(any())).thenReturn("token");
+        userService.resetPassword(createUserDto.getEmail());
+    }
+
+    @Test
+    public void testResetPasswordUserNotFound() {
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.resetPassword(createUserDto.getEmail()));
+    }
+
+    @Test
+    public void testChangePassword() {
+        when(confirmationTokenService.confirmToken(token)).thenReturn(user.getUserId());
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        userService.changePassword(token, createUserDto.getPassword());
+    }
+
+    @Test
+    public void testChangePasswordUserNotFound() {
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.changePassword(createUserDto.getEmail(), createUserDto.getPassword()));
     }
 }

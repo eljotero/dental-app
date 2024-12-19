@@ -112,4 +112,20 @@ public class UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
+
+    @Transactional
+    public void resetPassword(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+        String tokenCode = confirmationTokenService.saveConfirmationToken(user);
+        String link = "http://localhost:8080/api/user/reset-password?token=" + tokenCode;
+        String userName = user.getFirstName() + user.getLastName();
+        emailSenderService.sendResetPasswordEmail(user.getEmail(), userName, link);
+    }
+
+    @Transactional
+    public void changePassword(String token, String password) {
+        User user = userRepository.findById(confirmationTokenService.confirmToken(token)).orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
 }
