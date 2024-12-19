@@ -7,6 +7,7 @@ import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
+import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
@@ -14,7 +15,9 @@ import com.dentalapp.backend.model.user.entity.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -34,14 +37,16 @@ public class AppointmentService {
     private final InvoiceService invoiceService;
 
     private final PrescriptionService prescriptionService;
+    private final FileService fileService;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService, InvoiceService invoiceService, PrescriptionService prescriptionService) {
+    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService, InvoiceService invoiceService, PrescriptionService prescriptionService, FileService fileService) {
         this.appointmentRepository = appointmentRepository;
         this.userService = userService;
         this.availabilityService = availabilityService;
         this.emailSenderService = emailSenderService;
         this.invoiceService = invoiceService;
         this.prescriptionService = prescriptionService;
+        this.fileService = fileService;
     }
 
     public List<Appointment> getAppointments(LocalDate date) {
@@ -147,6 +152,14 @@ public class AppointmentService {
 
     @Transactional
     public void saveAppointment(Appointment appointment) {
+        appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public void uploadFileToAppointment(Long appointmentId, MultipartFile multipartFile) throws IOException {
+        Appointment appointment = getAppointmentById(appointmentId);
+        File file = fileService.saveFile(multipartFile, appointment);
+        appointment.getFiles().add(file);
         appointmentRepository.save(appointment);
     }
 

@@ -6,6 +6,9 @@ import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyEx
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityNotFoundException;
 import com.dentalapp.backend.model.enums.exceptions.PaymentMethodNotFoundException;
 import com.dentalapp.backend.model.enums.exceptions.PaymentStatusNotFoundException;
+import com.dentalapp.backend.model.file.exceptions.FileIsEmptyException;
+import com.dentalapp.backend.model.file.exceptions.FileNameAlreadyExists;
+import com.dentalapp.backend.model.file.exceptions.FileNotFoundException;
 import com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException;
 import com.dentalapp.backend.model.prescription.exceptions.PrescriptionNotFoundException;
 import com.dentalapp.backend.model.referral.exception.ReferralNotFoundException;
@@ -25,6 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -146,5 +150,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = PaymentMethodNotFoundException.class)
     public ResponseEntity<?> handlePaymentMethodNotFoundException(PaymentMethodNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = FileNotFoundException.class)
+    public ResponseEntity<?> handleFileNotFoundException(FileNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = FileNameAlreadyExists.class)
+    public ResponseEntity<?> handleFileNameAlreadyExists(FileNameAlreadyExists e) {
+        return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> handleMaxUploadSizeExceededException() {
+        return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "File size exceeds the limit"));
+    }
+
+    @ExceptionHandler(value = FileIsEmptyException.class)
+    public ResponseEntity<?> handleFileIsEmptyException(FileIsEmptyException e) {
+        return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 }
