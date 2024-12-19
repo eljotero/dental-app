@@ -31,12 +31,13 @@ jobs:
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}" >> .env
 
       - name: Start Docker containers with docker-compose
         run: docker-compose up -d
 
       - name: Build backend with Maven
-        run: mvn clean install --file backend/pom.xml -DPOSTGRES_DB=${{ secrets.POSTGRES_DB }} -DPOSTGRES_USER=${{ secrets.POSTGRES_USER }} -DPOSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} -DSECRET_KEY=${{ secrets.SECRET_KEY }}
+        run: mvn clean install --file backend/pom.xml -DPOSTGRES_DB=${{ secrets.POSTGRES_DB }} -DPOSTGRES_USER=${{ secrets.POSTGRES_USER }} -DPOSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} -DSECRET_KEY=${{ secrets.SECRET_KEY }} -DKEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}
 
       - name: Run tests for backend
         run: mvn test --file backend/pom.xml -DPOSTGRES_DB=${{ secrets.POSTGRES_DB }} -DPOSTGRES_USER=${{ secrets.POSTGRES_USER }} -DPOSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} -DSECRET_KEY=${{ secrets.SECRET_KEY }}
