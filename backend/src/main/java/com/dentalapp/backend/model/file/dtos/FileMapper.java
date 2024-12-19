@@ -29,6 +29,7 @@ public class FileMapper {
 
     public static GetFileDto toGetFileDto(File file) {
         GetFileDto getFileDto = new GetFileDto();
+        getFileDto.setFileId(file.getFileId());
         getFileDto.setFileName(file.getFileName());
         getFileDto.setUploadedAt(String.valueOf(file.getUploadedAt()));
         return getFileDto;

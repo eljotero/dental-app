@@ -2,8 +2,10 @@ package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.file.dtos.GetFileDto;
+import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.FileService;
+import com.dentalapp.backend.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,10 +18,12 @@ import java.util.List;
 public class FileController {
     private final FileService fileService;
     private final AppointmentService appointmentService;
+    private final UserService userService;
 
-    public FileController(FileService fileService, AppointmentService appointmentService) {
+    public FileController(FileService fileService, AppointmentService appointmentService, UserService userService) {
         this.fileService = fileService;
         this.appointmentService = appointmentService;
+        this.userService = userService;
     }
 
     @GetMapping("/{id}")
@@ -31,6 +35,12 @@ public class FileController {
     public ResponseEntity<List<GetFileDto>> getFilesByAppointmentId(@PathVariable Long id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
         return ResponseEntity.ok(fileService.getFilesByAppointmentId(appointment));
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<GetFileDto>> getPatientFiles(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(fileService.getFilesByUserId(user));
     }
 
     @PostMapping("/upload")
