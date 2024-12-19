@@ -36,8 +36,9 @@ public class UserControllerIntegrationTests {
 
     @BeforeEach
     public void setUp() {
-        baseURI = "http://localhost";
+        baseURI = "https://localhost";
         RestAssured.port = port;
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Test

@@ -8,6 +8,7 @@ import com.dentalapp.backend.model.file.exceptions.FileIsEmptyException;
 import com.dentalapp.backend.model.file.exceptions.FileNameAlreadyExists;
 import com.dentalapp.backend.model.file.exceptions.FileNotFoundException;
 import com.dentalapp.backend.model.file.repository.FileRepository;
+import com.dentalapp.backend.model.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +32,11 @@ public class FileService {
     @Transactional
     public List<GetFileDto> getFilesByAppointmentId(Appointment appointment) {
         return fileRepository.findFilesByAppointment(appointment).stream().map(FileMapper::toGetFileDto).toList();
+    }
+
+    @Transactional
+    public List<GetFileDto> getFilesByUserId(User user) {
+        return fileRepository.findFilesByUser(user).stream().map(FileMapper::toGetFileDto).toList();
     }
 
     @Transactional

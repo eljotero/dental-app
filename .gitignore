@@ -44,7 +44,6 @@ replay_pid*
 
 # misc
 .DS_Store
-*.pem
 
 # debug
 npm-debug.log*
