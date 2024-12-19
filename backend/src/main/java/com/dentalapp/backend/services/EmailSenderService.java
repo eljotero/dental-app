@@ -50,6 +50,38 @@ public class EmailSenderService {
         }
     }
 
+    @Async
+    public void sendAppointmentCancellationEmail(String to, String name, String appointmentDetails) {
+        try {
+            String emailText = buildAppointmentCancellationEmail(name, appointmentDetails);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            helper.setText(emailText, true);
+            helper.setTo(to);
+            helper.setSubject("Appointment Cancellation");
+            helper.setFrom("help@dentalapp.com");
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Error sending email");
+        }
+    }
+
+    @Async
+    public void sendResetPasswordEmail(String to, String name, String link) {
+        try {
+            String emailText = buildResetPasswordEmail(name, link);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            helper.setText(emailText, true);
+            helper.setTo(to);
+            helper.setSubject("Reset your password");
+            helper.setFrom("help@dentalapp.com");
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Error sending email");
+        }
+    }
+
     private String buildAppointmentConfirmationEmail(String name, String appointmentDetails, String confirmationLink) {
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
                 "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
@@ -165,6 +197,102 @@ public class EmailSenderService {
                 "  </tbody></table><div class=\"yj6qo\"></div><div class=\"adL\">\n" +
                 "\n" +
                 "</div></div>";
+    }
+
+    private String buildAppointmentCancellationEmail(String name, String appointmentDetails) {
+        return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
+                "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
+                "<table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;min-width:100%;width:100%!important\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n" +
+                "  <tbody><tr>\n" +
+                "    <td width=\"100%\" height=\"53\" bgcolor=\"#0b0c0c\">\n" +
+                "      <table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;max-width:580px\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n" +
+                "        <tbody><tr>\n" +
+                "          <td width=\"70\" bgcolor=\"#0b0c0c\" valign=\"middle\">\n" +
+                "            <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse\">\n" +
+                "              <tbody><tr>\n" +
+                "                <td style=\"padding-left:10px\"></td>\n" +
+                "                <td style=\"font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px\">\n" +
+                "                  <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Appointment Cancellation</span>\n" +
+                "                </td>\n" +
+                "              </tr>\n" +
+                "            </tbody></table>\n" +
+                "          </td>\n" +
+                "        </tr>\n" +
+                "      </tbody></table>\n" +
+                "    </td>\n" +
+                "  </tr>\n" +
+                "</tbody></table>\n" +
+                "<table role=\"presentation\" class=\"content\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;max-width:580px;width:100%!important\" width=\"100%\">\n" +
+                "  <tbody><tr>\n" +
+                "    <td height=\"30\"><br></td>\n" +
+                "  </tr>\n" +
+                "  <tr>\n" +
+                "    <td width=\"10\" valign=\"middle\"><br></td>\n" +
+                "    <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
+                "      <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p>\n" +
+                "      <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">We regret to inform you that your appointment has been cancelled. Here are the details:</p>\n" +
+                "      <blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\">\n" +
+                "        <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">" + appointmentDetails + "</p>\n" +
+                "      </blockquote>\n" +
+                "      <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">We apologize for any inconvenience caused. Please contact us if you have any questions.</p>\n" +
+                "      <p>Best regards,</p>\n" +
+                "      <p>Your DentalApp Team</p>\n" +
+                "    </td>\n" +
+                "    <td width=\"10\" valign=\"middle\"><br></td>\n" +
+                "  </tr>\n" +
+                "  <tr>\n" +
+                "    <td height=\"30\"><br></td>\n" +
+                "  </tr>\n" +
+                "</tbody></table>\n" +
+                "<div class=\"yj6qo\"></div><div class=\"adL\"></div></div>";
+    }
+
+    private String buildResetPasswordEmail(String name, String link) {
+        return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
+                "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
+                "<table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;min-width:100%;width:100%!important\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n" +
+                "  <tbody><tr>\n" +
+                "    <td width=\"100%\" height=\"53\" bgcolor=\"#0b0c0c\">\n" +
+                "      <table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;max-width:580px\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n" +
+                "        <tbody><tr>\n" +
+                "          <td width=\"70\" bgcolor=\"#0b0c0c\" valign=\"middle\">\n" +
+                "            <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse\">\n" +
+                "              <tbody><tr>\n" +
+                "                <td style=\"padding-left:10px\"></td>\n" +
+                "                <td style=\"font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px\">\n" +
+                "                  <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Reset your password</span>\n" +
+                "                </td>\n" +
+                "              </tr>\n" +
+                "            </tbody></table>\n" +
+                "          </td>\n" +
+                "        </tr>\n" +
+                "      </tbody></table>\n" +
+                "    </td>\n" +
+                "  </tr>\n" +
+                "</tbody></table>\n" +
+                "<table role=\"presentation\" class=\"content\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;max-width:580px;width:100%!important\" width=\"100%\">\n" +
+                "  <tbody><tr>\n" +
+                "    <td height=\"30\"><br></td>\n" +
+                "  </tr>\n" +
+                "  <tr>\n" +
+                "    <td width=\"10\" valign=\"middle\"><br></td>\n" +
+                "    <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
+                "      <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p>\n" +
+                "      <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">We received a request to reset your password. Click the link below to reset it:</p>\n" +
+                "      <blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\">\n" +
+                "        <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"><a href=\"" + link + "\">Reset Password</a></p>\n" +
+                "      </blockquote>\n" +
+                "      <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">If you did not request a password reset, please ignore this email.</p>\n" +
+                "      <p>Thank you,</p>\n" +
+                "      <p>Your DentalApp Team</p>\n" +
+                "    </td>\n" +
+                "    <td width=\"10\" valign=\"middle\"><br></td>\n" +
+                "  </tr>\n" +
+                "  <tr>\n" +
+                "    <td height=\"30\"><br></td>\n" +
+                "  </tr>\n" +
+                "</tbody></table>\n" +
+                "<div class=\"yj6qo\"></div><div class=\"adL\"></div></div>";
     }
 
 }

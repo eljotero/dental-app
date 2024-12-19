@@ -116,6 +116,8 @@ public class AppointmentService {
         Appointment appointment = getAppointmentById(appointmentId);
         appointment.setIsCancelled(true);
         appointmentRepository.save(appointment);
+        String appointmentDetails = "Appointment with " + appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName() + " on " + appointment.getAppointmentDate() + " at " + appointment.getAppointmentStartTime();
+        emailSenderService.sendAppointmentCancellationEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointmentDetails);
     }
 
     @Scheduled(cron = "0 0 8 * * *")

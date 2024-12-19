@@ -1,9 +1,7 @@
 package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
-import com.dentalapp.backend.model.user.dtos.CreateUserDto;
-import com.dentalapp.backend.model.user.dtos.LoginUserDto;
-import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
+import com.dentalapp.backend.model.user.dtos.*;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.Valid;
@@ -58,5 +56,17 @@ public class UserController {
     public ResponseEntity<String> confirmUser(@RequestParam String token) {
         userService.enableUser(token);
         return ResponseEntity.ok("User confirmed successfully");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto) {
+        userService.resetPassword(resetPasswordDto.getMail());
+        return ResponseEntity.ok("Password reset link sent to your email");
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestParam String token, @RequestBody @Valid UpdatePasswordDto updatePasswordDto) {
+        userService.changePassword(token, updatePasswordDto.getPassword());
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
