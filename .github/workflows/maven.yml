@@ -33,10 +33,6 @@ jobs:
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
           echo "KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}" >> .env
 
-      - name: Create keystore.p12 File
-        run: |
-          echo "${{ secrets.KEY_STORE }}" | base64 --decode > keystore.p12 > backend/src/main/resources/keystore.p12
-
       - name: Start Docker containers with docker-compose
         run: docker-compose up -d
 
