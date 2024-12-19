@@ -7,6 +7,7 @@ import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundExc
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
 import com.dentalapp.backend.model.enums.UserType;
+import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
@@ -19,7 +20,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -47,24 +51,27 @@ public class AppointmentServiceTests {
     @Mock
     private PrescriptionService prescriptionService;
 
+    @Mock
+    private FileService fileService;
+
     @InjectMocks
     private AppointmentService appointmentService;
 
-    List<Appointment> appointments;
+    private List<Appointment> appointments;
 
-    Appointment appointment;
+    private Appointment appointment;
 
-    Appointment appointment1;
+    private Appointment appointment1;
 
-    User patient;
+    private User patient;
 
-    User doctor;
+    private User doctor;
 
-    CreateAppointmentDto createAppointmentDto;
+    private CreateAppointmentDto createAppointmentDto;
 
-    UpdateAppointmentDto updateAppointmentDto;
+    private UpdateAppointmentDto updateAppointmentDto;
 
-    String patientEmail;
+    private String patientEmail;
 
     @BeforeEach
     public void setUp() {
@@ -98,6 +105,10 @@ public class AppointmentServiceTests {
         appointment.setDoctor(doctor);
         appointment.setPatient(patient);
         patientEmail = "test@mail.com";
+        List<File> files = new java.util.ArrayList<>(List.of());
+        File file = new File();
+        files.add(file);
+        appointment.setFiles(files);
     }
 
     @Test
@@ -247,6 +258,16 @@ public class AppointmentServiceTests {
     @Test
     public void testSaveAppointment() {
         appointmentService.saveAppointment(appointment);
+        verify(appointmentRepository).save(appointment);
+    }
+
+    @Test
+    public void testUpdateFileToAppointment() throws IOException {
+        MultipartFile multipartFile = new MockMultipartFile("file", "test.txt", "text/plain", "test".getBytes());
+        File file = new File();
+        when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
+        when(fileService.saveFile(multipartFile, appointment)).thenReturn(file);
+        appointmentService.uploadFileToAppointment(1L, multipartFile);
         verify(appointmentRepository).save(appointment);
     }
 

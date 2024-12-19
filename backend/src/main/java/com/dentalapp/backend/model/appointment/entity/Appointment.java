@@ -1,5 +1,6 @@
 package com.dentalapp.backend.model.appointment.entity;
 
+import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.referral.entity.Referral;
@@ -65,6 +66,10 @@ public class Appointment {
 
     @OneToMany(mappedBy = "appointment")
     private List<Referral> referrals;
+
+    @OneToMany(mappedBy = "appointment")
+    @JsonIgnore
+    private List<File> files;
 
     @Version
     @JsonIgnore
