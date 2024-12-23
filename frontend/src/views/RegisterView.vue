@@ -1,0 +1,381 @@
+<script setup lang="ts">
+import {Button} from '@/components/ui/button';
+import {Form} from '@/components/ui/form';
+import {toTypedSchema} from '@vee-validate/zod';
+import {z} from 'zod';
+import {useI18n} from "vue-i18n";
+import {Card, CardContent} from "@/components/ui/card";
+import FormFieldComponent from '@/components/FormFieldComponent.vue';
+import SelectFieldComponent from '@/components/SelectFieldComponent.vue';
+import type { RegisterDto } from '@/lib/types';
+import {register} from '@/lib/axios';
+import {toast} from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import router from "@/router";
+
+const {t} = useI18n();
+
+const formSchema = toTypedSchema(z.object({
+  firstName: z.string().nonempty(t('firstNameError')),
+  lastName: z.string().nonempty(t('lastNameError')),
+  email: z.string().email(t('emailError')),
+  password: z.string().nonempty(t('passwordError')).min(8, t('passwordLengthError')),
+  confirmPassword: z.string().nonempty(t('passwordConfirmError')).min(8, t('passwordLengthError')),
+  sex: z.string().nonempty(t('sexError')),
+  phoneNumber: z.string().nonempty(t('phoneNumberError')).regex(/^(\+\d{1,3})?(\d{3})?\d{3}\d{3}$/, {
+    message: t('phoneNumberLengthError'),
+  }),
+  personalIdNumber: z.string().nonempty(t('personalIdNumberError')).regex(/^\d{11}$/, {
+    message: t('personalIdNumberLengthError'),
+  }),
+  country: z.string().nonempty(t('countryError')),
+  city: z.string().nonempty(t('cityError')),
+  addressLine: z.string().nonempty(t('addressLineError')),
+  zipCode: z.string().nonempty(t('zipCodeError')),
+  dateOfBirth: z.string().nonempty(t('dateOfBirthError')).refine(data => {
+    const date = new Date(data);
+    const now = new Date();
+    return date < now;
+  }, {
+    message: t('dateOfBirthInvalidError'),
+  }),
+}).refine(data => data.password === data.confirmPassword, {
+  message: t('passwordMatchError'), path: ["confirmPassword"]
+}));
+
+const onSubmit = async (values: any) => {
+  const { confirmPassword, ...formValues } = values;
+  const dto = formValues as RegisterDto;
+  try {
+    const response = await register(dto);
+    if(response.status === 200) {
+      toast.success(t('registerSuccess'), {
+        autoClose: 2000,
+      });
+      setTimeout(() => {
+        router.push({name: 'home'});
+      }, 2000);
+    }
+  } catch (error: any) {
+    if (error.response.status === 400) {
+      const errors = error.response.data;
+      for (const key in errors) {
+        if (errors.hasOwnProperty(key)) {
+          const errorMessages = Array.isArray(errors[key]) ? errors[key] : [errors[key]];
+          errorMessages.forEach((message: string) => {
+            toast.error(message, {
+              autoClose: 3000,
+            });
+          });
+        }
+      }
+    } else {
+      console.error(error);
+    }
+  }
+};
+
+const countries = [
+  {value: 'AF', label: t('countries.AF')},
+  {value: 'AX', label: t('countries.AX')},
+  {value: 'AL', label: t('countries.AL')},
+  {value: 'DZ', label: t('countries.DZ')},
+  {value: 'AS', label: t('countries.AS')},
+  {value: 'AD', label: t('countries.AD')},
+  {value: 'AO', label: t('countries.AO')},
+  {value: 'AI', label: t('countries.AI')},
+  {value: 'AQ', label: t('countries.AQ')},
+  {value: 'AG', label: t('countries.AG')},
+  {value: 'AR', label: t('countries.AR')},
+  {value: 'AM', label: t('countries.AM')},
+  {value: 'AW', label: t('countries.AW')},
+  {value: 'AU', label: t('countries.AU')},
+  {value: 'AT', label: t('countries.AT')},
+  {value: 'AZ', label: t('countries.AZ')},
+  {value: 'BS', label: t('countries.BS')},
+  {value: 'BH', label: t('countries.BH')},
+  {value: 'BD', label: t('countries.BD')},
+  {value: 'BB', label: t('countries.BB')},
+  {value: 'BY', label: t('countries.BY')},
+  {value: 'BE', label: t('countries.BE')},
+  {value: 'BZ', label: t('countries.BZ')},
+  {value: 'BJ', label: t('countries.BJ')},
+  {value: 'BM', label: t('countries.BM')},
+  {value: 'BT', label: t('countries.BT')},
+  {value: 'BO', label: t('countries.BO')},
+  {value: 'BQ', label: t('countries.BQ')},
+  {value: 'BA', label: t('countries.BA')},
+  {value: 'BW', label: t('countries.BW')},
+  {value: 'BV', label: t('countries.BV')},
+  {value: 'BR', label: t('countries.BR')},
+  {value: 'IO', label: t('countries.IO')},
+  {value: 'BN', label: t('countries.BN')},
+  {value: 'BG', label: t('countries.BG')},
+  {value: 'BF', label: t('countries.BF')},
+  {value: 'BI', label: t('countries.BI')},
+  {value: 'CV', label: t('countries.CV')},
+  {value: 'KH', label: t('countries.KH')},
+  {value: 'CM', label: t('countries.CM')},
+  {value: 'CA', label: t('countries.CA')},
+  {value: 'KY', label: t('countries.KY')},
+  {value: 'CF', label: t('countries.CF')},
+  {value: 'TD', label: t('countries.TD')},
+  {value: 'CL', label: t('countries.CL')},
+  {value: 'CN', label: t('countries.CN')},
+  {value: 'CX', label: t('countries.CX')},
+  {value: 'CC', label: t('countries.CC')},
+  {value: 'CO', label: t('countries.CO')},
+  {value: 'KM', label: t('countries.KM')},
+  {value: 'CG', label: t('countries.CG')},
+  {value: 'CD', label: t('countries.CD')},
+  {value: 'CK', label: t('countries.CK')},
+  {value: 'CR', label: t('countries.CR')},
+  {value: 'CI', label: t('countries.CI')},
+  {value: 'HR', label: t('countries.HR')},
+  {value: 'CU', label: t('countries.CU')},
+  {value: 'CW', label: t('countries.CW')},
+  {value: 'CY', label: t('countries.CY')},
+  {value: 'CZ', label: t('countries.CZ')},
+  {value: 'DK', label: t('countries.DK')},
+  {value: 'DJ', label: t('countries.DJ')},
+  {value: 'DM', label: t('countries.DM')},
+  {value: 'DO', label: t('countries.DO')},
+  {value: 'EC', label: t('countries.EC')},
+  {value: 'EG', label: t('countries.EG')},
+  {value: 'SV', label: t('countries.SV')},
+  {value: 'GQ', label: t('countries.GQ')},
+  {value: 'ER', label: t('countries.ER')},
+  {value: 'EE', label: t('countries.EE')},
+  {value: 'SZ', label: t('countries.SZ')},
+  {value: 'ET', label: t('countries.ET')},
+  {value: 'FK', label: t('countries.FK')},
+  {value: 'FO', label: t('countries.FO')},
+  {value: 'FJ', label: t('countries.FJ')},
+  {value: 'FI', label: t('countries.FI')},
+  {value: 'FR', label: t('countries.FR')},
+  {value: 'GF', label: t('countries.GF')},
+  {value: 'PF', label: t('countries.PF')},
+  {value: 'TF', label: t('countries.TF')},
+  {value: 'GA', label: t('countries.GA')},
+  {value: 'GM', label: t('countries.GM')},
+  {value: 'GE', label: t('countries.GE')},
+  {value: 'DE', label: t('countries.DE')},
+  {value: 'GH', label: t('countries.GH')},
+  {value: 'GI', label: t('countries.GI')},
+  {value: 'GR', label: t('countries.GR')},
+  {value: 'GL', label: t('countries.GL')},
+  {value: 'GD', label: t('countries.GD')},
+  {value: 'GP', label: t('countries.GP')},
+  {value: 'GU', label: t('countries.GU')},
+  {value: 'GT', label: t('countries.GT')},
+  {value: 'GG', label: t('countries.GG')},
+  {value: 'GN', label: t('countries.GN')},
+  {value: 'GW', label: t('countries.GW')},
+  {value: 'GY', label: t('countries.GY')},
+  {value: 'HT', label: t('countries.HT')},
+  {value: 'HM', label: t('countries.HM')},
+  {value: 'VA', label: t('countries.VA')},
+  {value: 'HN', label: t('countries.HN')},
+  {value: 'HK', label: t('countries.HK')},
+  {value: 'HU', label: t('countries.HU')},
+  {value: 'IS', label: t('countries.IS')},
+  {value: 'IN', label: t('countries.IN')},
+  {value: 'ID', label: t('countries.ID')},
+  {value: 'IR', label: t('countries.IR')},
+  {value: 'IQ', label: t('countries.IQ')},
+  {value: 'IE', label: t('countries.IE')},
+  {value: 'IM', label: t('countries.IM')},
+  {value: 'IL', label: t('countries.IL')},
+  {value: 'IT', label: t('countries.IT')},
+  {value: 'JM', label: t('countries.JM')},
+  {value: 'JP', label: t('countries.JP')},
+  {value: 'JE', label: t('countries.JE')},
+  {value: 'JO', label: t('countries.JO')},
+  {value: 'KZ', label: t('countries.KZ')},
+  {value: 'KE', label: t('countries.KE')},
+  {value: 'KI', label: t('countries.KI')},
+  {value: 'KP', label: t('countries.KP')},
+  {value: 'KR', label: t('countries.KR')},
+  {value: 'KW', label: t('countries.KW')},
+  {value: 'KG', label: t('countries.KG')},
+  {value: 'LA', label: t('countries.LA')},
+  {value: 'LV', label: t('countries.LV')},
+  {value: 'LB', label: t('countries.LB')},
+  {value: 'LS', label: t('countries.LS')},
+  {value: 'LR', label: t('countries.LR')},
+  {value: 'LY', label: t('countries.LY')},
+  {value: 'LI', label: t('countries.LI')},
+  {value: 'LT', label: t('countries.LT')},
+  {value: 'LU', label: t('countries.LU')},
+  {value: 'MO', label: t('countries.MO')},
+  {value: 'MG', label: t('countries.MG')},
+  {value: 'MW', label: t('countries.MW')},
+  {value: 'MY', label: t('countries.MY')},
+  {value: 'MV', label: t('countries.MV')},
+  {value: 'ML', label: t('countries.ML')},
+  {value: 'MT', label: t('countries.MT')},
+  {value: 'MH', label: t('countries.MH')},
+  {value: 'MQ', label: t('countries.MQ')},
+  {value: 'MR', label: t('countries.MR')},
+  {value: 'MU', label: t('countries.MU')},
+  {value: 'YT', label: t('countries.YT')},
+  {value: 'MX', label: t('countries.MX')},
+  {value: 'FM', label: t('countries.FM')},
+  {value: 'MD', label: t('countries.MD')},
+  {value: 'MC', label: t('countries.MC')},
+  {value: 'MN', label: t('countries.MN')},
+  {value: 'ME', label: t('countries.ME')},
+  {value: 'MS', label: t('countries.MS')},
+  {value: 'MA', label: t('countries.MA')},
+  {value: 'MZ', label: t('countries.MZ')},
+  {value: 'MM', label: t('countries.MM')},
+  {value: 'NA', label: t('countries.NA')},
+  {value: 'NR', label: t('countries.NR')},
+  {value: 'NP', label: t('countries.NP')},
+  {value: 'NL', label: t('countries.NL')},
+  {value: 'NC', label: t('countries.NC')},
+  {value: 'NZ', label: t('countries.NZ')},
+  {value: 'NI', label: t('countries.NI')},
+  {value: 'NE', label: t('countries.NE')},
+  {value: 'NG', label: t('countries.NG')},
+  {value: 'NU', label: t('countries.NU')},
+  {value: 'NF', label: t('countries.NF')},
+  {value: 'MP', label: t('countries.MP')},
+  {value: 'NO', label: t('countries.NO')},
+  {value: 'OM', label: t('countries.OM')},
+  {value: 'PK', label: t('countries.PK')},
+  {value: 'PW', label: t('countries.PW')},
+  {value: 'PS', label: t('countries.PS')},
+  {value: 'PA', label: t('countries.PA')},
+  {value: 'PG', label: t('countries.PG')},
+  {value: 'PY', label: t('countries.PY')},
+  {value: 'PE', label: t('countries.PE')},
+  {value: 'PH', label: t('countries.PH')},
+  {value: 'PN', label: t('countries.PN')},
+  {value: 'PL', label: t('countries.PL')},
+  {value: 'PT', label: t('countries.PT')},
+  {value: 'PR', label: t('countries.PR')},
+  {value: 'QA', label: t('countries.QA')},
+  {value: 'RE', label: t('countries.RE')},
+  {value: 'RO', label: t('countries.RO')},
+  {value: 'RU', label: t('countries.RU')},
+  {value: 'RW', label: t('countries.RW')},
+  {value: 'BL', label: t('countries.BL')},
+  {value: 'SH', label: t('countries.SH')},
+  {value: 'KN', label: t('countries.KN')},
+  {value: 'LC', label: t('countries.LC')},
+  {value: 'MF', label: t('countries.MF')},
+  {value: 'PM', label: t('countries.PM')},
+  {value: 'VC', label: t('countries.VC')},
+  {value: 'WS', label: t('countries.WS')},
+  {value: 'SM', label: t('countries.SM')},
+  {value: 'ST', label: t('countries.ST')},
+  {value: 'SA', label: t('countries.SA')},
+  {value: 'SN', label: t('countries.SN')},
+  {value: 'RS', label: t('countries.RS')},
+  {value: 'SC', label: t('countries.SC')},
+  {value: 'SL', label: t('countries.SL')},
+  {value: 'SG', label: t('countries.SG')},
+  {value: 'SX', label: t('countries.SX')},
+  {value: 'SK', label: t('countries.SK')},
+  {value: 'SI', label: t('countries.SI')},
+  {value: 'SB', label: t('countries.SB')},
+  {value: 'SO', label: t('countries.SO')},
+  {value: 'ZA', label: t('countries.ZA')},
+  {value: 'GS', label: t('countries.GS')},
+  {value: 'SS', label: t('countries.SS')},
+  {value: 'ES', label: t('countries.ES')},
+  {value: 'LK', label: t('countries.LK')},
+  {value: 'SD', label: t('countries.SD')},
+  {value: 'SR', label: t('countries.SR')},
+  {value: 'SJ', label: t('countries.SJ')},
+  {value: 'SE', label: t('countries.SE')},
+  {value: 'CH', label: t('countries.CH')},
+  {value: 'SY', label: t('countries.SY')},
+  {value: 'TW', label: t('countries.TW')},
+  {value: 'TJ', label: t('countries.TJ')},
+  {value: 'TZ', label: t('countries.TZ')},
+  {value: 'TH', label: t('countries.TH')},
+  {value: 'TL', label: t('countries.TL')},
+  {value: 'TG', label: t('countries.TG')},
+  {value: 'TK', label: t('countries.TK')},
+  {value: 'TO', label: t('countries.TO')},
+  {value: 'TT', label: t('countries.TT')},
+  {value: 'TN', label: t('countries.TN')},
+  {value: 'TR', label: t('countries.TR')},
+  {value: 'TM', label: t('countries.TM')},
+  {value: 'TC', label: t('countries.TC')},
+  {value: 'TV', label: t('countries.TV')},
+  {value: 'UG', label: t('countries.UG')},
+  {value: 'UA', label: t('countries.UA')},
+  {value: 'AE', label: t('countries.AE')},
+  {value: 'GB', label: t('countries.GB')},
+  {value: 'US', label: t('countries.US')},
+  {value: 'UM', label: t('countries.UM')},
+  {value: 'UY', label: t('countries.UY')},
+  {value: 'UZ', label: t('countries.UZ')},
+  {value: 'VU', label: t('countries.VU')},
+  {value: 'VE', label: t('countries.VE')},
+  {value: 'VN', label: t('countries.VN')},
+  {value: 'VG', label: t('countries.VG')},
+  {value: 'VI', label: t('countries.VI')},
+  {value: 'WF', label: t('countries.WF')},
+  {value: 'EH', label: t('countries.EH')},
+  {value: 'YE', label: t('countries.YE')},
+  {value: 'ZM', label: t('countries.ZM')},
+  {value: 'ZW', label: t('countries.ZW')}
+];
+
+</script>
+
+<template>
+  <Card>
+    <CardContent>
+      <Form @submit="onSubmit" :validation-schema="formSchema" class="form-container">
+        <FormFieldComponent name="firstName" :label="t('firstNameLabel')" :placeholder="t('firstNamePlaceholder')"/>
+        <FormFieldComponent name="lastName" :label="t('lastNameLabel')" :placeholder="t('lastNamePlaceholder')"/>
+        <FormFieldComponent name="email" type="email" :label="t('emailLabel')" :placeholder="t('emailPlaceholder')"/>
+        <FormFieldComponent name="password" type="password" :label="t('passwordLabel')"
+                            :placeholder="t('passwordPlaceholder')"/>
+        <FormFieldComponent name="confirmPassword" type="password" :label="t('passwordConfirmLabel')"
+                            :placeholder="t('passwordConfirmPlaceholder')"/>
+        <FormFieldComponent name="phoneNumber" :label="t('phoneNumberLabel')"
+                            :placeholder="t('phoneNumberPlaceholder')"/>
+        <SelectFieldComponent name="sex" :label="t('sexLabel')" :placeholder="t('sexPlaceholder')"
+                              :options="[{ value: 'false', label: t('sexFemale') }, { value: 'true', label: t('sexMale') }]"/>
+        <FormFieldComponent name="personalIdNumber" :label="t('personalIdNumberLabel')"
+                            :placeholder="t('personalIdNumberPlaceholder')"/>
+        <SelectFieldComponent name="country" :label="t('countryLabel')" :placeholder="t('countryPlaceholder')"
+                              :options="countries"/>
+        <FormFieldComponent name="city" :label="t('cityLabel')" :placeholder="t('cityPlaceholder')"/>
+        <FormFieldComponent name="addressLine" :label="t('addressLineLabel')"
+                            :placeholder="t('addressLinePlaceholder')"/>
+        <FormFieldComponent name="zipCode" :label="t('zipCodeLabel')" :placeholder="t('zipCodePlaceholder')"/>
+        <FormFieldComponent name="dateOfBirth" type="date" :label="t('dateOfBirthLabel')"
+                            :placeholder="t('dateOfBirthPlaceholder')"/>
+        <Button type="submit">
+          {{ t('register') }}
+        </Button>
+      </Form>
+    </CardContent>
+  </Card>
+</template>
+
+<style scoped>
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-field label {
+  display: block;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+}
+</style>
