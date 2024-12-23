@@ -18,7 +18,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <FormField v-slot="{ field }" :name="name" class="form-field">
+  <FormField v-slot="{ field }" :name="name">
     <FormItem>
       <FormLabel>{{ label }}</FormLabel>
       <FormControl>
@@ -28,21 +28,3 @@ const props = defineProps({
     </FormItem>
   </FormField>
 </template>
-
-<style>
-.form-field {
-  width: 300px;
-  margin-bottom: 15px;
-}
-.form-field label {
-  display: block;
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-.form-field input,
-.form-field select {
-  width: 100%;
-}
-
-</style>

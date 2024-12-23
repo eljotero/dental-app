@@ -329,7 +329,7 @@ const countries = [
 </script>
 
 <template>
-  <Card>
+  <Card class="card">
     <CardContent>
       <Form @submit="onSubmit" :validation-schema="formSchema" class="form-container">
         <FormFieldComponent name="firstName" :label="t('firstNameLabel')" :placeholder="t('firstNamePlaceholder')"/>
@@ -353,7 +353,7 @@ const countries = [
         <FormFieldComponent name="zipCode" :label="t('zipCodeLabel')" :placeholder="t('zipCodePlaceholder')"/>
         <FormFieldComponent name="dateOfBirth" type="date" :label="t('dateOfBirthLabel')"
                             :placeholder="t('dateOfBirthPlaceholder')"/>
-        <Button type="submit">
+        <Button type="submit" class="submit-button">
           {{ t('register') }}
         </Button>
       </Form>
@@ -363,19 +363,27 @@ const countries = [
 
 <style scoped>
 .form-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+  grid-column-gap: 70px;
+  grid-row-gap: 6px;
+  margin-top: 6%;
 }
-
-.form-field label {
-  display: block;
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-.form-field input,
-.form-field select {
+.form-container > * {
   width: 100%;
+}
+.submit-button {
+  grid-column: span 2;
+  margin-top: 20px;
+  width: 40%;
+}
+.card {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
 }
 </style>
