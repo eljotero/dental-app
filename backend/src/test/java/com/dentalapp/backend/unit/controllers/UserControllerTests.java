@@ -2,12 +2,14 @@ package com.dentalapp.backend.unit.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.UserController;
+import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.user.dtos.*;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class UserControllerTests {
@@ -88,6 +91,8 @@ public class UserControllerTests {
 
         user = new User();
         user.setUserId(1L);
+        user.setLanguage("en");
+        user.setUserType(UserType.valueOf("PATIENT"));
     }
 
     @Test
@@ -111,22 +116,27 @@ public class UserControllerTests {
         createUserDto.setAddressLine("");
         createUserDto.setZipCode("");
         createUserDto.setDateOfBirth(LocalDate.now().plusDays(1));
-        assertEquals(15, validator.validate(createUserDto).size());
+        assertEquals(16, validator.validate(createUserDto).size());
         createUserDto.setEmail("test");
-        assertEquals(15, validator.validate(createUserDto).size());
+        assertEquals(16, validator.validate(createUserDto).size());
         createUserDto.setPassword("pass");
-        assertEquals(14, validator.validate(createUserDto).size());
+        assertEquals(15, validator.validate(createUserDto).size());
         createUserDto.setPhoneNumber("123");
-        assertEquals(13, validator.validate(createUserDto).size());
+        assertEquals(14, validator.validate(createUserDto).size());
         createUserDto.setPersonalIdNumber("123");
-        assertEquals(12, validator.validate(createUserDto).size());
+        assertEquals(13, validator.validate(createUserDto).size());
         createUserDto.setZipCode("123");
-        assertEquals(11, validator.validate(createUserDto).size());
+        assertEquals(12, validator.validate(createUserDto).size());
     }
 
     @Test
     public void testLogin() {
-        when(userService.loginUser(loginUserDto)).thenReturn("token");
+        LoginUserDtoResponse loginUserDtoResponse = new LoginUserDtoResponse();
+        loginUserDtoResponse.setLanguage("en");
+        loginUserDtoResponse.setRole("PATIENT");
+        when(userService.loginUser(loginUserDto)).thenReturn(loginUserDtoResponse);
+        when(userService.getUser(loginUserDto.getEmail())).thenReturn(user);
+        when(userService.loginUser(loginUserDto)).thenReturn(loginUserDtoResponse);
         userController.loginUser(loginUserDto);
         verify(userService).loginUser(loginUserDto);
     }
@@ -169,10 +179,10 @@ public class UserControllerTests {
     @Test
     public void testResetPassword() {
         ResetPasswordDto resetPasswordDto = new ResetPasswordDto();
-        resetPasswordDto.setMail("test@mail.com");
-        doNothing().when(userService).resetPassword(resetPasswordDto.getMail());
+        resetPasswordDto.setEmail("test@mail.com");
+        doNothing().when(userService).resetPassword(resetPasswordDto.getEmail());
         ResponseEntity<?> response = userController.resetPassword(resetPasswordDto);
-        verify(userService).resetPassword(resetPasswordDto.getMail());
+        verify(userService).resetPassword(resetPasswordDto.getEmail());
         assertEquals(ResponseEntity.ok("Password reset link sent to your email"), response);
         assertEquals(200, response.getStatusCode().value());
     }

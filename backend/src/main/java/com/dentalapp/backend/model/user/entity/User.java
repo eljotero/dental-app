@@ -87,6 +87,9 @@ public class User implements UserDetails {
     @JsonIgnore
     private Boolean isCredentialsNonExpired = true;
 
+    @Column(name="language", nullable = false)
+    private String language;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

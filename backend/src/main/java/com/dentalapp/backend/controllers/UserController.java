@@ -30,9 +30,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody @Valid LoginUserDto loginUserDto) {
-        String token = userService.loginUser(loginUserDto);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<LoginUserDtoResponse> loginUser(@RequestBody @Valid LoginUserDto loginUserDto) {
+        return ResponseEntity.ok(userService.loginUser(loginUserDto));
     }
 
     @PutMapping("/update")
@@ -60,7 +59,7 @@ public class UserController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto) {
-        userService.resetPassword(resetPasswordDto.getMail());
+        userService.resetPassword(resetPasswordDto.getEmail());
         return ResponseEntity.ok("Password reset link sent to your email");
     }
 

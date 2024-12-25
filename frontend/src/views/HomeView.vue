@@ -1,11 +1,25 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
-import {Button} from '../components/ui/button';
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from '@/components/ui/navigation-menu'
 </script>
 
 <template>
-  <main>
-    <TheWelcome/>
-    <Button>Click me</Button>
-  </main>
+  <NavigationMenu>
+    <NavigationMenuList>
+      <NavigationMenuItem>
+        <NavigationMenuLink>
+          <a href="/">Home</a>
+        </NavigationMenuLink>
+      </NavigationMenuItem>
+      <NavigationMenuItem>
+        <NavigationMenuLink>
+          <a href="/register">Register</a>
+        </NavigationMenuLink>
+      </NavigationMenuItem>
+    </NavigationMenuList>
+  </NavigationMenu>
 </template>
