@@ -53,4 +53,7 @@ public class CreateUserDto {
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
+
+    @NotBlank
+    private String language;
 }

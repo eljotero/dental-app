@@ -11,5 +11,5 @@ public class ResetPasswordDto {
 
     @NotNull
     @Email
-    private String mail;
+    private String email;
 }

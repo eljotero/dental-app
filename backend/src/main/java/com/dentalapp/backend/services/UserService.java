@@ -2,10 +2,7 @@ package com.dentalapp.backend.services;
 
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.enums.UserType;
-import com.dentalapp.backend.model.user.dtos.CreateUserDto;
-import com.dentalapp.backend.model.user.dtos.LoginUserDto;
-import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
-import com.dentalapp.backend.model.user.dtos.UserMapper;
+import com.dentalapp.backend.model.user.dtos.*;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
 import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
@@ -66,10 +63,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String loginUser(LoginUserDto loginUserDto) {
+    public LoginUserDtoResponse loginUser(LoginUserDto loginUserDto) {
         User user = getUser(loginUserDto.getEmail());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUserDto.getEmail(), loginUserDto.getPassword()));
-        return jwtService.generateToken(user);
+        String token = jwtService.generateToken(user);
+        return UserMapper.toResponse(user, token);
     }
 
     @Transactional

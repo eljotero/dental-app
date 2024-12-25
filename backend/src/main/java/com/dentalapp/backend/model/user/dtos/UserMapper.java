@@ -18,6 +18,7 @@ public class UserMapper {
         user.setAddress(createUserDto.getAddressLine());
         user.setZipCode(createUserDto.getZipCode());
         user.setDateOfBirth(createUserDto.getDateOfBirth());
+        user.setLanguage(createUserDto.getLanguage());
         return user;
     }
 
@@ -56,5 +57,13 @@ public class UserMapper {
             user.setDateOfBirth(updateUserDto.getDateOfBirth());
         }
         return user;
+    }
+
+    public static LoginUserDtoResponse toResponse(User user, String token) {
+        LoginUserDtoResponse loginUserDtoResponse = new LoginUserDtoResponse();
+        loginUserDtoResponse.setToken(token);
+        loginUserDtoResponse.setRole(user.getUserType().name());
+        loginUserDtoResponse.setLanguage(user.getLanguage());
+        return loginUserDtoResponse;
     }
 }

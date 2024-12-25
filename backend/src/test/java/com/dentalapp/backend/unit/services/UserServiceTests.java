@@ -4,6 +4,7 @@ import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.user.dtos.CreateUserDto;
 import com.dentalapp.backend.model.user.dtos.LoginUserDto;
+import com.dentalapp.backend.model.user.dtos.LoginUserDtoResponse;
 import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
@@ -105,6 +106,7 @@ public class UserServiceTests {
         user.setEmail(createUserDto.getEmail());
         user.setPassword("password");
         user.setEmail("test@mail.com");
+        user.setUserType(UserType.PATIENT);
     }
 
 
@@ -144,9 +146,11 @@ public class UserServiceTests {
         when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(user));
         when(authenticationManager.authenticate(any())).thenReturn(null);
         when(jwtService.generateToken(user)).thenReturn(token);
-        String dbToken = userService.loginUser(loginUserDto);
-        Assertions.assertNotNull(dbToken);
-        Assertions.assertEquals(token, dbToken);
+
+        LoginUserDtoResponse response = userService.loginUser(loginUserDto);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(token, response.getToken());
     }
 
     @Test
