@@ -8,16 +8,16 @@
 <script setup>
 import { useI18n } from 'vue-i18n';
 import { watchEffect } from 'vue';
+import store from '../store/index.ts';
 
 const { locale } = useI18n();
 
 const setLanguage = (newLang) => {
-  locale.value = newLang;
-  localStorage.setItem('lang', newLang);
+  store.dispatch('setLanguage', newLang);
 };
 
 watchEffect(() => {
-  const storedLang = localStorage.getItem('lang');
+  const storedLang = store.getters.getLanguage;
   if (storedLang) {
     locale.value = storedLang;
   }

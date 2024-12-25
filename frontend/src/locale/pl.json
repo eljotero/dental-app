@@ -297,9 +297,18 @@
   "zipCodeLabel": "Kod pocztowy",
   "zipCodePlaceholder": "Wpisz swój kod pocztowy",
   "zipCodeError": "Kod pocztowy jest wymagany",
+  "zipCodeInvalid": "Kod pocztowy jest nieprawidłowy",
   "dateOfBirthLabel": "Data urodzenia",
   "dateOfBirthPlaceholder": "Wybierz datę urodzenia",
   "dateOfBirthError": "Data urodzenia jest wymagana",
   "dateOfBirthInvalidError": "Data urodzenia jest nieprawidłowa",
-  "registerSuccess": "Rejestracja zakończona sukcesem, potwierdź swoje konto klikając w link wysłany na Twój adres email"
+  "registerSuccess": "Rejestracja zakończona sukcesem, potwierdź swoje konto klikając w link wysłany na Twój adres email",
+  "loginSuccess": "Zostałeś pomyślnie zalogowany",
+  "login": "Zaloguj się",
+  "alreadyRegistered": "Masz już konto? Zaloguj się",
+  "notRegistered": "Nie masz jeszcze konta? Zarejestruj się",
+  "createAccount": "Załóż konto",
+  "accountNotConfirmedError": "Konto nie zostało jeszcze potwierdzone, sprawdź swoją skrzynkę email",
+  "forgotPassword": "Zapomniałeś hasła? Kliknij tutaj aby je zresetować",
+  "resetPasswordSuccess": "Hasło zostało zresetowane, sprawdź swoją skrzynkę email"
 }

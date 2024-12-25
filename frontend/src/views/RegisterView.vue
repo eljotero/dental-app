@@ -4,14 +4,15 @@ import {Form} from '@/components/ui/form';
 import {toTypedSchema} from '@vee-validate/zod';
 import {z} from 'zod';
 import {useI18n} from "vue-i18n";
-import {Card, CardContent} from "@/components/ui/card";
+import {Card, CardContent, CardTitle} from "@/components/ui/card";
 import FormFieldComponent from '@/components/FormFieldComponent.vue';
 import SelectFieldComponent from '@/components/SelectFieldComponent.vue';
-import type { RegisterDto } from '@/lib/types';
+import type {RegisterDto} from '@/lib/types';
 import {register} from '@/lib/axios';
 import {toast} from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import router from "@/router";
+import store from "@/store";
 
 const {t} = useI18n();
 
@@ -31,7 +32,9 @@ const formSchema = toTypedSchema(z.object({
   country: z.string().nonempty(t('countryError')),
   city: z.string().nonempty(t('cityError')),
   addressLine: z.string().nonempty(t('addressLineError')),
-  zipCode: z.string().nonempty(t('zipCodeError')),
+  zipCode: z.string().nonempty(t('zipCodeError')).regex(/^\d{5}$/, {
+    message: t('zipCodeInvalid'),
+  }),
   dateOfBirth: z.string().nonempty(t('dateOfBirthError')).refine(data => {
     const date = new Date(data);
     const now = new Date();
@@ -46,32 +49,23 @@ const formSchema = toTypedSchema(z.object({
 const onSubmit = async (values: any) => {
   const { confirmPassword, ...formValues } = values;
   const dto = formValues as RegisterDto;
+  dto.language = store.getters.getLanguage;
   try {
     const response = await register(dto);
-    if(response.status === 200) {
+    if (response.status === 200) {
       toast.success(t('registerSuccess'), {
         autoClose: 2000,
       });
       setTimeout(() => {
-        router.push({name: 'home'});
+        router.push({ name: 'home' });
       }, 2000);
     }
   } catch (error: any) {
-    if (error.response.status === 400) {
-      const errors = error.response.data;
-      for (const key in errors) {
-        if (errors.hasOwnProperty(key)) {
-          const errorMessages = Array.isArray(errors[key]) ? errors[key] : [errors[key]];
-          errorMessages.forEach((message: string) => {
-            toast.error(message, {
-              autoClose: 3000,
-            });
-          });
-        }
-      }
-    } else {
-      console.error(error);
-    }
+    const errorMessage = error.response.data.message;
+    const errorMessages = Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage;
+    toast.error(errorMessages, {
+      autoClose: 3000,
+    });
   }
 };
 
@@ -331,6 +325,7 @@ const countries = [
 <template>
   <Card class="card">
     <CardContent>
+      <CardTitle>{{ t('register') }}</CardTitle>
       <Form @submit="onSubmit" :validation-schema="formSchema" class="form-container">
         <FormFieldComponent name="firstName" :label="t('firstNameLabel')" :placeholder="t('firstNamePlaceholder')"/>
         <FormFieldComponent name="lastName" :label="t('lastNameLabel')" :placeholder="t('lastNamePlaceholder')"/>
@@ -356,6 +351,7 @@ const countries = [
         <Button type="submit" class="submit-button">
           {{ t('register') }}
         </Button>
+        <a @click="router.push({name: 'login'})">{{ t('alreadyRegistered') }}</a>
       </Form>
     </CardContent>
   </Card>
@@ -370,14 +366,17 @@ const countries = [
   grid-row-gap: 6px;
   margin-top: 6%;
 }
+
 .form-container > * {
   width: 100%;
 }
+
 .submit-button {
   grid-column: span 2;
   margin-top: 20px;
   width: 40%;
 }
+
 .card {
   max-width: 900px;
   margin: 0 auto;

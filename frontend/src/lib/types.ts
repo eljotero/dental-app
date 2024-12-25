@@ -16,4 +16,16 @@ export interface RegisterDto {
     addressLine: string;
     zipCode: string;
     dateOfBirth: string;
+    language: string;
+}
+
+export interface LoginDto {
+    email: string;
+    password: string;
+}
+
+export interface State {
+    userToken: string | null;
+    role: string | null;
+    language: string;
 }

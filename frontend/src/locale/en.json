@@ -297,9 +297,18 @@
   "zipCodeLabel": "Zip code",
   "zipCodePlaceholder": "Enter your zip code",
   "zipCodeError": "Zip code is required",
+  "zipCodeInvalid": "Zip code is invalid",
   "dateOfBirthLabel": "Date of birth",
   "dateOfBirthPlaceholder": "Enter your date of birth",
   "dateOfBirthError": "Date of birth is required",
   "dateOfBirthInvalidError": "Date of birth is invalid",
-  "registerSuccess": "You have been successfully registered, please check your email to confirm your account"
+  "registerSuccess": "You have been successfully registered, please check your email to confirm your account",
+  "loginSuccess": "You have been successfully logged in",
+  "login": "Login",
+  "alreadyRegistered": "Already have an account? Login",
+  "notRegistered": "Don't have an account yet? Register",
+  "createAccount": "Create an account",
+  "accountNotConfirmedError": "Your account is not confirmed, please check your email",
+  "forgotPassword": "Forgot password? Click here to reset it",
+  "resetPasswordSuccess": "Password has been reset, please check your email"
 }
