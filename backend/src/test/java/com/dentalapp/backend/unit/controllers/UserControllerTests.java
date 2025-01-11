@@ -98,9 +98,9 @@ public class UserControllerTests {
     @Test
     public void testRegisterUser() {
         doNothing().when(userService).createUser(createUserDto);
-        ResponseEntity<?> response = userController.registerUser(createUserDto);
+        ResponseEntity<String> response = userController.registerUser(createUserDto);
         verify(userService).createUser(createUserDto);
-        assertEquals(ResponseEntity.ok("User registered successfully"), response);
+        Assertions.assertEquals(ResponseEntity.ok("User registered successfully"), response);
     }
 
     @Test
@@ -116,17 +116,17 @@ public class UserControllerTests {
         createUserDto.setAddressLine("");
         createUserDto.setZipCode("");
         createUserDto.setDateOfBirth(LocalDate.now().plusDays(1));
-        assertEquals(16, validator.validate(createUserDto).size());
+        Assertions.assertEquals(16, validator.validate(createUserDto).size());
         createUserDto.setEmail("test");
-        assertEquals(16, validator.validate(createUserDto).size());
+        Assertions.assertEquals(16, validator.validate(createUserDto).size());
         createUserDto.setPassword("pass");
-        assertEquals(15, validator.validate(createUserDto).size());
+        Assertions.assertEquals(15, validator.validate(createUserDto).size());
         createUserDto.setPhoneNumber("123");
-        assertEquals(14, validator.validate(createUserDto).size());
+        Assertions.assertEquals(14, validator.validate(createUserDto).size());
         createUserDto.setPersonalIdNumber("123");
-        assertEquals(13, validator.validate(createUserDto).size());
+        Assertions.assertEquals(13, validator.validate(createUserDto).size());
         createUserDto.setZipCode("123");
-        assertEquals(12, validator.validate(createUserDto).size());
+        Assertions.assertEquals(12, validator.validate(createUserDto).size());
     }
 
     @Test
@@ -147,15 +147,15 @@ public class UserControllerTests {
         String email = token.substring(7);
         when((jwtService).extractEmail(token)).thenReturn(email);
         doNothing().when(userService).updateUser(updateUserDto, email);
-        ResponseEntity<?> response = userController.updateUser(token, updateUserDto);
-        assertEquals(ResponseEntity.ok("User updated successfully"), response);
+        ResponseEntity<String> response = userController.updateUser(token, updateUserDto);
+        Assertions.assertEquals(ResponseEntity.ok("User updated successfully"), response);
         Assertions.assertEquals(ResponseEntity.ok("User updated successfully"), response);
     }
 
     @Test
     public void testGetAllUsers() {
         when(userService.getAllUsers()).thenReturn(List.of(user));
-        ResponseEntity<?> response = userController.getAllUsers();
+        ResponseEntity<List<User>> response = userController.getAllUsers();
         verify(userService).getAllUsers();
         Assertions.assertEquals(ResponseEntity.ok(List.of(user)), response);
     }
@@ -163,7 +163,7 @@ public class UserControllerTests {
     @Test
     public void testGetUserById() {
         when(userService.getUserById(1L)).thenReturn(user);
-        ResponseEntity<?> response = userController.getUserById(1L);
+        ResponseEntity<User> response = userController.getUserById(1L);
         verify(userService).getUserById(1L);
         Assertions.assertEquals(ResponseEntity.ok(user), response);
     }
@@ -171,9 +171,9 @@ public class UserControllerTests {
     @Test
     public void testConfirmUser() {
         doNothing().when(userService).enableUser("token");
-        ResponseEntity<?> response = userController.confirmUser("token");
+        ResponseEntity<String> response = userController.confirmUser("token");
         verify(userService).enableUser("token");
-        assertEquals(ResponseEntity.ok("User confirmed successfully"), response);
+        Assertions.assertEquals(ResponseEntity.ok("User confirmed successfully"), response);
     }
 
     @Test
@@ -181,10 +181,10 @@ public class UserControllerTests {
         ResetPasswordDto resetPasswordDto = new ResetPasswordDto();
         resetPasswordDto.setEmail("test@mail.com");
         doNothing().when(userService).resetPassword(resetPasswordDto.getEmail());
-        ResponseEntity<?> response = userController.resetPassword(resetPasswordDto);
+        ResponseEntity<String> response = userController.resetPassword(resetPasswordDto);
         verify(userService).resetPassword(resetPasswordDto.getEmail());
-        assertEquals(ResponseEntity.ok("Password reset link sent to your email"), response);
-        assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(ResponseEntity.ok("Password reset link sent to your email"), response);
+        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -192,9 +192,30 @@ public class UserControllerTests {
         UpdatePasswordDto updatePasswordDto = new UpdatePasswordDto();
         updatePasswordDto.setPassword("password");
         doNothing().when(userService).changePassword("token", updatePasswordDto.getPassword());
-        ResponseEntity<?> response = userController.changePassword("token", updatePasswordDto);
+        ResponseEntity<String> response = userController.changePassword("token", updatePasswordDto);
         verify(userService).changePassword("token", updatePasswordDto.getPassword());
-        assertEquals(ResponseEntity.ok("Password changed successfully"), response);
-        assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(ResponseEntity.ok("Password changed successfully"), response);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+    }
+
+    @Test
+    public void testGetMe() {
+        String token = "Bearer test@mail.com";
+        String email = "test@mail.com";
+        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
+        when(userService.getUser(email)).thenReturn(user);
+        ResponseEntity<User> response = userController.getMe(token);
+        verify(userService).getUser(email);
+        Assertions.assertEquals(ResponseEntity.ok(user), response);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+    }
+
+    @Test
+    public void testGetDoctors() {
+        GetDoctorDto getDoctorDto = UserMapper.toGetDoctorDto(user);
+        when(userService.getDoctors()).thenReturn(List.of(getDoctorDto));
+        ResponseEntity<List<GetDoctorDto>> response = userController.getDoctors();
+        verify(userService).getDoctors();
+        assertEquals(ResponseEntity.ok(List.of(getDoctorDto)), response);
     }
 }

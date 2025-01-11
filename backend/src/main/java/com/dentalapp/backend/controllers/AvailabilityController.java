@@ -6,6 +6,7 @@ import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
 import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.services.AvailabilityService;
+import com.dentalapp.backend.services.AvailableSlotsService;
 import jakarta.validation.Valid;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/availability")
@@ -23,9 +25,12 @@ public class AvailabilityController {
 
     private final JwtService jwtService;
 
-    public AvailabilityController(AvailabilityService availabilityService, JwtService jwtService) {
+    private final AvailableSlotsService availableSlotsService;
+
+    public AvailabilityController(AvailabilityService availabilityService, JwtService jwtService, AvailableSlotsService availableSlotsService) {
         this.availabilityService = availabilityService;
         this.jwtService = jwtService;
+        this.availableSlotsService = availableSlotsService;
     }
 
     @GetMapping("/all")
@@ -66,5 +71,10 @@ public class AvailabilityController {
     public ResponseEntity<String> updateAvailability(@PathVariable Long id, @RequestBody @Valid UpdateAvailabilityDto updateAvailabilityDto) {
         availabilityService.updateAvailability(id, updateAvailabilityDto);
         return ResponseEntity.ok("Availability updated successfully");
+    }
+
+    @GetMapping("/slots/{doctorId}/{date}")
+    public ResponseEntity<Map<String, String>> getAvailableSlots(@PathVariable Long doctorId, @PathVariable LocalDate date) {
+        return ResponseEntity.ok(availableSlotsService.getAvailableSlots(doctorId, date));
     }
 }

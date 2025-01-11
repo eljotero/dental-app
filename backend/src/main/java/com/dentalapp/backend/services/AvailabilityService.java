@@ -34,6 +34,10 @@ public class AvailabilityService {
         return availabilityRepository.findAll(spec).stream().map(AvailabilityMapper::toDto).toList();
     }
 
+    public List<Availability> getDoctorAvailability(Long doctorId, LocalDate date) {
+        return availabilityRepository.findAllByDoctorUserIdAndAvailabilityDate(doctorId, date);
+    }
+
 
     @Transactional
     public void addDoctorAvailability(CreateAvailabilityDto createAvailabilityDto, String email) {
@@ -67,6 +71,7 @@ public class AvailabilityService {
     public boolean isDoctorAvailable(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return availabilityRepository.isDeclared(doctor, date, startTime, endTime);
     }
+
 
     private boolean isAvailabilityExists(AvailabilityDayDto availabilityDayDto, User doctor) {
         return availabilityRepository.hasDoctorAvailability(doctor, availabilityDayDto.getDate());

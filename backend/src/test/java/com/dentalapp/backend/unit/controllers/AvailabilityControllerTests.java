@@ -8,6 +8,7 @@ import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
 import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.services.AvailabilityService;
+import com.dentalapp.backend.services.AvailableSlotsService;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -23,8 +24,8 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +36,9 @@ public class AvailabilityControllerTests {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private AvailableSlotsService availableSlotsService;
 
     @InjectMocks
     private AvailabilityController availabilityController;
@@ -129,7 +133,7 @@ public class AvailabilityControllerTests {
     @Test
     public void testAddDoctorAvailability() {
         when(jwtService.extractEmail("token")).thenReturn(email);
-        ResponseEntity<?> response = availabilityController.addDoctorAvailability(token, createAvailabilityDto);
+        ResponseEntity<String> response = availabilityController.addDoctorAvailability(token, createAvailabilityDto);
         verify(availabilityService).addDoctorAvailability(createAvailabilityDto, email);
         Assertions.assertEquals(ResponseEntity.status(201).body("Availability added successfully"), response);
     }
@@ -147,6 +151,18 @@ public class AvailabilityControllerTests {
         ResponseEntity<String> response = availabilityController.updateAvailability(1L, updateAvailabilityDto);
         verify(availabilityService).updateAvailability(1L, updateAvailabilityDto);
         Assertions.assertEquals(ResponseEntity.ok("Availability updated successfully"), response);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+    }
+
+    @Test
+    public void testGetAvailableSlots() {
+        Long doctorId = 1L;
+        LocalDate date = LocalDate.of(2021, 10, 10);
+        Map<String, String> availableSlots = Map.of("09:00", "10:00");
+        when(availableSlotsService.getAvailableSlots(doctorId, date)).thenReturn(availableSlots);
+        ResponseEntity<Map<String, String>> response = availabilityController.getAvailableSlots(doctorId, date);
+        verify(availableSlotsService).getAvailableSlots(doctorId, date);
+        Assertions.assertEquals(ResponseEntity.ok(availableSlots), response);
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
 }

@@ -1,8 +1,6 @@
 package com.dentalapp.backend.services;
 
-import com.dentalapp.backend.model.appointment.dtos.AppointmentMapper;
-import com.dentalapp.backend.model.appointment.dtos.CreateAppointmentDto;
-import com.dentalapp.backend.model.appointment.dtos.UpdateAppointmentDto;
+import com.dentalapp.backend.model.appointment.dtos.*;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
@@ -37,6 +35,7 @@ public class AppointmentService {
     private final InvoiceService invoiceService;
 
     private final PrescriptionService prescriptionService;
+
     private final FileService fileService;
 
     public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService, InvoiceService invoiceService, PrescriptionService prescriptionService, FileService fileService) {
@@ -56,9 +55,9 @@ public class AppointmentService {
         return appointmentRepository.findAllByDate(date);
     }
 
-    public List<Appointment> getPatientAppointments(String patientEmail) {
+    public List<GetAppointmentDto> getPatientAppointments(String patientEmail) {
         Long patientId = userService.getPatientByEmail(patientEmail).getUserId();
-        return appointmentRepository.findAllByPatientId(patientId);
+        return appointmentRepository.findAllByPatientId(patientId).stream().map(AppointmentMapper::toGetAppointmentDto).toList();
     }
 
     public List<Appointment> getDoctorAppointments(String doctorEmail, LocalDate date) {
@@ -72,6 +71,15 @@ public class AppointmentService {
     public List<Appointment> getDoctorAppointmentsByDate(String doctorEmail, LocalDate date) {
         Long doctorId = userService.getDoctorByEmail(doctorEmail).getUserId();
         return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date);
+    }
+
+    public List<Appointment> getDoctorsAppointmentsByDate(Long doctorId, LocalDate date) {
+        return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date);
+    }
+
+    public GetAppointmentDtoV2 getAppointmentByIdDto(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
+        return AppointmentMapper.toGetAppointmentDtoV2(appointment);
     }
 
     public Appointment getAppointmentById(Long appointmentId) {

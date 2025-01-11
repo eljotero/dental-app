@@ -44,22 +44,22 @@ public class ConfirmationTokenServiceTests {
         ConfirmationToken savedToken = tokenCaptor.getValue();
 
         assertNotNull(tokenCode);
-        assertEquals(tokenCode, savedToken.getToken());
-        assertEquals(user, savedToken.getUser());
+        Assertions.assertEquals(tokenCode, savedToken.getToken());
+        Assertions.assertEquals(user, savedToken.getUser());
         assertNotNull(savedToken.getCreatedAt());
         assertNotNull(savedToken.getExpiresAt());
-        assertEquals(savedToken.getCreatedAt().plusMinutes(15).withNano(0), savedToken.getExpiresAt().withNano(0));
+        Assertions.assertEquals(savedToken.getCreatedAt().plusMinutes(15).withNano(0), savedToken.getExpiresAt().withNano(0));
         assertNull(savedToken.getConfirmedAt());
     }
 
     @Test
     public void testConfirmToken() {
         ConfirmationToken confirmationToken = new ConfirmationToken();
-        confirmationToken.setExpiresAt(LocalDateTime.of(2025, 1, 1, 1, 1));
+        confirmationToken.setExpiresAt(LocalDateTime.of(2030, 1, 1, 1, 1));
         confirmationToken.setUser(new User());
         when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));
         Long userId = confirmationTokenService.confirmToken(token);
-        assertEquals(confirmationToken.getUser().getUserId(), userId);
+        Assertions.assertEquals(confirmationToken.getUser().getUserId(), userId);
     }
 
     @Test

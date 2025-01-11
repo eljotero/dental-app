@@ -57,8 +57,9 @@ public class TreatmentControllerTests {
         updateTreatmentDto.setPrice(100L);
         updateTreatmentDto.setDescription("Treatment 3 Description");
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
     }
 
     @Test
@@ -109,7 +110,7 @@ public class TreatmentControllerTests {
 
     @Test
     public void testDeleteTreatment() {
-        ResponseEntity<?> response = treatmentController.deleteTreatment(1L);
+        ResponseEntity<String> response = treatmentController.deleteTreatment(1L);
         verify(treatmentService).deleteTreatment(1L);
         Assertions.assertEquals("Treatment deleted successfully", response.getBody());
     }

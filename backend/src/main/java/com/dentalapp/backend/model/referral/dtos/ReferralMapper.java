@@ -37,4 +37,14 @@ public class ReferralMapper {
         }
         return referral;
     }
+
+    public static GetReferralDto toGetReferralDto(Referral referral) {
+        GetReferralDto getReferralDto = new GetReferralDto();
+        getReferralDto.setProcedureName(referral.getProcedureName());
+        getReferralDto.setProcedureDescription(referral.getProcedureDescription());
+        getReferralDto.setDoctorName(referral.getDoctorName());
+        getReferralDto.setClinicName(referral.getClinicName());
+        getReferralDto.setClinicAddress(referral.getClinicAddress());
+        return getReferralDto;
+    }
 }

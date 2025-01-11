@@ -51,6 +51,16 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<User> getMe(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(userService.getUser(jwtService.extractEmail(token.substring(7))));
+    }
+
+    @GetMapping("/doctors")
+    public ResponseEntity<List<GetDoctorDto>> getDoctors() {
+        return ResponseEntity.ok(userService.getDoctors());
+    }
+
     @GetMapping("/confirm")
     public ResponseEntity<String> confirmUser(@RequestParam String token) {
         userService.enableUser(token);

@@ -85,6 +85,10 @@ public class UserService {
         return user.orElse(null);
     }
 
+    public List<GetDoctorDto> getDoctors() {
+        return userRepository.findAllDoctors().stream().map(UserMapper::toGetDoctorDto).toList();
+    }
+
     public User getPatientById(Long patientId) {
         return userRepository.findPatientById(patientId).orElseThrow(() -> new UserNotFoundException("Patient not found"));
     }

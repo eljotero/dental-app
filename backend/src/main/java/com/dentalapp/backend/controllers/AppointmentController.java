@@ -2,6 +2,8 @@ package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.appointment.dtos.CreateAppointmentDto;
+import com.dentalapp.backend.model.appointment.dtos.GetAppointmentDto;
+import com.dentalapp.backend.model.appointment.dtos.GetAppointmentDtoV2;
 import com.dentalapp.backend.model.appointment.dtos.UpdateAppointmentDto;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.services.AppointmentService;
@@ -32,12 +34,12 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id) {
-        return ResponseEntity.ok(appointmentService.getAppointmentById(id));
+    public ResponseEntity<GetAppointmentDtoV2> getAppointmentById(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.getAppointmentByIdDto(id));
     }
 
     @GetMapping("/patient")
-    public ResponseEntity<List<Appointment>> getPatientAppointments(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<List<GetAppointmentDto>> getPatientAppointments(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(appointmentService.getPatientAppointments(jwtService.extractEmail(token.substring(7))));
     }
 
