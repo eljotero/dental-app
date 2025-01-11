@@ -29,3 +29,37 @@ export interface State {
     role: string | null;
     language: string;
 }
+
+export interface Treatment {
+    treatmentId: number;
+    treatmentName: string;
+    treatmentDescription: string;
+    treatmentPrice: number;
+    isActive: boolean;
+}
+
+export interface UserProfile {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    sex: boolean;
+    country: string;
+    city: string;
+    address: string;
+    zipCode: string;
+    dateOfBirth: string;
+}
+
+export interface UpdateUserProfile {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phoneNumber?: string;
+    sex?: boolean;
+    country?: string;
+    city?: string;
+    address?: string;
+    zipCode?: string;
+    dateOfBirth?: string;
+}

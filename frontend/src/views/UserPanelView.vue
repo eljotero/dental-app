@@ -1,40 +1,36 @@
 <script setup lang="ts">
-import {Button} from '@/components/ui/button';
-import {Form} from '@/components/ui/form';
-import {toTypedSchema} from '@vee-validate/zod';
-import {z} from 'zod';
-import {useI18n} from "vue-i18n";
+import type {UserProfile, UpdateUserProfile} from '@/lib/types';
+import {getUserProfile, updateProfile} from '@/lib/axios';
+import {onMounted, ref} from 'vue';
 import {Card, CardContent, CardTitle} from "@/components/ui/card";
 import FormFieldComponent from '@/components/FormFieldComponent.vue';
 import SelectFieldComponent from '@/components/SelectFieldComponent.vue';
-import type {RegisterDto} from '@/lib/types';
-import {register} from '@/lib/axios';
+import {Button} from '@/components/ui/button';
+import {useI18n} from 'vue-i18n';
+import {toTypedSchema} from "@vee-validate/zod";
+import {z} from "zod";
+import {useCountries} from '@/lib/countries';
+import {Form} from "@/components/ui/form";
 import {toast} from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import router from "@/router";
-import store from "@/store";
-import {useCountries} from '@/lib/countries';
+
+const userProfileRef = ref<UserProfile>({} as UserProfile);
+let originalData = {} as UserProfile;
+const countries = useCountries();
 
 const {t} = useI18n();
-
-const countries = useCountries();
 
 const formSchema = toTypedSchema(z.object({
   firstName: z.string().nonempty(t('firstNameError')),
   lastName: z.string().nonempty(t('lastNameError')),
   email: z.string().email(t('emailError')),
-  password: z.string().nonempty(t('passwordError')).min(8, t('passwordLengthError')),
-  confirmPassword: z.string().nonempty(t('passwordConfirmError')).min(8, t('passwordLengthError')),
   sex: z.string().nonempty(t('sexError')),
   phoneNumber: z.string().nonempty(t('phoneNumberError')).regex(/^(\+\d{1,3})?(\d{3})?\d{3}\d{3}$/, {
     message: t('phoneNumberLengthError'),
   }),
-  personalIdNumber: z.string().nonempty(t('personalIdNumberError')).regex(/^\d{11}$/, {
-    message: t('personalIdNumberLengthError'),
-  }),
   country: z.string().nonempty(t('countryError')),
   city: z.string().nonempty(t('cityError')),
-  addressLine: z.string().nonempty(t('addressLineError')),
+  address: z.string().nonempty(t('addressLineError')),
   zipCode: z.string().nonempty(t('zipCodeError')).regex(/^\d{5}$/, {
     message: t('zipCodeInvalid'),
   }),
@@ -45,65 +41,87 @@ const formSchema = toTypedSchema(z.object({
   }, {
     message: t('dateOfBirthInvalidError'),
   }),
-}).refine(data => data.password === data.confirmPassword, {
-  message: t('passwordMatchError'), path: ["confirmPassword"]
 }));
 
-const onSubmit = async (values: any) => {
-  const { confirmPassword, ...formValues } = values;
-  const dto = formValues as RegisterDto;
-  dto.language = store.getters.getLanguage;
-  try {
-    const response = await register(dto);
-    if (response.status === 200) {
-      toast.success(t('registerSuccess'), {
-        autoClose: 2000,
-      });
-      setTimeout(() => {
-        router.push({ name: 'home' });
-      }, 2000);
+onMounted(async () => {
+  const response = await getUserProfile();
+  if (response.status === 200 && response.data) {
+    userProfileRef.value.setValues({
+      firstName: response.data.firstName,
+      lastName: response.data.lastName,
+      email: response.data.email,
+      phoneNumber: response.data.phoneNumber,
+      city: response.data.city,
+      address: response.data.address,
+      zipCode: response.data.zipCode,
+      dateOfBirth: response.data.dateOfBirth,
+      sex: response.data.sex.toString(),
+      country: response.data.country,
+    });
+    originalData.firstName = response.data.firstName;
+    originalData.lastName = response.data.lastName;
+    originalData.email = response.data.email;
+    originalData.phoneNumber = response.data.phoneNumber;
+    originalData.city = response.data.city;
+    originalData.address = response.data.address;
+    originalData.zipCode = response.data.zipCode;
+    originalData.dateOfBirth = response.data.dateOfBirth;
+    originalData.sex = response.data.sex.toString();
+    originalData.country = response.data.country;
+  } else {
+    console.error('Error while fetching user profile');
+  }
+});
+
+const onSubmit = async (values: UserProfile) => {
+  const dto: UpdateUserProfile = {};
+  for (const key in values) {
+    if (values[key] !== originalData[key]) {
+      dto[key] = values[key];
     }
-  } catch (error: any) {
-    const errorMessage = error.response.data.message;
-    const errorMessages = Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage;
-    toast.error(errorMessages, {
+  }
+  if(Object.keys(dto).length === 0) {
+    toast.info(t('noDataToUpdate'), {
+      autoClose: 2000,
+    });
+    return;
+  }
+  const response = await updateProfile(dto);
+  if(response.status === 200) {
+    toast.success(t('updateDataSuccess'), {
+      autoClose: 2000,
+    });
+  } else {
+    toast.error(t('updateDataError'), {
       autoClose: 3000,
     });
   }
-};
-
+}
 </script>
 
 <template>
   <Card class="card">
     <CardContent>
-      <CardTitle>{{ t('register') }}</CardTitle>
-      <Form @submit="onSubmit" :validation-schema="formSchema" class="form-container">
+      <CardTitle>{{ t('updateDataHeader') }}</CardTitle>
+      <Form @submit="onSubmit" ref="userProfileRef" :validation-schema="formSchema" class="form-container">
         <FormFieldComponent name="firstName" :label="t('firstNameLabel')" :placeholder="t('firstNamePlaceholder')"/>
         <FormFieldComponent name="lastName" :label="t('lastNameLabel')" :placeholder="t('lastNamePlaceholder')"/>
         <FormFieldComponent name="email" type="email" :label="t('emailLabel')" :placeholder="t('emailPlaceholder')"/>
-        <FormFieldComponent name="password" type="password" :label="t('passwordLabel')"
-                            :placeholder="t('passwordPlaceholder')"/>
-        <FormFieldComponent name="confirmPassword" type="password" :label="t('passwordConfirmLabel')"
-                            :placeholder="t('passwordConfirmPlaceholder')"/>
         <FormFieldComponent name="phoneNumber" :label="t('phoneNumberLabel')"
                             :placeholder="t('phoneNumberPlaceholder')"/>
         <SelectFieldComponent name="sex" :label="t('sexLabel')" :placeholder="t('sexPlaceholder')"
                               :options="[{ value: 'false', label: t('sexFemale') }, { value: 'true', label: t('sexMale') }]"/>
-        <FormFieldComponent name="personalIdNumber" :label="t('personalIdNumberLabel')"
-                            :placeholder="t('personalIdNumberPlaceholder')"/>
         <SelectFieldComponent name="country" :label="t('countryLabel')" :placeholder="t('countryPlaceholder')"
                               :options="countries"/>
         <FormFieldComponent name="city" :label="t('cityLabel')" :placeholder="t('cityPlaceholder')"/>
-        <FormFieldComponent name="addressLine" :label="t('addressLineLabel')"
+        <FormFieldComponent name="address" :label="t('addressLineLabel')"
                             :placeholder="t('addressLinePlaceholder')"/>
         <FormFieldComponent name="zipCode" :label="t('zipCodeLabel')" :placeholder="t('zipCodePlaceholder')"/>
         <FormFieldComponent name="dateOfBirth" type="date" :label="t('dateOfBirthLabel')"
                             :placeholder="t('dateOfBirthPlaceholder')"/>
         <Button type="submit" class="submit-button">
-          {{ t('register') }}
+          {{ t('updateData') }}
         </Button>
-        <a @click="router.push({name: 'login'})">{{ t('alreadyRegistered') }}</a>
       </Form>
     </CardContent>
   </Card>

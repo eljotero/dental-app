@@ -1,4 +1,6 @@
 {
+  "enLang": "English",
+  "plLang": "Polish",
   "firstNameError": "First name is required",
   "lastNameError": "Last name is required",
   "emailError": "Email is required",
@@ -310,5 +312,18 @@
   "createAccount": "Create an account",
   "accountNotConfirmedError": "Your account is not confirmed, please check your email",
   "forgotPassword": "Forgot password? Click here to reset it",
-  "resetPasswordSuccess": "Password has been reset, please check your email"
+  "resetPasswordSuccess": "Password has been reset, please check your email",
+  "homePage": "Home Page",
+  "priceList": "Treatment price list",
+  "treatmentName": "Treatment name",
+  "treatmentDescription": "Treatment description",
+  "treatmentPrice": "Treatment price (PLN)",
+  "logout": "Logout",
+  "profilePanel": "Profile panel",
+  "updateData": "Update data",
+  "updateDataHeader": "Update your data",
+  "updateDataSuccess": "Data has been successfully updated",
+  "updateDataError": "Data update failed",
+  "noDataToUpdate": "No data to update",
+  "myAppointments": "My appointments"
 }
