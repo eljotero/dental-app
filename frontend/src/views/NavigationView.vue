@@ -16,6 +16,9 @@
       <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register'">
         <NavigationMenuLink href="/priceList" class="nav-link">{{ t('priceList') }}</NavigationMenuLink>
       </NavigationMenuItem>
+      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && role === 'PATIENT'">
+        <NavigationMenuLink href="/createAppointment" class="nav-link">{{ t('createAppointment') }}</NavigationMenuLink>
+      </NavigationMenuItem>
       <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register'">
         <NavigationMenuLink href="/appointments" class="nav-link">{{ t('myAppointments') }}</NavigationMenuLink>
       </NavigationMenuItem>

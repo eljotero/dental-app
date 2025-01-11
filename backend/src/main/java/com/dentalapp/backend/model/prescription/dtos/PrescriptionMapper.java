@@ -30,4 +30,11 @@ public class PrescriptionMapper {
         getPrescriptionDto.setAppointmentId(prescription.getAppointment().getAppointmentId());
         return getPrescriptionDto;
     }
+
+    public static GetPrescriptionDtoV2 toGetPrescriptionDtoV2(Prescription prescription) {
+        GetPrescriptionDtoV2 getPrescriptionDtoV2 = new GetPrescriptionDtoV2();
+        getPrescriptionDtoV2.setDosage(prescription.getDosage());
+        getPrescriptionDtoV2.setMedicineName(prescription.getMedicine());
+        return getPrescriptionDtoV2;
+    }
 }

@@ -33,6 +33,17 @@ const router = createRouter({
             path: '/appointments',
             name: 'appointments',
             component: () => import('../views/MyAppointmentsView.vue'),
+        },
+        {
+            path: '/appointment/:appointmentId',
+            name: 'appointment',
+            component: () => import('../views/AppointmentView.vue'),
+            props: true
+        },
+        {
+            path: '/createAppointment',
+            name: 'createAppointment',
+            component: () => import('../views/CreateAppointmentView.vue')
         }
     ],
 })

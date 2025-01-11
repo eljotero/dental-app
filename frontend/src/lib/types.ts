@@ -63,3 +63,55 @@ export interface UpdateUserProfile {
     zipCode?: string;
     dateOfBirth?: string;
 }
+
+export interface Appointment {
+    appointmentId: number;
+    appointmentDate: string;
+    appointmentStartTime: string;
+    appointmentEndTime: string;
+}
+
+export interface AppointmentDetails {
+    doctorName: string;
+    doctorLastName: string;
+    doctorPhoneNumber: string;
+    appointmentDate: string;
+    appointmentStartTime: string;
+    appointmentEndTime: string;
+    description: string;
+    cancelled: boolean;
+    paid: boolean;
+    confirmed: boolean;
+    prescriptions: Prescription[];
+    referrals: Referral[];
+}
+
+export interface Prescription {
+    medicineName: string;
+    dosage: string;
+}
+
+export interface Referral {
+    procedureName: string;
+    procedureDescription: string;
+    doctorName: string;
+    clinicName: string;
+    clinicAddress: string;
+}
+
+export interface GetDoctorDto {
+    doctorId: number;
+    firstName: string;
+    lastName: string;
+}
+
+export interface TimeSlots {
+    [startTime: string]: string;
+}
+
+export interface CreateAppointment {
+    doctorId: number;
+    appointmentDate: string;
+    appointmentStartTime: string;
+    appointmentEndTime: string;
+}
