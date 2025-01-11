@@ -73,7 +73,7 @@ onMounted(async () => {
   }
 });
 
-const onSubmit = async (values: UserProfile) => {
+const onSubmit = async (values: any) => {
   const dto: UpdateUserProfile = {};
   for (const key in values) {
     if (values[key] !== originalData[key]) {

@@ -46,7 +46,7 @@ const cancel = async(id: number) => {
     toast.success(t('appointmentCanceled'), {
       autoClose: 2000,
     });
-    appointment.value!.canceled = true;
+    appointment.value!.cancelled = true;
   } else {
     toast.error(t('appointmentCancelError'), {
       autoClose: 2000,
