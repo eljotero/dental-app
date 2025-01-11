@@ -19,9 +19,5 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Long
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END FROM Availability a WHERE a.doctor = ?1 AND a.availabilityDate = ?2")
     boolean hasDoctorAvailability(User doctor, LocalDate date);
 
-    @Query("SELECT a FROM Availability a WHERE a.doctor = ?1")
-    List<Availability> findByDoctor(User doctor);
-
-    @Query("SELECT a FROM Availability a WHERE a.doctor = ?1 AND a.availabilityDate = ?2")
-    List<Availability> findByDoctorAndDate(User doctor, LocalDate date);
+    List<Availability> findAllByDoctorUserIdAndAvailabilityDate(Long doctorUserId, LocalDate availabilityDate);
 }

@@ -42,8 +42,9 @@ public class SupplyControllerTests {
         supply.setQuantity(10.0);
         supply.setLink("https://test.com");
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
     }
 
     @Test

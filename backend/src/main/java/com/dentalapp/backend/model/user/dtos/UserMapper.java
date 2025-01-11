@@ -66,4 +66,12 @@ public class UserMapper {
         loginUserDtoResponse.setLanguage(user.getLanguage());
         return loginUserDtoResponse;
     }
+
+    public static GetDoctorDto toGetDoctorDto(User user) {
+        GetDoctorDto getDoctorDto = new GetDoctorDto();
+        getDoctorDto.setDoctorId(user.getUserId());
+        getDoctorDto.setFirstName(user.getFirstName());
+        getDoctorDto.setLastName(user.getLastName());
+        return getDoctorDto;
+    }
 }

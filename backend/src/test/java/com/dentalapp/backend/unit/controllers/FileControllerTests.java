@@ -1,10 +1,13 @@
 package com.dentalapp.backend.unit.controllers;
 
 import com.dentalapp.backend.controllers.FileController;
+import com.dentalapp.backend.model.file.dtos.FileMapper;
 import com.dentalapp.backend.model.file.dtos.GetFileDto;
 import com.dentalapp.backend.model.file.entity.File;
+import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.FileService;
+import com.dentalapp.backend.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +33,9 @@ public class FileControllerTests {
     @Mock
     private AppointmentService appointmentService;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private FileController fileController;
 
@@ -37,11 +43,16 @@ public class FileControllerTests {
 
     private File file;
 
+    private User user;
+
     @BeforeEach
     public void setUp() throws IOException {
         multipartFile = new MockMultipartFile("file", "test.txt", "text/plain", "test data".getBytes());
+
         file = new File();
         file.setFileData(multipartFile.getBytes());
+
+        user = new User();
     }
 
     @Test
@@ -82,6 +93,16 @@ public class FileControllerTests {
         doNothing().when(fileService).deleteFile(1L);
         ResponseEntity<String> response = fileController.deleteFile(1L);
         Assertions.assertEquals("File deleted successfully", response.getBody());
+        Assertions.assertEquals(200, response.getStatusCode().value());
+    }
+
+    @Test
+    public void testGetPatientFiles() {
+        GetFileDto getFileDto = FileMapper.toGetFileDto(file);
+        when(userService.getUserById(1L)).thenReturn(user);
+        when(fileService.getFilesByUserId(user)).thenReturn(List.of(getFileDto));
+        ResponseEntity<List<GetFileDto>> response = fileController.getPatientFiles(1L);
+        Assertions.assertEquals(List.of(getFileDto), response.getBody());
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
 }

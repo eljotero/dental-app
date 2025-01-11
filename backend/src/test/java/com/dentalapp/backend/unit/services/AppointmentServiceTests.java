@@ -1,16 +1,17 @@
 package com.dentalapp.backend.unit.services;
 
-import com.dentalapp.backend.model.appointment.dtos.CreateAppointmentDto;
-import com.dentalapp.backend.model.appointment.dtos.UpdateAppointmentDto;
+import com.dentalapp.backend.model.appointment.dtos.*;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
 import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.file.entity.File;
+import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
+import com.dentalapp.backend.model.referral.entity.Referral;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.*;
 import org.junit.jupiter.api.Assertions;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 
@@ -73,42 +75,69 @@ public class AppointmentServiceTests {
 
     private String patientEmail;
 
+    private Invoice invoice;
+
+    private Prescription prescription;
+
+    private Referral referral;
+
     @BeforeEach
     public void setUp() {
-        appointment = new Appointment();
-        appointment1 = new Appointment();
-        appointments = List.of(appointment, appointment1);
         patient = new User();
         patient.setUserId(1L);
         patient.setUserType(UserType.PATIENT);
         patient.setEmail("test@mail.com");
+
         doctor = new User();
         doctor.setUserId(2L);
         doctor.setUserType(UserType.DOCTOR);
         doctor.setEmail("test2@mail.com");
         doctor.setFirstName("test");
         doctor.setLastName("test");
+
+        appointment = new Appointment();
+        appointment.setAppointmentDate(LocalDate.of(2021, 1, 1));
+        appointment.setAppointmentStartTime(LocalTime.of(12, 0));
+        appointment.setAppointmentEndTime(LocalTime.of(13, 0));
+
+        appointment.setDoctor(doctor);
+        appointment.setPatient(patient);
+
+        appointment1 = new Appointment();
+        appointment1.setAppointmentStartTime(LocalTime.of(14, 0));
+        appointment1.setAppointmentEndTime(LocalTime.of(15, 0));
+        appointment.setAppointmentDate(LocalDate.of(2021, 1, 1));
+
+        appointments = List.of(appointment, appointment1);
+
         createAppointmentDto = new CreateAppointmentDto();
         createAppointmentDto.setDoctorId(doctor.getUserId());
         createAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
         createAppointmentDto.setAppointmentStartTime("12:00");
         createAppointmentDto.setAppointmentEndTime("13:00");
+
         updateAppointmentDto = new UpdateAppointmentDto();
         updateAppointmentDto.setDoctorId(doctor.getUserId());
         updateAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
         updateAppointmentDto.setDescription("test");
         updateAppointmentDto.setAppointmentStartTime("12:00");
         updateAppointmentDto.setAppointmentEndTime("13:00");
-        appointment.setAppointmentDate(LocalDate.of(2021, 1, 1));
-        appointment.setAppointmentStartTime(LocalTime.of(12, 0));
-        appointment.setAppointmentEndTime(LocalTime.of(13, 0));
-        appointment.setDoctor(doctor);
-        appointment.setPatient(patient);
+
         patientEmail = "test@mail.com";
+
         List<File> files = new java.util.ArrayList<>(List.of());
         File file = new File();
         files.add(file);
         appointment.setFiles(files);
+
+        invoice = new Invoice();
+        appointment.setInvoice(invoice);
+
+        referral = new Referral();
+        appointment.setReferrals(List.of(referral));
+
+        prescription = new Prescription();
+        appointment.setPrescriptions(List.of(prescription));
     }
 
     @Test
@@ -129,7 +158,14 @@ public class AppointmentServiceTests {
     public void testGetPatientAppointments() {
         when(userService.getPatientByEmail(patient.getEmail())).thenReturn(patient);
         when(appointmentRepository.findAllByPatientId(patient.getUserId())).thenReturn(appointments);
-        Assertions.assertEquals(appointments, appointmentService.getPatientAppointments(patient.getEmail()));
+
+        List<GetAppointmentDto> expected = appointments.stream()
+                .map(AppointmentMapper::toGetAppointmentDto)
+                .collect(Collectors.toList());
+
+        List<GetAppointmentDto> result = appointmentService.getPatientAppointments(patient.getEmail());
+
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -269,6 +305,36 @@ public class AppointmentServiceTests {
         when(fileService.saveFile(multipartFile, appointment)).thenReturn(file);
         appointmentService.uploadFileToAppointment(1L, multipartFile);
         verify(appointmentRepository).save(appointment);
+    }
+
+    @Test
+    public void testGetDoctorsAppointmentsByDate() {
+        LocalDate date = LocalDate.of(2021, 1, 1);
+        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), date)).thenReturn(appointments);
+        Assertions.assertEquals(appointments, appointmentService.getDoctorsAppointmentsByDate(doctor.getUserId(), date));
+    }
+
+    @Test
+    public void testGetAppointmentByIdDto() {
+        when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
+        GetAppointmentDtoV2 expectedDto = AppointmentMapper.toGetAppointmentDtoV2(appointment);
+        GetAppointmentDtoV2 result = appointmentService.getAppointmentByIdDto(1L);
+        Assertions.assertEquals(result.getAppointmentDate(), expectedDto.getAppointmentDate());
+        Assertions.assertEquals(result.getAppointmentStartTime(), expectedDto.getAppointmentStartTime());
+        Assertions.assertEquals(result.getAppointmentEndTime(), expectedDto.getAppointmentEndTime());
+        Assertions.assertEquals(result.getDescription(), expectedDto.getDescription());
+        Assertions.assertEquals(result.getDoctorName(), expectedDto.getDoctorName());
+        Assertions.assertEquals(result.getDoctorLastName(), expectedDto.getDoctorLastName());
+        Assertions.assertEquals(result.getDoctorPhoneNumber(), expectedDto.getDoctorPhoneNumber());
+        Assertions.assertEquals(result.isCancelled(), expectedDto.isCancelled());
+        Assertions.assertEquals(result.isConfirmed(), expectedDto.isConfirmed());
+        Assertions.assertEquals(result.isPaid(), expectedDto.isPaid());
+    }
+
+    @Test
+    public void testGetAppointmentByIdDtoNotFound() {
+        when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        Assertions.assertThrows(AppointmentNotFoundException.class, () -> appointmentService.getAppointmentByIdDto(1L));
     }
 
 }

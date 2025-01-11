@@ -122,4 +122,10 @@ public class AvailabilityServiceTests {
         when(availabilityRepository.isDeclared(user, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getStartTime()), LocalTime.parse(availabilityDayDto.getEndTime()))).thenReturn(true);
         Assertions.assertTrue(availabilityService.isDoctorAvailable(user, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getStartTime()), LocalTime.parse(availabilityDayDto.getEndTime())));
     }
+
+    @Test
+    public void testGetDoctorAvailabilityV2() {
+        when(availabilityRepository.findAllByDoctorUserIdAndAvailabilityDate(1L, LocalDate.of(2024, 1, 1))).thenReturn(List.of());
+        Assertions.assertEquals(0, availabilityService.getDoctorAvailability(1L, LocalDate.of(2024, 1, 1)).size());
+    }
 }
