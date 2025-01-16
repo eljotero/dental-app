@@ -1,6 +1,6 @@
 <template>
-  <NavigationMenu class="bg-gray-100 p-4 rounded-lg shadow-md">
-    <NavigationMenuList class="flex flex-row gap-2">
+  <NavigationMenu class="bg-gray-100 p-4 rounded-lg shadow-md w-full fixed top-0 left-0">
+    <NavigationMenuList>
       <NavigationMenuItem>
         <NavigationMenuLink href="/" class="nav-link">{{ t('homePage') }}</NavigationMenuLink>
       </NavigationMenuItem>
@@ -13,13 +13,13 @@
       <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && role === 'PATIENT'">
         <NavigationMenuLink href="/profile" class="nav-link">{{ t('profilePanel') }}</NavigationMenuLink>
       </NavigationMenuItem>
-      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register'">
+      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && currentRoute !== '/priceList'">
         <NavigationMenuLink href="/priceList" class="nav-link">{{ t('priceList') }}</NavigationMenuLink>
       </NavigationMenuItem>
       <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && role === 'PATIENT'">
         <NavigationMenuLink href="/createAppointment" class="nav-link">{{ t('createAppointment') }}</NavigationMenuLink>
       </NavigationMenuItem>
-      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register'">
+      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && isLoggedIn && currentRoute !== '/adminPanel'">
         <NavigationMenuLink href="/appointments" class="nav-link">{{ t('myAppointments') }}</NavigationMenuLink>
       </NavigationMenuItem>
       <NavigationMenuItem v-if="currentLang !== 'en'">
@@ -42,12 +42,16 @@ import store from '../store/index.ts';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, NavigationMenuLink } from "@/components/ui/navigation-menu/index.ts";
 import { useRoute } from "vue-router";
 import router from "@/router";
+import {changeLanguage} from '@/lib/axios';
 
 const { t, locale } = useI18n();
 
-const setLanguage = (newLang) => {
-  store.dispatch('setLanguage', newLang);
+const setLanguage = async (newLang) => {
+  await store.dispatch('setLanguage', newLang);
   locale.value = newLang;
+  if(isLoggedIn.value) {
+    await changeLanguage(newLang);
+  }
 };
 
 const logout = () => {

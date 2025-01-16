@@ -46,14 +46,14 @@ public class TreatmentServiceTests {
         treatment.setTreatmentPrice(100L);
 
         createTreatmentDto = new CreateTreatmentDto();
-        createTreatmentDto.setName("Treatment 2");
-        createTreatmentDto.setPrice(100L);
-        createTreatmentDto.setDescription("Treatment 2 Description");
+        createTreatmentDto.setTreatmentName("Treatment 2");
+        createTreatmentDto.setTreatmentPrice(100L);
+        createTreatmentDto.setTreatmentDescription("Treatment 2 Description");
 
         updateTreatmentDto = new UpdateTreatmentDto();
-        updateTreatmentDto.setName("Treatment 3");
-        updateTreatmentDto.setPrice(100L);
-        updateTreatmentDto.setDescription("Treatment 3 Description");
+        updateTreatmentDto.setTreatmentName("Treatment 3");
+        updateTreatmentDto.setTreatmentPrice(100L);
+        updateTreatmentDto.setTreatmentDescription("Treatment 3 Description");
     }
 
     @Test
@@ -96,14 +96,14 @@ public class TreatmentServiceTests {
 
     @Test
     public void testCreateTreatment() {
-        when(treatmentRepository.findByName(createTreatmentDto.getName())).thenReturn(Optional.empty());
+        when(treatmentRepository.findByName(createTreatmentDto.getTreatmentName())).thenReturn(Optional.empty());
         treatmentService.createTreatment(createTreatmentDto);
         verify(treatmentRepository).save(any());
     }
 
     @Test
     public void testCreateTreatmentAlreadyExists() {
-        when(treatmentRepository.findByName(createTreatmentDto.getName())).thenReturn(Optional.of(treatment));
+        when(treatmentRepository.findByName(createTreatmentDto.getTreatmentName())).thenReturn(Optional.of(treatment));
         Assertions.assertThrows(TreatmentAlreadyExistsException.class, () -> treatmentService.createTreatment(createTreatmentDto));
     }
 

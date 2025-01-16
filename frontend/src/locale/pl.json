@@ -310,7 +310,7 @@
   "alreadyRegistered": "Masz już konto? Zaloguj się",
   "notRegistered": "Nie masz jeszcze konta? Zarejestruj się",
   "createAccount": "Załóż konto",
-  "accountNotConfirmedError": "Konto nie zostało jeszcze potwierdzone, sprawdź swoją skrzynkę email",
+  "wrongPasswordError": "Podane hasło jest nieprawidłowe. Spróbuj jeszcze raz",
   "forgotPassword": "Zapomniałeś hasła? Kliknij tutaj aby je zresetować",
   "resetPasswordSuccess": "Hasło zostało zresetowane, sprawdź swoją skrzynkę email",
   "homePage": "Strona główna",
@@ -365,5 +365,16 @@
   "createAppointmentHeader": "Umów się na wizytę",
   "appointmentCreated": "Wizyta została pomyślnie utworzona",
   "appointmentCreateError": "Wystąpił błąd podczas tworzenia wizyty",
-  "confirmAppointmentCreateButton": "Umów wizytę"
+  "confirmAppointmentCreateButton": "Umów wizytę",
+  "adminPanel": "Panel administratora",
+  "editTreatment": "Edytuj zabieg",
+  "createTreatment": "Dodaj zabieg",
+  "deleteTreatment": "Usuń zabieg",
+  "treatmentNameError": "Nazwa zabiegu jest wymagana",
+  "treatmentDescriptionError": "Opis zabiegu jest wymagany",
+  "treatmentPriceErrorNegative": "Cena zabiegu nie może być ujemna",
+  "saveChanges": "Zapisz zmiany",
+  "treatmentCreated": "Zabieg został pomyślnie dodany",
+  "treatmentDeleted": "Zabieg został pomyślnie usunięty",
+  "treatmentDeleteError": "Wystąpił błąd podczas usuwania zabiegu"
 }

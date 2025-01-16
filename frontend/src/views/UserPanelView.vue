@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {UserProfile, UpdateUserProfile} from '@/lib/types';
+import type {UpdateUserProfile, UserProfile} from '@/lib/types';
 import {getUserProfile, updateProfile} from '@/lib/axios';
 import {onMounted, ref} from 'vue';
 import {Card, CardContent, CardTitle} from "@/components/ui/card";
@@ -15,7 +15,7 @@ import {toast} from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 const userProfileRef = ref<UserProfile>({} as UserProfile);
-let originalData = {} as UserProfile;
+const originalData = {} as UserProfile;
 const countries = useCountries();
 
 const {t} = useI18n();
@@ -80,14 +80,14 @@ const onSubmit = async (values: any) => {
       dto[key] = values[key];
     }
   }
-  if(Object.keys(dto).length === 0) {
+  if (Object.keys(dto).length === 0) {
     toast.info(t('noDataToUpdate'), {
       autoClose: 2000,
     });
     return;
   }
   const response = await updateProfile(dto);
-  if(response.status === 200) {
+  if (response.status === 200) {
     toast.success(t('updateDataSuccess'), {
       autoClose: 2000,
     });

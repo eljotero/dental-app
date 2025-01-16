@@ -1,5 +1,12 @@
 import axios from "axios";
-import type {LoginDto, RegisterDto, UpdateUserProfile, CreateAppointment} from './types';
+import type {
+    LoginDto,
+    RegisterDto,
+    UpdateUserProfile,
+    CreateAppointment,
+    UpdateTreatment,
+    CreateTreatment
+} from './types';
 import store from "@/store";
 
 const axiosInstance = axios.create({
@@ -30,6 +37,30 @@ export const getTreatments = async () => {
 
 export const getTreatment = async (id: number) => {
     return axiosInstance.get(`/api/services/${id}`);
+}
+
+export const createTreatment = async(data: CreateTreatment) => {
+    return axiosInstance.post('/api/services/create', data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const updateTreatment = async(id: number, data:UpdateTreatment) => {
+    return axiosInstance.put(`/api/services/${id}`, data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const deleteTreatment = async(id: number) => {
+    return axiosInstance.delete(`/api/services/${id}`, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
 }
 
 export const getUserProfile = async () => {
@@ -106,6 +137,14 @@ export const getDoctorsAvailability = async(id: number, date: string) => {
 
 export const createAppointment = async(data: CreateAppointment) => {
     return axiosInstance.post('/api/appointments/add', data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const changeLanguage = async(language: string) => {
+    return axiosInstance.post('/api/user/change-language', {language}, {
         headers: {
             Authorization: `Bearer ${store.getters.getUserToken}`
         }

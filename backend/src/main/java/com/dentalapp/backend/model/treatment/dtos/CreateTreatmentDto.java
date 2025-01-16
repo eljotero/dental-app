@@ -8,13 +8,15 @@ import lombok.Data;
 @Data
 public class CreateTreatmentDto {
 
+    @NotNull(message = "Name is required")
     @NotBlank(message = "Name is required")
-    private String name;
+    private String treatmentName;
 
+    @NotNull(message = "Description is required")
     @NotBlank(message = "Description is required")
-    private String description;
+    private String treatmentDescription;
 
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be positive")
-    private Long price;
+    private Long treatmentPrice;
 }

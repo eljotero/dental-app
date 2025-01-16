@@ -310,7 +310,7 @@
   "alreadyRegistered": "Already have an account? Login",
   "notRegistered": "Don't have an account yet? Register",
   "createAccount": "Create an account",
-  "accountNotConfirmedError": "Your account is not confirmed, please check your email",
+  "wrongPasswordError": "The password you entered is incorrect. Please try again",
   "forgotPassword": "Forgot password? Click here to reset it",
   "resetPasswordSuccess": "Password has been reset, please check your email",
   "homePage": "Home Page",
@@ -365,5 +365,16 @@
   "createAppointmentHeader": "Schedule an appointment",
   "appointmentCreated": "Appointment has been created",
   "appointmentCreateError": "Appointment creation failed",
-  "confirmAppointmentCreateButton": "Schedule appointment"
+  "confirmAppointmentCreateButton": "Schedule appointment",
+  "adminPanel": "Admin panel",
+  "editTreatment": "Edit treatment",
+  "createTreatment": "Create treatment",
+  "deleteTreatment": "Delete treatment",
+  "treatmentNameError": "Treatment name is required",
+  "treatmentDescriptionError": "Treatment description is required",
+  "treatmentPriceErrorNegative": "Treatment price must be a positive number",
+  "saveChanges": "Save changes",
+  "treatmentCreated": "Treatment has been created",
+  "treatmentDeleted": "Treatment has been deleted",
+  "treatmentDeleteError": "Treatment deletion failed"
 }

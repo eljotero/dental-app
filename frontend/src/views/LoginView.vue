@@ -39,7 +39,7 @@ const onSubmit = async (values: any) => {
     }
   } catch (error: any) {
     if(error.status === 403) {
-      toast.error(t('accountNotConfirmedError'), {
+      toast.error(t('wrongPasswordError'), {
         autoClose: 3000,
       });
       return;

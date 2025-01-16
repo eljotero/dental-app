@@ -22,7 +22,7 @@ const router = createRouter({
         {
             path: '/priceList',
             name: 'priceList',
-            component: () => import('../views/PriceListView.vue'),
+            component: () => import('../views/TreatmentsListView.vue'),
         },
         {
             path: '/profile',
@@ -44,6 +44,17 @@ const router = createRouter({
             path: '/createAppointment',
             name: 'createAppointment',
             component: () => import('../views/CreateAppointmentView.vue')
+        },
+        {
+            path: '/editTreatment/:treatmentId',
+            name: 'treatment',
+            component: () => import('../views/EditTreatmentView.vue'),
+            props: true
+        },
+        {
+            path: '/createTreatment',
+            name: 'createTreatment',
+            component: () => import('../views/AddTreatmentView.vue')
         }
     ],
 })

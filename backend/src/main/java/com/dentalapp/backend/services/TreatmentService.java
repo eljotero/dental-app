@@ -35,7 +35,7 @@ public class TreatmentService {
 
     @Transactional
     public void createTreatment(CreateTreatmentDto createTreatmentDto) {
-        doesTreatmentExist(createTreatmentDto.getName());
+        doesTreatmentExist(createTreatmentDto.getTreatmentName());
         Treatment treatment = TreatmentMapper.toEntityCreate(createTreatmentDto);
         treatmentRepository.save(treatment);
     }
@@ -50,8 +50,7 @@ public class TreatmentService {
     @Transactional
     public void deleteTreatment(Long id) {
         Treatment treatment = getTreatmentById(id);
-        treatment.setIsActive(false);
-        treatmentRepository.save(treatment);
+        treatmentRepository.delete(treatment);
     }
 
     private void doesTreatmentExist(String name) {

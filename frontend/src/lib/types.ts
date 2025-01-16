@@ -31,11 +31,25 @@ export interface State {
 }
 
 export interface Treatment {
+    [key: string]: any;
     treatmentId: number;
     treatmentName: string;
     treatmentDescription: string;
     treatmentPrice: number;
     isActive: boolean;
+}
+
+export interface CreateTreatment {
+    treatmentName: string;
+    treatmentDescription: string;
+    treatmentPrice: number;
+}
+
+export interface UpdateTreatment {
+    [key: string]: any;
+    treatmentName?: string;
+    treatmentDescription?: string;
+    treatmentPrice?: number;
 }
 
 export interface UserProfile {
@@ -74,6 +88,7 @@ export interface Appointment {
 }
 
 export interface AppointmentDetails {
+    [key: string]: any;
     doctorName: string;
     doctorLastName: string;
     doctorPhoneNumber: string;

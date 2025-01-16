@@ -78,4 +78,11 @@ public class UserController {
         userService.changePassword(token, updatePasswordDto.getPassword());
         return ResponseEntity.ok("Password changed successfully");
     }
+
+    @PostMapping("/change-language")
+    public ResponseEntity<String> changeLanguage(@RequestHeader("Authorization") String token, @RequestBody @Valid ChangeLanguageDto changeLanguageDto) {
+        String email = jwtService.extractEmail(token.substring(7));
+        userService.changeLanguage(email, changeLanguageDto.getLanguage());
+        return ResponseEntity.ok("Language changed successfully");
+    }
 }

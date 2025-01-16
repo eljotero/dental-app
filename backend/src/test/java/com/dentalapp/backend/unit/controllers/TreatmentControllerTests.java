@@ -48,14 +48,14 @@ public class TreatmentControllerTests {
         treatment.setTreatmentPrice(100L);
 
         createTreatmentDto = new CreateTreatmentDto();
-        createTreatmentDto.setName("Treatment 2");
-        createTreatmentDto.setPrice(100L);
-        createTreatmentDto.setDescription("Treatment 2 Description");
+        createTreatmentDto.setTreatmentName("Treatment 2");
+        createTreatmentDto.setTreatmentPrice(100L);
+        createTreatmentDto.setTreatmentDescription("Treatment 2 Description");
 
         updateTreatmentDto = new UpdateTreatmentDto();
-        updateTreatmentDto.setName("Treatment 3");
-        updateTreatmentDto.setPrice(100L);
-        updateTreatmentDto.setDescription("Treatment 3 Description");
+        updateTreatmentDto.setTreatmentName("Treatment 3");
+        updateTreatmentDto.setTreatmentPrice(100L);
+        updateTreatmentDto.setTreatmentDescription("Treatment 3 Description");
 
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
@@ -64,15 +64,15 @@ public class TreatmentControllerTests {
 
     @Test
     public void testValidation() {
-        createTreatmentDto.setName(null);
-        createTreatmentDto.setDescription(null);
-        createTreatmentDto.setPrice(-100L);
+        createTreatmentDto.setTreatmentName(null);
+        createTreatmentDto.setTreatmentDescription(null);
+        createTreatmentDto.setTreatmentPrice(-100L);
         Assertions.assertEquals(3, validator.validate(createTreatmentDto).size());
-        createTreatmentDto.setName("");
-        createTreatmentDto.setDescription("");
+        createTreatmentDto.setTreatmentName("");
+        createTreatmentDto.setTreatmentDescription("");
         Assertions.assertEquals(3, validator.validate(createTreatmentDto).size());
 
-        updateTreatmentDto.setPrice(-100L);
+        updateTreatmentDto.setTreatmentPrice(-100L);
         Assertions.assertEquals(1, validator.validate(updateTreatmentDto).size());
     }
 
