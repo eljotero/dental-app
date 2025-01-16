@@ -36,10 +36,10 @@ export interface Treatment {
     treatmentName: string;
     treatmentDescription: string;
     treatmentPrice: number;
-    isActive: boolean;
 }
 
 export interface CreateTreatment {
+    [key: string]: any;
     treatmentName: string;
     treatmentDescription: string;
     treatmentPrice: number;

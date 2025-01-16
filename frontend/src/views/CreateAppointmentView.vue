@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import type {CreateAppointment, GetDoctorDto, Option, TimeSlots} from "@/lib/types.ts";
-import {onMounted, ref} from "vue";
-import {createAppointment, getDoctorsAvailability, getDoctorsForAppointment} from "@/lib/axios.ts";
-import {toTypedSchema} from '@vee-validate/zod';
-import {z} from 'zod';
+import { Card } from "@/components/ui/card";
+import type { CreateAppointment, GetDoctorDto, Option, TimeSlots } from "@/lib/types.ts";
+import { onMounted, ref } from "vue";
+import { createAppointment, getDoctorsAvailability, getDoctorsForAppointment } from "@/lib/axios.ts";
+import { toTypedSchema } from '@vee-validate/zod';
+import { z } from 'zod';
 import FormFieldComponent from "@/components/FormFieldComponent.vue";
 import SelectFieldComponent from "@/components/SelectFieldComponent.vue";
-import {Form} from "@/components/ui/form";
-import {toast} from 'vue3-toastify';
+import { Form } from "@/components/ui/form";
+import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import {useI18n} from "vue-i18n";
+import { useI18n } from "vue-i18n";
+import {Button} from "@/components/ui/button";
 
-const {t} = useI18n();
+const { t } = useI18n();
 
 const formSchema = toTypedSchema(z.object({
   doctorId: z.string(),
@@ -30,6 +32,7 @@ const slots = ref<TimeSlots>({});
 const isSlotsVisible = ref(false);
 const selectedDoctorId = ref("");
 const selectedDate = ref("");
+const selectedTime = ref("");
 
 onMounted(async () => {
   const response = await getDoctorsForAppointment();
@@ -65,6 +68,10 @@ const fetchTimeSlots = async (values: any) => {
   }
 };
 
+const selectTime = (time: string) => {
+  selectedTime.value = time;
+};
+
 const submitFinalForm = async (values: any) => {
   const appointmentStartTime = values.time;
   const appointmentEndTime = addOneHour(appointmentStartTime);
@@ -93,40 +100,55 @@ const addOneHour = (time: string): string => {
   const [hours, minutes] = time.split(":").map(Number);
   return `${hours + 1}:${minutes.toString().padStart(2, "0")}`;
 };
-
 </script>
 
 <template>
-  <div>
-    <h1 class="text-2xl font-bold mb-4">{{ t('createAppointmentHeader') }}</h1>
-    <Form :schema="formSchema" @submit="fetchTimeSlots">
-      <SelectFieldComponent
-          name="doctorId"
-          :label="t('selectDoctor')"
-          :placeholder="t('selectDoctor')"
-          :options="doctorOptions"
-      />
-      <FormFieldComponent
-          name="date"
-          type="date"
-          :label="t('selectDate')"
-      />
-      <Button type="submit">{{ t('searchButton') }}</Button>
-    </Form>
-
-    <div v-if="isSlotsVisible" class="mt-4">
-      <h2 class="text-xl font-bold">Available Time Slots</h2>
-      <Form :schema="finalSchema" @submit="submitFinalForm">
-        <SelectFieldComponent
-            name="time"
-            :label="t('selectTime')"
-            :placeholder="t('selectTime')"
-            :options="Object.keys(slots).map(time => ({ value: time, label: time }))"
-        />
-        <input type="hidden" name="doctorId" v-model="selectedDoctorId"/>
-        <input type="hidden" name="date" v-model="selectedDate"/>
-        <Button type="submit">{{ t('confirmAppointmentCreateButton') }}</Button>
-      </Form>
-    </div>
+  <div class="container mx-auto p-4 mt-16 h-full">
+    <Card class="flex h-full justify-center items-center">
+      <div class="w-1/2 pr-4 flex-1 flex flex-col">
+        <h1 class="text-2xl font-bold mb-4 text-center">{{ t('createAppointmentHeader') }}</h1>
+        <Form :schema="formSchema" @submit="fetchTimeSlots" class="space-y-4">
+          <SelectFieldComponent
+              name="doctorId"
+              :label="t('selectDoctor')"
+              :placeholder="t('selectDoctor')"
+              :options="doctorOptions"
+              class="w-1/2"
+          />
+          <FormFieldComponent
+              name="date"
+              type="date"
+              :label="t('selectDate')"
+              class="w-1/2"
+          />
+          <div class="flex justify-center">
+            <Button type="submit" class="mt-4">{{ t('searchButton') }}</Button>
+          </div>
+        </Form>
+      </div>
+      <div class="w-1/2 pl-4 flex-1 flex flex-col">
+        <div v-if="isSlotsVisible" class="flex-1">
+          <h2 class="text-xl font-bold text-center mb-4">{{ t('availableTimeSlots') }}</h2>
+          <div class="grid grid-rows-3 gap-4 content-center">
+            <Button
+                v-for="time in Object.keys(slots)"
+                :key="time"
+                @click="selectTime(time)"
+                class="p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-700 w-1/2 mx-auto"
+            >
+              {{ time }}
+            </Button>
+          </div>
+          <Form :schema="finalSchema" @submit="submitFinalForm" class="space-y-4 mt-4">
+            <input type="hidden" name="time" v-model="selectedTime" />
+            <input type="hidden" name="doctorId" v-model="selectedDoctorId" />
+            <input type="hidden" name="date" v-model="selectedDate" />
+            <div class="flex justify-center">
+              <Button type="submit" class="mt-4">{{ t('confirmAppointmentCreateButton') }}</Button>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </Card>
   </div>
 </template>

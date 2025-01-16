@@ -44,17 +44,6 @@ const router = createRouter({
             path: '/createAppointment',
             name: 'createAppointment',
             component: () => import('../views/CreateAppointmentView.vue')
-        },
-        {
-            path: '/editTreatment/:treatmentId',
-            name: 'treatment',
-            component: () => import('../views/EditTreatmentView.vue'),
-            props: true
-        },
-        {
-            path: '/createTreatment',
-            name: 'createTreatment',
-            component: () => import('../views/AddTreatmentView.vue')
         }
     ],
 })

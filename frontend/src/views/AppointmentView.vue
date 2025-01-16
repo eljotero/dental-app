@@ -1,69 +1,14 @@
-<template>
-  <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">{{ t('appointmentDetails') }}</h1>
-    <Card v-if="appointment" class="mb-4 shadow-lg rounded-lg overflow-hidden">
-      <CardHeader class="bg-blue-500 text-white p-4">
-        <h2 class="text-xl font-semibold">{{ t('appointmentDate') }}: {{ appointment.appointmentDate }}</h2>
-      </CardHeader>
-      <CardContent class="p-4">
-        <Form @submit="onSubmit" :validation-schema="formSchema" ref="appointment" class="form-container">
-          <FormFieldComponent name="appointmentStartTime" :label="t('appointmentStartTime')"/>
-          <FormFieldComponent name="appointmentEndTime" :label="t('appointmentEndTime')"/>
-          <FormFieldComponent name="doctorName" :label="t('doctorName')"/>
-          <FormFieldComponent name="doctorLastName" :label="t('doctorLastName')"/>
-          <FormFieldComponent name="doctorPhoneNumber" :label="t('doctorPhoneNumber')"/>
-          <FormFieldComponent name="description" :label="t('description')" v-if="role === 'DOCTOR'" />
-          <p v-else>{{ appointment.description }}</p>
-          <p class="mb-2"><strong>{{ t('canceled') }}:</strong> {{ appointment.cancelled ? t('yes') : t('no') }}</p>
-          <p class="mb-2"><strong>{{ t('paid') }}:</strong> {{ appointment.paid ? t('yes') : t('no') }}</p>
-          <p class="mb-2"><strong>{{ t('confirmed') }}:</strong> {{ appointment.confirmed ? t('yes') : t('no') }}</p>
-          <div v-if="!appointment.confirmed && !appointment.cancelled">
-            <Button @click="confirm(Number(appointmentId))" class="mt-4">{{ t('appointmentConfirmButton') }}</Button>
-          </div>
-          <div v-if="!appointment.cancelled">
-            <Button @click="cancel(Number(appointmentId))" class="mt-4" variant='destructive'>{{ t('appointmentCancelButton') }}</Button>
-          </div>
-          <div v-if="appointment.prescriptions">
-            <h3 class="text-lg font-semibold mt-4">{{ t('prescriptions') }}</h3>
-            <ul>
-              <li v-for="prescription in appointment.prescriptions" :key="prescription.medicineName" class="mb-2">
-                <strong>{{ t('medicineName') }}:</strong> {{ prescription.medicineName }}<br>
-                <strong>{{ t('dosage') }}:</strong> {{ prescription.dosage }}
-              </li>
-            </ul>
-          </div>
-          <div v-if="appointment.referrals">
-            <h3 class="text-lg font-semibold mt-4">{{ t('referrals') }}</h3>
-            <ul>
-              <li v-for="referral in appointment.referrals" :key="referral.procedureName" class="mb-2">
-                <strong>{{ t('procedureName') }}:</strong> {{ referral.procedureName }}<br>
-                <strong>{{ t('procedureDescription') }}:</strong> {{ referral.procedureDescription }}<br>
-                <strong>{{ t('doctorName') }}:</strong> {{ referral.doctorName }}<br>
-                <strong>{{ t('clinicName') }}:</strong> {{ referral.clinicName }}<br>
-                <strong>{{ t('clinicAddress') }}:</strong> {{ referral.clinicAddress }}
-              </li>
-            </ul>
-          </div>
-        </Form>
-      </CardContent>
-    </Card>
-  </div>
-</template>
-
 <script setup lang="ts">
-import {fetchAppointment, confirmAppointment, cancelAppointment} from '@/lib/axios';
+import {cancelAppointment, confirmAppointment, fetchAppointment} from '@/lib/axios';
 import type {AppointmentDetails} from '@/lib/types';
-import {onMounted, ref} from "vue";
-import {Card, CardHeader, CardContent} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {useI18n} from "vue-i18n";
+import {onMounted, ref} from 'vue';
+import {Card, CardContent, CardHeader} from '@/components/ui/card';
+import {Button} from '@/components/ui/button';
+import {useI18n} from 'vue-i18n';
 import {toast} from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import store from '@/store';
-import {Form} from "@/components/ui/form";
-import FormFieldComponent from '@/components/FormFieldComponent.vue';
-import {toTypedSchema} from "@vee-validate/zod";
-import {z} from "zod";
+import {Table, TableBody, TableCell, TableRow} from "@/components/ui/table";
 
 const {t} = useI18n();
 
@@ -72,53 +17,12 @@ const props = defineProps<{
 }>();
 
 const appointment = ref<AppointmentDetails>({} as AppointmentDetails);
-const originalData = {} as AppointmentDetails;
 const role = store.getters.getRole;
-
-const formSchema = toTypedSchema(z.object({
-  appointmentStartTime: z.string().nonempty(t('appointmentStartTimeError')),
-  appointmentEndTime: z.string().nonempty(t('appointmentEndTimeError')),
-  appointmentDate: z.string().nonempty(t('appointmentDateError')),
-  doctorName: z.string().nonempty(t('doctorNameError')),
-  doctorLastName: z.string().nonempty(t('doctorLastNameError')),
-  doctorPhoneNumber: z.string().nonempty(t('doctorPhoneNumberError')),
-  description: z.string().nonempty(t('descriptionError')),
-  cancelled: z.boolean(),
-  paid: z.boolean(),
-  confirmed: z.boolean(),
-  prescriptions: z.array(z.object({
-    medicineName: z.string().nonempty(t('medicineNameError')),
-    dosage: z.string().nonempty(t('dosageError')),
-  })),
-  referrals: z.array(z.object({
-    procedureName: z.string().nonempty(t('procedureNameError')),
-    procedureDescription: z.string().nonempty(t('procedureDescriptionError')),
-    doctorName: z.string().nonempty(t('doctorNameError')),
-    clinicName: z.string().nonempty(t('clinicNameError')),
-    clinicAddress: z.string().nonempty(t('clinicAddressError')),
-  })),
-}));
 
 onMounted(async () => {
   const response = await fetchAppointment(Number(props.appointmentId));
-  if(response.status === 200) {
-    console.log(response.data);
-    appointment.value.setValues({
-      appointmentDate: response.data.appointmentDate,
-      appointmentStartTime: response.data.appointmentStartTime,
-      appointmentEndTime: response.data.appointmentEndTime,
-      doctorName: response.data.doctorName,
-      doctorLastName: response.data.doctorLastName,
-      doctorPhoneNumber: response.data.doctorPhoneNumber,
-      description: response.data.description,
-      cancelled: response.data.cancelled,
-      paid: response.data.paid,
-      confirmed: response.data.confirmed,
-      prescriptions: response.data.prescriptions,
-      referrals: response.data.referrals
-    });
-    console.log(appointment.value.prescriptions);
-    console.log(appointment.value.confirmed);
+  if (response.status === 200) {
+    appointment.value = response.data;
   } else {
     console.error('Error while fetching appointment');
   }
@@ -126,7 +30,7 @@ onMounted(async () => {
 
 const confirm = async (id: number) => {
   const response = await confirmAppointment(id);
-  if(response.status === 200) {
+  if (response.status === 200) {
     toast.success(t('appointmentConfirmed'), {
       autoClose: 2000,
     });
@@ -136,11 +40,11 @@ const confirm = async (id: number) => {
       autoClose: 2000,
     });
   }
-}
+};
 
-const cancel = async(id: number) => {
+const cancel = async (id: number) => {
   const response = await cancelAppointment(id);
-  if(response.status === 200) {
+  if (response.status === 200) {
     toast.success(t('appointmentCanceled'), {
       autoClose: 2000,
     });
@@ -150,9 +54,128 @@ const cancel = async(id: number) => {
       autoClose: 2000,
     });
   }
-}
-
-const onSubmit = async (values: any) => {
-  console.log(values);
-}
+};
 </script>
+
+<template>
+  <div class="container mx-auto p-4 mt-14">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <Card v-if="appointment" class="shadow-lg rounded-lg overflow-hidden">
+        <CardHeader class="bg-blue-500 text-white p-4">
+          <h2 class="text-xl font-semibold">{{ t('appointmentDetails') }}</h2>
+        </CardHeader>
+        <CardContent class="p-4">
+          <Table class="w-full mb-4">
+            <TableBody>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('appointmentDate') }}</TableCell>
+                <TableCell>{{ appointment.appointmentDate }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('appointmentStartTime') }}</TableCell>
+                <TableCell>{{ appointment.appointmentStartTime }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('appointmentEndTime') }}</TableCell>
+                <TableCell>{{ appointment.appointmentEndTime }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('doctorName') }}</TableCell>
+                <TableCell>{{ appointment.doctorName }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('doctorLastName') }}</TableCell>
+                <TableCell>{{ appointment.doctorLastName }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('doctorPhoneNumber') }}</TableCell>
+                <TableCell>{{ appointment.doctorPhoneNumber }}</TableCell>
+              </TableRow>
+              <TableRow v-if="role === 'DOCTOR'">
+                <TableCell class="font-bold">{{ t('description') }}</TableCell>
+                <TableCell>{{ appointment.description }}</TableCell>
+              </TableRow>
+              <TableRow v-else>
+                <TableCell colspan="2">{{ appointment.description }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('canceled') }}</TableCell>
+                <TableCell>{{ appointment.cancelled ? t('yes') : t('no') }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('paid') }}</TableCell>
+                <TableCell>{{ appointment.paid ? t('yes') : t('no') }}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell class="font-bold">{{ t('confirmed') }}</TableCell>
+                <TableCell>{{ appointment.confirmed ? t('yes') : t('no') }}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          <div v-if="!appointment.confirmed && !appointment.cancelled" class="flex gap-4 justify-center">
+            <Button @click="confirm(Number(appointmentId))" class="mt-4">{{ t('appointmentConfirmButton') }}</Button>
+            <Button @click="cancel(Number(appointmentId))" class="mt-4" variant='destructive'>
+              {{ t('appointmentCancelButton') }}
+            </Button>
+            <Button class="mt-4" variant='edit'>
+              {{ t('appointmentPayButton') }}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card v-if="appointment.prescriptions" class="shadow-lg rounded-lg overflow-hidden flex flex-col h-full">
+        <CardHeader class="bg-green-500 text-white p-4">
+          <h2 class="text-xl font-semibold">{{ t('prescriptions') }}</h2>
+        </CardHeader>
+        <CardContent class="p-4 flex flex-col flex-grow">
+          <Table class="w-full mb-4 flex-grow overflow-auto">
+            <TableBody>
+              <TableRow v-for="prescription in appointment.prescriptions" :key="prescription.medicineName" class="mb-2">
+                <TableCell>
+                  <strong>{{ t('medicineName') }}:</strong> {{ prescription.medicineName }}<br>
+                  <strong>{{ t('dosage') }}:</strong> {{ prescription.dosage }}
+                </TableCell>
+                <TableCell class="flex justify-end gap-2">
+                  <Button variant='edit'>{{ t('edit') }}</Button>
+                  <Button variant='destructive'>{{ t('remove') }}</Button>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          <div class="flex justify-center mt-auto">
+            <Button variant='default'>{{ t('add') }}</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card v-if="appointment.referrals" class="shadow-lg rounded-lg overflow-hidden flex flex-col h-full">
+        <CardHeader class="bg-yellow-500 text-white p-4">
+          <h2 class="text-xl font-semibold">{{ t('referrals') }}</h2>
+        </CardHeader>
+        <CardContent class="p-4 flex flex-col flex-grow">
+          <Table class="w-full mb-4 flex-grow overflow-auto">
+            <TableBody>
+              <TableRow v-for="referral in appointment.referrals" :key="referral.procedureName" class="mb-2">
+                <TableCell>
+                  <strong>{{ t('procedureName') }}:</strong> {{ referral.procedureName }}<br>
+                  <strong>{{ t('procedureDescription') }}:</strong> {{ referral.procedureDescription }}<br>
+                  <strong>{{ t('doctorName') }}:</strong> {{ referral.doctorName }}<br>
+                  <strong>{{ t('clinicName') }}:</strong> {{ referral.clinicName }}<br>
+                  <strong>{{ t('clinicAddress') }}:</strong> {{ referral.clinicAddress }}
+                </TableCell>
+                <TableCell class="flex justify-end gap-2">
+                  <Button variant='edit'>{{ t('edit') }}</Button>
+                  <Button variant='destructive'>{{ t('remove') }}</Button>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          <div class="flex justify-center mt-auto">
+            <Button variant='default'>{{ t('add') }}</Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+</template>

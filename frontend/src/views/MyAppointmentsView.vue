@@ -43,7 +43,9 @@ const showMore = (appointmentId: number) => {
           <TableCell class="py-2 px-4 border-b">{{ appointment.appointmentDate }}</TableCell>
           <TableCell class="py-2 px-4 border-b">{{ appointment.appointmentStartTime }}</TableCell>
           <TableCell class="py-2 px-4 border-b">{{ appointment.appointmentEndTime }}</TableCell>
-          <Button @click="showMore(appointment.appointmentId)" class="py-2 px-4 border-b">{{ t('showMore') }}</Button>
+          <TableCell class="py-2 px-4 border-b text-center">
+            <Button @click="showMore(appointment.appointmentId)" class="py-2 px-4 w-1/2">{{ t('showMore') }}</Button>
+          </TableCell>
         </TableRow>
       </TableBody>
     </Table>

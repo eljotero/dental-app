@@ -1,16 +1,139 @@
+<script setup lang="ts">
+import {createTreatment, deleteTreatment, getTreatments} from '@/lib/axios';
+import type {CreateTreatment, Treatment} from '@/lib/types';
+import {onMounted, ref} from 'vue';
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table/index.ts';
+import {Button} from '@/components/ui/button';
+import {useI18n} from 'vue-i18n';
+import store from '../store/index.ts';
+import {toast} from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import {toTypedSchema} from "@vee-validate/zod";
+import * as z from 'zod';
+import {Form} from '@/components/ui/form'
+import FormFieldComponent from "@/components/FormFieldComponent.vue";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,} from '@/components/ui/dialog';
+
+const treatments = ref<Treatment[]>([]);
+const selectedTreatmentId = ref<number | null>(null);
+const editFormRef = ref({
+  treatmentNameUpdate: 'asdasd',
+  treatmentDescriptionUpdate: 'asdasdasd',
+  treatmentPriceUpdate: 1555,
+});
+const originalData = {} as Treatment;
+
+const {t} = useI18n();
+
+const role = store.getters.getRole;
+
+onMounted(async () => {
+  const response = await getTreatments();
+  if (response.status === 200) {
+    treatments.value = response.data;
+  } else {
+    console.error('Error while fetching treatments');
+  }
+});
+
+const createFormSchema = toTypedSchema(z.object({
+  treatmentName: z.string().nonempty(t('treatmentNameError')),
+  treatmentDescription: z.string().nonempty(t('treatmentDescriptionError')),
+  treatmentPrice: z.number().positive(t('treatmentPriceErrorNegative')),
+}));
+
+const editFormSchema = toTypedSchema(z.object({
+  treatmentNameUpdate: z.string().nonempty(t('treatmentNameError')),
+  treatmentDescriptionUpdate: z.string().nonempty(t('treatmentDescriptionError')),
+  treatmentPriceUpdate: z.number().positive(t('treatmentPriceErrorNegative')),
+}));
+
+const onSubmitCreate = async (values: any) => {
+  const dto = values as CreateTreatment;
+  try {
+    const response = await createTreatment(dto);
+    if (response.status === 201) {
+      toast.success(t('treatmentCreated'), {
+        autoClose: 2000,
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
+  } catch (error: any) {
+    const errorMessage = error.response.data.message;
+    const errorMessages = Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage;
+    toast.error(errorMessages, {
+      autoClose: 3000,
+    });
+
+  }
+};
+
+const onSubmitEdit = async (values: any) => {
+  console.log(values);
+  /*const dto = values as UpdateTreatment;
+  try {
+    const response = await updateTreatment(selectedTreatmentId.value, dto);
+    if (response.status === 200) {
+      toast.success(t('treatmentUpdated'), {
+        autoClose: 2000,
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
+  } catch (error: any) {
+    const errorMessage = error.response.data.message;
+    const errorMessages = Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage;
+    toast.error(errorMessages, {
+      autoClose: 3000,
+    });
+  }*/
+};
+
+const setEditFormValues = (treatment: Treatment) => {
+  // editFormRef.value = {
+  //   treatmentName: treatment.treatmentName,
+  //   treatmentDescription: treatment.treatmentDescription,
+  //   treatmentPrice: treatment.treatmentPrice,
+  // };
+  selectedTreatmentId.value = treatment.treatmentId;
+  originalData.treatmentName = treatment.treatmentName;
+  originalData.treatmentDescription = treatment.treatmentDescription;
+  originalData.treatmentPrice = treatment.treatmentPrice;
+};
+
+const removeTreatment = async (treatmentId: number) => {
+  const response = await deleteTreatment(treatmentId);
+  if (response.status === 200) {
+    toast.success(t('treatmentDeleted'), {
+      autoClose: 2000,
+    });
+  } else {
+    toast.error(t('treatmentDeleteError'), {
+      autoClose: 3000,
+    });
+  }
+  setTimeout(() => {
+    window.location.reload();
+  }, 2000);
+};
+</script>
+
 <template>
   <div class="container mx-auto p-4">
     <h1 class="text-2xl font-bold mb-4">{{ t('priceList') }}</h1>
-    <Form v-slot="{ handleSubmit }" as="" keep-values :validation-schema="createFormSchema">
+    <Form v-slot="{ handleSubmit }" as="" keep-values :validation-schema="createFormSchema" v-if="role === 'DOCTOR'">
       <Dialog>
         <DialogTrigger as-child>
-          <Button variant="outline">
-            {{ t('createTreatment') }}
+          <Button>
+            {{ t('createButton') }}
           </Button>
         </DialogTrigger>
         <DialogContent class="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{{ t('createTreatment') }}</DialogTitle>
+            <DialogTitle>{{ t('createButton') }}</DialogTitle>
           </DialogHeader>
           <form id="createDialogForm" @submit="handleSubmit($event, onSubmitCreate)">
             <FormFieldComponent name="treatmentName" :label="t('treatmentName')" :placeholder="t('treatmentName')"/>
@@ -42,89 +165,40 @@
           <TableCell class="py-2 px-4 border-b">{{ treatment.treatmentName }}</TableCell>
           <TableCell class="py-2 px-4 border-b">{{ treatment.treatmentDescription }}</TableCell>
           <TableCell class="py-2 px-4 border-b">{{ treatment.treatmentPrice }}</TableCell>
+          <Form v-slot="{ handleSubmit }" ref="editFormRef" as="" keep-values :validation-schema="editFormSchema">
+            <Dialog>
+              <DialogTrigger as-child>
+                <Button variant="outline" @click="setEditFormValues(treatment)">
+                  {{ t('editButton') }}
+                </Button>
+              </DialogTrigger>
+              <DialogContent class="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{{ t('editButton') }}</DialogTitle>
+                </DialogHeader>
+                <form id="editDialogForm" @submit="handleSubmit($event, onSubmitEdit)">
+                  <FormFieldComponent name="treatmentNameUpdate" :label="t('treatmentName')"
+                                      :placeholder="t('treatmentName')"/>
+                  <FormFieldComponent name="treatmentDescriptionUpdate" :label="t('treatmentDescription')"
+                                      :placeholder="t('treatmentDescription')"/>
+                  <FormFieldComponent name="treatmentPriceUpdate" type="number" :label="t('treatmentPrice')"
+                                      :placeholder="t('treatmentPrice')"/>
+                  <DialogFooter>
+                    <DialogTrigger as-child>
+                      <Button type="submit" form="editDialogForm">
+                        {{ t('saveChanges') }}
+                      </Button>
+                    </DialogTrigger>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </Form>
           <Button variant="destructive" v-if="role === 'DOCTOR'" @click="removeTreatment(treatment.treatmentId)">
-            {{ t('deleteTreatment') }}
+            {{ t('deleteButton') }}
           </Button>
         </TableRow>
       </TableBody>
     </Table>
   </div>
 </template>
-
-<script setup lang="ts">
-import {createTreatment, deleteTreatment, getTreatments} from '@/lib/axios';
-import type {CreateTreatment, Treatment} from '@/lib/types';
-import {onMounted, ref} from 'vue';
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table/index.ts';
-import {Button} from '@/components/ui/button';
-import {useI18n} from 'vue-i18n';
-import store from '../store/index.ts';
-import {toast} from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-import {toTypedSchema} from "@vee-validate/zod";
-import * as z from 'zod';
-import {Form} from '@/components/ui/form'
-import FormFieldComponent from "@/components/FormFieldComponent.vue";
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,} from '@/components/ui/dialog';
-
-const treatments = ref<Treatment[]>([]);
-const selectedTreatmentId = ref<number | null>(null);
-
-const {t} = useI18n();
-
-const role = store.getters.getRole;
-
-onMounted(async () => {
-  const response = await getTreatments();
-  if (response.status === 200) {
-    treatments.value = response.data;
-  } else {
-    console.error('Error while fetching treatments');
-  }
-});
-
-const createFormSchema = toTypedSchema(z.object({
-  treatmentName: z.string().nonempty(t('treatmentNameError')),
-  treatmentDescription: z.string().nonempty(t('treatmentDescriptionError')),
-  treatmentPrice: z.number().positive(t('treatmentPriceErrorNegative')),
-}));
-
-const onSubmitCreate = async (values: any) => {
-  const dto = values as CreateTreatment;
-  try {
-    const response = await createTreatment(dto);
-    if (response.status === 201) {
-      toast.success(t('treatmentCreated'), {
-        autoClose: 2000,
-      });
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    }
-  } catch (error: any) {
-    const errorMessage = error.response.data.message;
-    const errorMessages = Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage;
-    toast.error(errorMessages, {
-      autoClose: 3000,
-    });
-
-  }
-};
-
-
-const removeTreatment = async (treatmentId: number) => {
-  const response = await deleteTreatment(treatmentId);
-  if (response.status === 200) {
-    toast.success(t('treatmentDeleted'), {
-      autoClose: 2000,
-    });
-  } else {
-    toast.error(t('treatmentDeleteError'), {
-      autoClose: 3000,
-    });
-  }
-  setTimeout(() => {
-    window.location.reload();
-  }, 2000);
-};
-</script>
