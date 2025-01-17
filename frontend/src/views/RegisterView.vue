@@ -5,8 +5,6 @@ import {toTypedSchema} from '@vee-validate/zod';
 import {z} from 'zod';
 import {useI18n} from "vue-i18n";
 import {Card, CardContent, CardTitle} from "@/components/ui/card";
-import FormFieldComponent from '@/components/FormFieldComponent.vue';
-import SelectFieldComponent from '@/components/SelectFieldComponent.vue';
 import type {RegisterDto} from '@/lib/types';
 import {register} from '@/lib/axios';
 import {toast} from 'vue3-toastify';
@@ -14,6 +12,8 @@ import 'vue3-toastify/dist/index.css';
 import router from "@/router";
 import store from "@/store";
 import {useCountries} from '@/lib/countries';
+import StyledFormItem from "@/components/StyledFormItem.vue";
+import StyledSelectFormItem from "@/components/StyledSelectFormItem.vue";
 
 const {t} = useI18n();
 
@@ -79,27 +79,18 @@ const onSubmit = async (values: any) => {
     <CardContent>
       <CardTitle>{{ t('register') }}</CardTitle>
       <Form @submit="onSubmit" :validation-schema="formSchema" class="form-container">
-        <FormFieldComponent name="firstName" :label="t('firstNameLabel')" :placeholder="t('firstNamePlaceholder')"/>
-        <FormFieldComponent name="lastName" :label="t('lastNameLabel')" :placeholder="t('lastNamePlaceholder')"/>
-        <FormFieldComponent name="email" type="email" :label="t('emailLabel')" :placeholder="t('emailPlaceholder')"/>
-        <FormFieldComponent name="password" type="password" :label="t('passwordLabel')"
-                            :placeholder="t('passwordPlaceholder')"/>
-        <FormFieldComponent name="confirmPassword" type="password" :label="t('passwordConfirmLabel')"
-                            :placeholder="t('passwordConfirmPlaceholder')"/>
-        <FormFieldComponent name="phoneNumber" :label="t('phoneNumberLabel')"
-                            :placeholder="t('phoneNumberPlaceholder')"/>
-        <SelectFieldComponent name="sex" :label="t('sexLabel')" :placeholder="t('sexPlaceholder')"
-                              :options="[{ value: 'false', label: t('sexFemale') }, { value: 'true', label: t('sexMale') }]"/>
-        <FormFieldComponent name="personalIdNumber" :label="t('personalIdNumberLabel')"
-                            :placeholder="t('personalIdNumberPlaceholder')"/>
-        <SelectFieldComponent name="country" :label="t('countryLabel')" :placeholder="t('countryPlaceholder')"
-                              :options="countries"/>
-        <FormFieldComponent name="city" :label="t('cityLabel')" :placeholder="t('cityPlaceholder')"/>
-        <FormFieldComponent name="addressLine" :label="t('addressLineLabel')"
-                            :placeholder="t('addressLinePlaceholder')"/>
-        <FormFieldComponent name="zipCode" :label="t('zipCodeLabel')" :placeholder="t('zipCodePlaceholder')"/>
-        <FormFieldComponent name="dateOfBirth" type="date" :label="t('dateOfBirthLabel')"
-                            :placeholder="t('dateOfBirthPlaceholder')"/>
+        <StyledFormItem inputName="firstName" inputType="text" :inputPlaceholder="t('firstNameLabel')" labelFor="firstName" :labelPlaceholder="t('firstNamePlaceholder')" :label="t('firstNamePlaceholder')" errorMessageName="firstName"/>
+        <StyledFormItem inputName="lastName" inputType="text" :inputPlaceholder="t('lastNameLabel')" labelFor="lastName" :labelPlaceholder="t('lastNamePlaceholder')" :label="t('lastNamePlaceholder')" errorMessageName="lastName"/>
+        <StyledFormItem inputName="email" inputType="email" :inputPlaceholder="t('emailLabel')" labelFor="email" :labelPlaceholder="t('emailPlaceholder')" :label="t('emailPlaceholder')" errorMessageName="email"/>
+        <StyledFormItem inputName="password" inputType="password" :inputPlaceholder="t('passwordLabel')" labelFor="password" :labelPlaceholder="t('passwordPlaceholder')" :label="t('passwordPlaceholder')" errorMessageName="password"/>
+        <StyledFormItem inputName="confirmPassword" inputType="password" :inputPlaceholder="t('passwordConfirmLabel')" labelFor="confirmPassword" :labelPlaceholder="t('passwordConfirmPlaceholder')" :label="t('passwordConfirmPlaceholder')" errorMessageName="confirmPassword"/>
+        <StyledFormItem inputName="phoneNumber" inputType="text" :inputPlaceholder="t('phoneNumberLabel')" labelFor="phoneNumber" :labelPlaceholder="t('phoneNumberPlaceholder')" :label="t('phoneNumberPlaceholder')" errorMessageName="phoneNumber"/>
+        <StyledSelectFormItem inputName="sex" labelFor="sex" :label="t('sexLabel')" :labelPlaceholder="t('sexPlaceholder')" :options="[{ value: 'false', label: t('sexFemale') }, { value: 'true', label: t('sexMale') }]" errorMessageName="sex"/>
+        <StyledFormItem inputName="personalIdNumber" inputType="text" :inputPlaceholder="t('personalIdNumberLabel')" labelFor="personalIdNumber" :labelPlaceholder="t('personalIdNumberPlaceholder')" :label="t('personalIdNumberPlaceholder')" errorMessageName="personalIdNumber"/>
+        <StyledSelectFormItem inputName="country" labelFor="country" :label="t('countryLabel')" :labelPlaceholder="t('countryPlaceholder')" :options="countries" errorMessageName="country"/>        <StyledFormItem inputName="city" inputType="text" :inputPlaceholder="t('cityLabel')" labelFor="city" :labelPlaceholder="t('cityPlaceholder')" :label="t('cityPlaceholder')" errorMessageName="city"/>
+        <StyledFormItem inputName="addressLine" inputType="text" :inputPlaceholder="t('addressLineLabel')" labelFor="addressLine" :labelPlaceholder="t('addressLinePlaceholder')" :label="t('addressLinePlaceholder')" errorMessageName="addressLine"/>
+        <StyledFormItem inputName="zipCode" inputType="text" :inputPlaceholder="t('zipCodeLabel')" labelFor="zipCode" :labelPlaceholder="t('zipCodePlaceholder')" :label="t('zipCodePlaceholder')" errorMessageName="zipCode"/>
+        <StyledFormItem inputName="dateOfBirth" inputType="date" :inputPlaceholder="t('dateOfBirthLabel')" labelFor="dateOfBirth" :labelPlaceholder="t('dateOfBirthPlaceholder')" :label="t('dateOfBirthPlaceholder')" errorMessageName="dateOfBirth"/>
         <Button type="submit" class="submit-button">
           {{ t('register') }}
         </Button>

@@ -5,13 +5,13 @@ import { onMounted, ref } from "vue";
 import { createAppointment, getDoctorsAvailability, getDoctorsForAppointment } from "@/lib/axios.ts";
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import FormFieldComponent from "@/components/FormFieldComponent.vue";
-import SelectFieldComponent from "@/components/SelectFieldComponent.vue";
 import { Form } from "@/components/ui/form";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import { useI18n } from "vue-i18n";
 import {Button} from "@/components/ui/button";
+import StyledSelectFormItem from "@/components/StyledSelectFormItem.vue";
+import StyledFormItem from "@/components/StyledFormItem.vue";
 
 const { t } = useI18n();
 
@@ -50,7 +50,6 @@ onMounted(async () => {
 const fetchTimeSlots = async (values: any) => {
   if (values.doctorId && values.date) {
     const response = await getDoctorsAvailability(values.doctorId, values.date);
-    console.log(response);
     if (response.status === 200) {
       slots.value = response.data;
       selectedDoctorId.value = values.doctorId;
@@ -108,19 +107,8 @@ const addOneHour = (time: string): string => {
       <div class="w-1/2 pr-4 flex-1 flex flex-col">
         <h1 class="text-2xl font-bold mb-4 text-center">{{ t('createAppointmentHeader') }}</h1>
         <Form :schema="formSchema" @submit="fetchTimeSlots" class="space-y-4">
-          <SelectFieldComponent
-              name="doctorId"
-              :label="t('selectDoctor')"
-              :placeholder="t('selectDoctor')"
-              :options="doctorOptions"
-              class="w-1/2"
-          />
-          <FormFieldComponent
-              name="date"
-              type="date"
-              :label="t('selectDate')"
-              class="w-1/2"
-          />
+          <StyledSelectFormItem :options="doctorOptions" inputName="doctorId" labelFor="doctorId" :labelPlaceholder="t('selectDoctor')" :label="t('selectDoctor')" errorMessageName="doctorId" />
+          <StyledFormItem inputName="date" inputType="date" inputPlaceholder="YYYY-MM-DD" labelFor="date" :labelPlaceholder="t('selectDate')" :label="t('selectDate')" errorMessageName="date" />
           <div class="flex justify-center">
             <Button type="submit" class="mt-4">{{ t('searchButton') }}</Button>
           </div>

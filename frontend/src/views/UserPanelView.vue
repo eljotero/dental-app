@@ -1,24 +1,28 @@
 <script setup lang="ts">
-import type {UpdateUserProfile, UserProfile} from '@/lib/types';
-import {getUserProfile, updateProfile} from '@/lib/axios';
+import type {UserProfile} from '@/lib/types';
+import {getUserProfile} from '@/lib/axios';
 import {onMounted, ref} from 'vue';
 import {Card, CardContent, CardTitle} from "@/components/ui/card";
-import FormFieldComponent from '@/components/FormFieldComponent.vue';
-import SelectFieldComponent from '@/components/SelectFieldComponent.vue';
 import {Button} from '@/components/ui/button';
 import {useI18n} from 'vue-i18n';
 import {toTypedSchema} from "@vee-validate/zod";
 import {z} from "zod";
 import {useCountries} from '@/lib/countries';
-import {Form} from "@/components/ui/form";
-import {toast} from 'vue3-toastify';
+import {Form} from 'vee-validate';
 import 'vue3-toastify/dist/index.css';
+import StyledFormItem from "@/components/StyledFormItem.vue";
+import StyledSelectFormItem from "@/components/StyledSelectFormItem.vue";
+
+
+const {t} = useI18n();
 
 const userProfileRef = ref<UserProfile>({} as UserProfile);
 const originalData = {} as UserProfile;
 const countries = useCountries();
-
-const {t} = useI18n();
+const sexes = [
+  {value: 'false', label: t('sexFemale')},
+  {value: 'true', label: t('sexMale')},
+]
 
 const formSchema = toTypedSchema(z.object({
   firstName: z.string().nonempty(t('firstNameError')),
@@ -74,28 +78,29 @@ onMounted(async () => {
 });
 
 const onSubmit = async (values: any) => {
-  const dto: UpdateUserProfile = {};
-  for (const key in values) {
-    if (values[key] !== originalData[key]) {
-      dto[key] = values[key];
-    }
-  }
-  if (Object.keys(dto).length === 0) {
-    toast.info(t('noDataToUpdate'), {
-      autoClose: 2000,
-    });
-    return;
-  }
-  const response = await updateProfile(dto);
-  if (response.status === 200) {
-    toast.success(t('updateDataSuccess'), {
-      autoClose: 2000,
-    });
-  } else {
-    toast.error(t('updateDataError'), {
-      autoClose: 3000,
-    });
-  }
+  console.log(values);
+  // const dto: UpdateUserProfile = {};
+  // for (const key in values) {
+  //   if (values[key] !== originalData[key]) {
+  //     dto[key] = values[key];
+  //   }
+  // }
+  // if (Object.keys(dto).length === 0) {
+  //   toast.info(t('noDataToUpdate'), {
+  //     autoClose: 2000,
+  //   });
+  //   return;
+  // }
+  // const response = await updateProfile(dto);
+  // if (response.status === 200) {
+  //   toast.success(t('updateDataSuccess'), {
+  //     autoClose: 2000,
+  //   });
+  // } else {
+  //   toast.error(t('updateDataError'), {
+  //     autoClose: 3000,
+  //   });
+  // }
 }
 </script>
 
@@ -104,21 +109,72 @@ const onSubmit = async (values: any) => {
     <CardContent>
       <CardTitle>{{ t('updateDataHeader') }}</CardTitle>
       <Form @submit="onSubmit" ref="userProfileRef" :validation-schema="formSchema" class="form-container">
-        <FormFieldComponent name="firstName" :label="t('firstNameLabel')" :placeholder="t('firstNamePlaceholder')"/>
-        <FormFieldComponent name="lastName" :label="t('lastNameLabel')" :placeholder="t('lastNamePlaceholder')"/>
-        <FormFieldComponent name="email" type="email" :label="t('emailLabel')" :placeholder="t('emailPlaceholder')"/>
-        <FormFieldComponent name="phoneNumber" :label="t('phoneNumberLabel')"
-                            :placeholder="t('phoneNumberPlaceholder')"/>
-        <SelectFieldComponent name="sex" :label="t('sexLabel')" :placeholder="t('sexPlaceholder')"
-                              :options="[{ value: 'false', label: t('sexFemale') }, { value: 'true', label: t('sexMale') }]"/>
-        <SelectFieldComponent name="country" :label="t('countryLabel')" :placeholder="t('countryPlaceholder')"
-                              :options="countries"/>
-        <FormFieldComponent name="city" :label="t('cityLabel')" :placeholder="t('cityPlaceholder')"/>
-        <FormFieldComponent name="address" :label="t('addressLineLabel')"
-                            :placeholder="t('addressLinePlaceholder')"/>
-        <FormFieldComponent name="zipCode" :label="t('zipCodeLabel')" :placeholder="t('zipCodePlaceholder')"/>
-        <FormFieldComponent name="dateOfBirth" type="date" :label="t('dateOfBirthLabel')"
-                            :placeholder="t('dateOfBirthPlaceholder')"/>
+        <StyledFormItem
+            inputName="firstName"
+            inputType="text"
+            :inputPlaceholder="t('firstNamePlaceholder')"
+            labelFor="firstName"
+            :labelPlaceholder="t('firstNameLabel')"
+            errorMessageName="firstName"
+        />
+        <StyledFormItem
+            inputName="lastName"
+            inputType="text"
+            :inputPlaceholder="t('lastNamePlaceholder')"
+            labelFor="lastName"
+            :labelPlaceholder="t('lastNameLabel')"
+            errorMessageName="lastName"
+        />
+        <StyledFormItem
+            inputName="email"
+            inputType="email"
+            :inputPlaceholder="t('emailPlaceholder')"
+            labelFor="email"
+            :labelPlaceholder="t('emailLabel')"
+            errorMessageName="email"
+        />
+        <StyledFormItem
+            inputName="phoneNumber"
+            inputType="text"
+            :inputPlaceholder="t('phoneNumberPlaceholder')"
+            labelFor="phoneNumber"
+            :labelPlaceholder="t('phoneNumberLabel')"
+            errorMessageName="phoneNumber"
+        />
+        <StyledSelectFormItem :options="sexes" inputName="sex" labelFor="sex" labelPlaceholder="Sex" errorMessageName="sex"/>
+        <StyledSelectFormItem :options="countries" inputName="country" labelFor="country" labelPlaceholder="Country" errorMessageName="country"/>
+        <StyledFormItem
+            inputName="city"
+            inputType="text"
+            :inputPlaceholder="t('cityPlaceholder')"
+            labelFor="city"
+            :labelPlaceholder="t('cityLabel')"
+            errorMessageName="city"
+        />
+        <StyledFormItem
+            inputName="address"
+            inputType="text"
+            :inputPlaceholder="t('addressLinePlaceholder')"
+            labelFor="address"
+            :labelPlaceholder="t('addressLineLabel')"
+            errorMessageName="address"
+        />
+        <StyledFormItem
+            inputName="zipCode"
+            inputType="text"
+            :inputPlaceholder="t('zipCodePlaceholder')"
+            labelFor="zipCode"
+            :labelPlaceholder="t('zipCodeLabel')"
+            errorMessageName="zipCode"
+        />
+        <StyledFormItem
+            inputName="dateOfBirth"
+            inputType="date"
+            :inputPlaceholder="t('dateOfBirthPlaceholder')"
+            labelFor="dateOfBirth"
+            :labelPlaceholder="t('dateOfBirthLabel')"
+            errorMessageName="dateOfBirth"
+        />
         <Button type="submit" class="submit-button">
           {{ t('updateData') }}
         </Button>

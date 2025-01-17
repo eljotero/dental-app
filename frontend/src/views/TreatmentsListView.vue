@@ -12,8 +12,8 @@ import {toTypedSchema} from "@vee-validate/zod";
 import * as z from 'zod';
 import {Form} from '@/components/ui/form';
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
-import {ErrorMessage, Field} from "vee-validate";
 import {handleRequest, handleSubmit} from '@/lib/functions';
+import StyledFormItem from "@/components/StyledFormItem.vue";
 
 const treatments = ref<Treatment[]>([]);
 const selectedTreatmentId = ref<number>(0);
@@ -105,45 +105,9 @@ const removeTreatment = async (treatmentId: number) => {
             <DialogTitle>{{ t('createButton') }}</DialogTitle>
           </DialogHeader>
           <form id="createDialogForm" @submit="handleSubmit($event, onSubmitCreate)">
-            <div class="mb-4">
-              <label for="treatmentName" class="block text-sm font-medium text-gray-700">
-                {{ t('treatmentName') }}
-              </label>
-              <Field
-                  id="treatmentName"
-                  name="treatmentName"
-                  type="text"
-                  class="w-full border p-2 rounded"
-                  :placeholder="t('treatmentName')"
-              />
-              <ErrorMessage name="treatmentName" class="text-red-500" />
-            </div>
-            <div class="mb-4">
-              <label for="treatmentDescription" class="block text-sm font-medium text-gray-700">
-                {{ t('treatmentDescription') }}
-              </label>
-              <Field
-                  id="treatmentDescription"
-                  name="treatmentDescription"
-                  type="text"
-                  class="w-full border p-2 rounded"
-                  :placeholder="t('treatmentDescription')"
-              />
-              <ErrorMessage name="treatmentDescription" class="text-red-500"/>
-            </div>
-            <div class="mb-4">
-              <label for="treatmentPrice" class="block text-sm font-medium text-gray-700">
-                {{ t('treatmentPrice') }}
-              </label>
-              <Field
-                  id="treatmentPrice"
-                  name="treatmentPrice"
-                  type="number"
-                  class="w-full border p-2 rounded"
-                  :placeholder="t('treatmentPrice')"
-              />
-              <ErrorMessage name="treatmentPrice" class="text-red-500"/>
-            </div>
+            <StyledFormItem inputName="treatmentName" inputType="text" :inputPlaceholder="t('treatmentName')" labelFor="treatmentName" :labelPlaceholder="t('treatmentName')" errorMessageName="treatmentName"/>
+            <StyledFormItem inputName="treatmentDescription" inputType="text" :inputPlaceholder="t('treatmentDescription')" labelFor="treatmentDescription" :labelPlaceholder="t('treatmentDescription')" errorMessageName="treatmentDescription"/>
+            <StyledFormItem inputName="treatmentPrice" inputType="number" :inputPlaceholder="t('treatmentPrice')" labelFor="treatmentPrice" :labelPlaceholder="t('treatmentPrice')" errorMessageName="treatmentPrice"/>
             <DialogFooter>
               <DialogTrigger as-child>
                 <Button type="submit" form="createDialogForm">
@@ -180,45 +144,9 @@ const removeTreatment = async (treatmentId: number) => {
                   <DialogTitle>{{ t('editButton') }}</DialogTitle>
                 </DialogHeader>
                 <form id="editDialogForm" @submit="handleSubmit($event, onSubmitEdit)">
-                  <div class="mb-4">
-                    <label for="treatmentName" class="block text-sm font-medium text-gray-700">
-                      {{ t('treatmentName') }}
-                    </label>
-                    <Field
-                        id="treatmentName"
-                        name="treatmentName"
-                        type="text"
-                        v-model="editFormRef.treatmentName"
-                        class="w-full border p-2 rounded"
-                        placeholder="{{ t('treatmentName') }}"
-                    />
-                  </div>
-                  <div class="mb-4">
-                    <label for="treatmentDescription" class="block text-sm font-medium text-gray-700">
-                      {{ t('treatmentDescription') }}
-                    </label>
-                    <Field
-                        id="treatmentDescription"
-                        name="treatmentDescription"
-                        type="text"
-                        v-model="editFormRef.treatmentDescription"
-                        class="w-full border p-2 rounded"
-                        placeholder="{{ t('treatmentDescription') }}"
-                    />
-                  </div>
-                  <div class="mb-4">
-                    <label for="treatmentPrice" class="block text-sm font-medium text-gray-700">
-                      {{ t('treatmentPrice') }}
-                    </label>
-                    <Field
-                        id="treatmentPrice"
-                        name="treatmentPrice"
-                        type="number"
-                        v-model="editFormRef.treatmentPrice"
-                        class="w-full border p-2 rounded"
-                        placeholder="{{ t('treatmentPrice') }}"
-                    />
-                  </div>
+                  <StyledFormItem inputName="treatmentName" inputType="text" :inputPlaceholder="t('treatmentName')" labelFor="treatmentName" :labelPlaceholder="t('treatmentName')" errorMessageName="treatmentName" :modelValue="editFormRef.treatmentName"/>
+                  <StyledFormItem inputName="treatmentDescription" inputType="text" :inputPlaceholder="t('treatmentDescription')" labelFor="treatmentDescription" :labelPlaceholder="t('treatmentDescription')" errorMessageName="treatmentDescription" :modelValue="editFormRef.treatmentDescription"/>
+                  <StyledFormItem inputName="treatmentPrice" inputType="number" :inputPlaceholder="t('treatmentPrice')" labelFor="treatmentPrice" :labelPlaceholder="t('treatmentPrice')" errorMessageName="treatmentPrice" :modelValue="editFormRef.treatmentPrice"/>
                   <DialogFooter>
                     <DialogTrigger as-child>
                       <Button type="submit" form="editDialogForm">
