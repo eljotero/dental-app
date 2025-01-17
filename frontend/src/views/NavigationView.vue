@@ -58,7 +58,7 @@ watchEffect(() => {
       <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && role === 'PATIENT'">
         <NavigationMenuLink href="/createAppointment" class="nav-link">{{ t('createAppointment') }}</NavigationMenuLink>
       </NavigationMenuItem>
-      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && isLoggedIn && currentRoute !== '/adminPanel'">
+      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && currentRoute !== '/appointments' && isLoggedIn && currentRoute !== '/adminPanel'">
         <NavigationMenuLink href="/appointments" class="nav-link">{{ t('myAppointments') }}</NavigationMenuLink>
       </NavigationMenuItem>
       <NavigationMenuItem v-if="currentLang !== 'en'">

@@ -137,14 +137,14 @@ const cancel = async (id: number) => {
                   <strong>{{ t('dosage') }}:</strong> {{ prescription.dosage }}
                 </TableCell>
                 <TableCell class="flex justify-end gap-2">
-                  <Button variant='edit'>{{ t('edit') }}</Button>
-                  <Button variant='destructive'>{{ t('remove') }}</Button>
+                  <Button variant='edit'>{{ t('editButton') }}</Button>
+                  <Button variant='destructive'>{{ t('deleteButton') }}</Button>
                 </TableCell>
               </TableRow>
             </TableBody>
           </Table>
           <div class="flex justify-center mt-auto">
-            <Button variant='default'>{{ t('add') }}</Button>
+            <Button variant='default'>{{ t('createButton') }}</Button>
           </div>
         </CardContent>
       </Card>
@@ -165,14 +165,14 @@ const cancel = async (id: number) => {
                   <strong>{{ t('clinicAddress') }}:</strong> {{ referral.clinicAddress }}
                 </TableCell>
                 <TableCell class="flex justify-end gap-2">
-                  <Button variant='edit'>{{ t('edit') }}</Button>
-                  <Button variant='destructive'>{{ t('remove') }}</Button>
+                  <Button variant='edit'>{{ t('editButton') }}</Button>
+                  <Button variant='destructive'>{{ t('deleteButton') }}</Button>
                 </TableCell>
               </TableRow>
             </TableBody>
           </Table>
           <div class="flex justify-center mt-auto">
-            <Button variant='default'>{{ t('add') }}</Button>
+            <Button variant='default'>{{ t('createButton') }}</Button>
           </div>
         </CardContent>
       </Card>

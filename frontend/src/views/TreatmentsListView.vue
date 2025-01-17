@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {createTreatment, deleteTreatment, getTreatments} from '@/lib/axios';
-import type {CreateTreatment, Treatment} from '@/lib/types';
+import {createTreatment, deleteTreatment, getTreatments, updateTreatment} from '@/lib/axios';
+import type {CreateTreatment, Treatment, UpdateTreatment} from '@/lib/types';
 import {onMounted, ref} from 'vue';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table/index.ts';
 import {Button} from '@/components/ui/button';
@@ -10,18 +10,15 @@ import {toast} from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import {toTypedSchema} from "@vee-validate/zod";
 import * as z from 'zod';
-import {Form} from '@/components/ui/form'
-import FormFieldComponent from "@/components/FormFieldComponent.vue";
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,} from '@/components/ui/dialog';
+import {Form} from '@/components/ui/form';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
+import {ErrorMessage, Field} from "vee-validate";
+import {handleRequest, handleSubmit} from '@/lib/functions';
 
 const treatments = ref<Treatment[]>([]);
-const selectedTreatmentId = ref<number | null>(null);
-const editFormRef = ref({
-  treatmentNameUpdate: 'asdasd',
-  treatmentDescriptionUpdate: 'asdasdasd',
-  treatmentPriceUpdate: 1555,
-});
-const originalData = {} as Treatment;
+const selectedTreatmentId = ref<number>(0);
+const editFormRef = ref({} as UpdateTreatment);
+const originalData = {} as UpdateTreatment;
 
 const {t} = useI18n();
 
@@ -43,61 +40,33 @@ const createFormSchema = toTypedSchema(z.object({
 }));
 
 const editFormSchema = toTypedSchema(z.object({
-  treatmentNameUpdate: z.string().nonempty(t('treatmentNameError')),
-  treatmentDescriptionUpdate: z.string().nonempty(t('treatmentDescriptionError')),
-  treatmentPriceUpdate: z.number().positive(t('treatmentPriceErrorNegative')),
+  treatmentName: z.string().nonempty(t('treatmentNameError')),
+  treatmentDescription: z.string().nonempty(t('treatmentDescriptionError')),
+  treatmentPrice: z.number().positive(t('treatmentPriceErrorNegative')),
 }));
 
 const onSubmitCreate = async (values: any) => {
   const dto = values as CreateTreatment;
-  try {
-    const response = await createTreatment(dto);
-    if (response.status === 201) {
-      toast.success(t('treatmentCreated'), {
-        autoClose: 2000,
-      });
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    }
-  } catch (error: any) {
-    const errorMessage = error.response.data.message;
-    const errorMessages = Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage;
-    toast.error(errorMessages, {
-      autoClose: 3000,
-    });
-
-  }
+  await handleRequest(
+      (dto) => createTreatment(dto),
+      dto,
+      t('treatmentCreated'),
+      t('treatmentCreateError'),
+      t,
+      201
+  );
 };
 
 const onSubmitEdit = async (values: any) => {
-  console.log(values);
-  /*const dto = values as UpdateTreatment;
-  try {
-    const response = await updateTreatment(selectedTreatmentId.value, dto);
-    if (response.status === 200) {
-      toast.success(t('treatmentUpdated'), {
-        autoClose: 2000,
-      });
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    }
-  } catch (error: any) {
-    const errorMessage = error.response.data.message;
-    const errorMessages = Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage;
-    toast.error(errorMessages, {
-      autoClose: 3000,
-    });
-  }*/
+  await handleSubmit(values, originalData, updateTreatment, selectedTreatmentId.value, t('updateDataSuccess'), t('updateDataError'), t);
 };
 
 const setEditFormValues = (treatment: Treatment) => {
-  // editFormRef.value = {
-  //   treatmentName: treatment.treatmentName,
-  //   treatmentDescription: treatment.treatmentDescription,
-  //   treatmentPrice: treatment.treatmentPrice,
-  // };
+  editFormRef.value = {
+    treatmentName: treatment.treatmentName,
+    treatmentDescription: treatment.treatmentDescription,
+    treatmentPrice: treatment.treatmentPrice,
+  };
   selectedTreatmentId.value = treatment.treatmentId;
   originalData.treatmentName = treatment.treatmentName;
   originalData.treatmentDescription = treatment.treatmentDescription;
@@ -136,11 +105,45 @@ const removeTreatment = async (treatmentId: number) => {
             <DialogTitle>{{ t('createButton') }}</DialogTitle>
           </DialogHeader>
           <form id="createDialogForm" @submit="handleSubmit($event, onSubmitCreate)">
-            <FormFieldComponent name="treatmentName" :label="t('treatmentName')" :placeholder="t('treatmentName')"/>
-            <FormFieldComponent name="treatmentDescription" :label="t('treatmentDescription')"
-                                :placeholder="t('treatmentDescription')"/>
-            <FormFieldComponent name="treatmentPrice" type="number" :label="t('treatmentPrice')"
-                                :placeholder="t('treatmentPrice')"/>
+            <div class="mb-4">
+              <label for="treatmentName" class="block text-sm font-medium text-gray-700">
+                {{ t('treatmentName') }}
+              </label>
+              <Field
+                  id="treatmentName"
+                  name="treatmentName"
+                  type="text"
+                  class="w-full border p-2 rounded"
+                  :placeholder="t('treatmentName')"
+              />
+              <ErrorMessage name="treatmentName" class="text-red-500" />
+            </div>
+            <div class="mb-4">
+              <label for="treatmentDescription" class="block text-sm font-medium text-gray-700">
+                {{ t('treatmentDescription') }}
+              </label>
+              <Field
+                  id="treatmentDescription"
+                  name="treatmentDescription"
+                  type="text"
+                  class="w-full border p-2 rounded"
+                  :placeholder="t('treatmentDescription')"
+              />
+              <ErrorMessage name="treatmentDescription" class="text-red-500"/>
+            </div>
+            <div class="mb-4">
+              <label for="treatmentPrice" class="block text-sm font-medium text-gray-700">
+                {{ t('treatmentPrice') }}
+              </label>
+              <Field
+                  id="treatmentPrice"
+                  name="treatmentPrice"
+                  type="number"
+                  class="w-full border p-2 rounded"
+                  :placeholder="t('treatmentPrice')"
+              />
+              <ErrorMessage name="treatmentPrice" class="text-red-500"/>
+            </div>
             <DialogFooter>
               <DialogTrigger as-child>
                 <Button type="submit" form="createDialogForm">
@@ -165,10 +168,10 @@ const removeTreatment = async (treatmentId: number) => {
           <TableCell class="py-2 px-4 border-b">{{ treatment.treatmentName }}</TableCell>
           <TableCell class="py-2 px-4 border-b">{{ treatment.treatmentDescription }}</TableCell>
           <TableCell class="py-2 px-4 border-b">{{ treatment.treatmentPrice }}</TableCell>
-          <Form v-slot="{ handleSubmit }" ref="editFormRef" as="" keep-values :validation-schema="editFormSchema">
+          <Form v-slot="{ handleSubmit }" as="" :validation-schema="editFormSchema" keep-values>
             <Dialog>
               <DialogTrigger as-child>
-                <Button variant="outline" @click="setEditFormValues(treatment)">
+                <Button variant="outline" @click="setEditFormValues(treatment)" v-if="role === 'DOCTOR'">
                   {{ t('editButton') }}
                 </Button>
               </DialogTrigger>
@@ -177,12 +180,45 @@ const removeTreatment = async (treatmentId: number) => {
                   <DialogTitle>{{ t('editButton') }}</DialogTitle>
                 </DialogHeader>
                 <form id="editDialogForm" @submit="handleSubmit($event, onSubmitEdit)">
-                  <FormFieldComponent name="treatmentNameUpdate" :label="t('treatmentName')"
-                                      :placeholder="t('treatmentName')"/>
-                  <FormFieldComponent name="treatmentDescriptionUpdate" :label="t('treatmentDescription')"
-                                      :placeholder="t('treatmentDescription')"/>
-                  <FormFieldComponent name="treatmentPriceUpdate" type="number" :label="t('treatmentPrice')"
-                                      :placeholder="t('treatmentPrice')"/>
+                  <div class="mb-4">
+                    <label for="treatmentName" class="block text-sm font-medium text-gray-700">
+                      {{ t('treatmentName') }}
+                    </label>
+                    <Field
+                        id="treatmentName"
+                        name="treatmentName"
+                        type="text"
+                        v-model="editFormRef.treatmentName"
+                        class="w-full border p-2 rounded"
+                        placeholder="{{ t('treatmentName') }}"
+                    />
+                  </div>
+                  <div class="mb-4">
+                    <label for="treatmentDescription" class="block text-sm font-medium text-gray-700">
+                      {{ t('treatmentDescription') }}
+                    </label>
+                    <Field
+                        id="treatmentDescription"
+                        name="treatmentDescription"
+                        type="text"
+                        v-model="editFormRef.treatmentDescription"
+                        class="w-full border p-2 rounded"
+                        placeholder="{{ t('treatmentDescription') }}"
+                    />
+                  </div>
+                  <div class="mb-4">
+                    <label for="treatmentPrice" class="block text-sm font-medium text-gray-700">
+                      {{ t('treatmentPrice') }}
+                    </label>
+                    <Field
+                        id="treatmentPrice"
+                        name="treatmentPrice"
+                        type="number"
+                        v-model="editFormRef.treatmentPrice"
+                        class="w-full border p-2 rounded"
+                        placeholder="{{ t('treatmentPrice') }}"
+                    />
+                  </div>
                   <DialogFooter>
                     <DialogTrigger as-child>
                       <Button type="submit" form="editDialogForm">
