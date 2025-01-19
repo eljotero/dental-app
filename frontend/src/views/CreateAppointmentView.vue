@@ -130,7 +130,7 @@ const addOneHour = (time: string): string => {
               <Button
                   v-for="(endTime, startTime) in times"
                   :key="startTime"
-                  @click="selectTime(startTime, date)"
+                  @click="selectTime(startTime, date.toString())"
                   class="p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-700 w-1/2 mx-auto"
               >
                 {{ startTime }} - {{ endTime }}
