@@ -31,14 +31,13 @@ public class PrescriptionService {
         return prescriptionRepository.findAllByDoctor(email).stream().map(PrescriptionMapper::toGetPrescriptionDto).toList();
     }
 
+
     @Transactional
-    public List<Prescription> addPrescriptions(CreatePrescriptionsDto createPrescriptionsDto, Appointment appointment) {
+    public List<Prescription> addPrescriptions(CreatePrescriptionDto createPrescriptionDto, Appointment appointment) {
         List<Prescription> prescriptions = new ArrayList<>();
-        for (CreatePrescriptionDto createPrescription : createPrescriptionsDto.getCreatePrescriptionsDtoList()) {
-            Prescription prescription = PrescriptionMapper.toEntity(createPrescription, appointment);
-            prescriptionRepository.save(prescription);
-            prescriptions.add(prescription);
-        }
+        Prescription prescription = PrescriptionMapper.toEntity(createPrescriptionDto, appointment);
+        prescriptionRepository.save(prescription);
+        prescriptions.add(prescription);
         return prescriptions;
     }
 

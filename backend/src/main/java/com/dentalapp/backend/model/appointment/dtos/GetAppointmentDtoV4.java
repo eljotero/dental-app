@@ -15,10 +15,10 @@ import java.util.ArrayList;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetAppointmentDtoV2 {
-    private String doctorName;
-    private String doctorLastName;
-    private String doctorPhoneNumber;
+public class GetAppointmentDtoV4 {
+    private String patientName;
+    private String patientLastName;
+    private String patientPhoneNumber;
     private LocalDate appointmentDate;
     private String appointmentStartTime;
     private String appointmentEndTime;

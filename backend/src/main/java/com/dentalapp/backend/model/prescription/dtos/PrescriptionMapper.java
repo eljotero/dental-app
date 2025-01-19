@@ -6,7 +6,7 @@ import com.dentalapp.backend.model.prescription.entity.Prescription;
 public class PrescriptionMapper {
     public static Prescription toEntity(CreatePrescriptionDto createPrescriptionDto, Appointment appointment) {
         Prescription prescription = new Prescription();
-        prescription.setMedicine(createPrescriptionDto.getMedicine());
+        prescription.setMedicine(createPrescriptionDto.getMedicineName());
         prescription.setDosage(createPrescriptionDto.getDosage());
         prescription.setAppointment(appointment);
         return prescription;
@@ -16,8 +16,8 @@ public class PrescriptionMapper {
         if(updatePrescriptionDto.getDosage() != null && !updatePrescriptionDto.getDosage().equals(prescription.getDosage())) {
             prescription.setDosage(updatePrescriptionDto.getDosage());
         }
-        if(updatePrescriptionDto.getMedicine() != null && !updatePrescriptionDto.getMedicine().equals(prescription.getMedicine())) {
-            prescription.setMedicine(updatePrescriptionDto.getMedicine());
+        if(updatePrescriptionDto.getMedicineName() != null && !updatePrescriptionDto.getMedicineName().equals(prescription.getMedicine())) {
+            prescription.setMedicine(updatePrescriptionDto.getMedicineName());
         }
         return prescription;
     }
@@ -33,6 +33,7 @@ public class PrescriptionMapper {
 
     public static GetPrescriptionDtoV2 toGetPrescriptionDtoV2(Prescription prescription) {
         GetPrescriptionDtoV2 getPrescriptionDtoV2 = new GetPrescriptionDtoV2();
+        getPrescriptionDtoV2.setPrescriptionId(prescription.getPrescriptionId());
         getPrescriptionDtoV2.setDosage(prescription.getDosage());
         getPrescriptionDtoV2.setMedicineName(prescription.getMedicine());
         return getPrescriptionDtoV2;

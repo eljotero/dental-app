@@ -1,17 +1,29 @@
 <script setup lang="ts">
 import {
   cancelAppointment,
-  confirmAppointment, createPrescription, createTreatment,
-  deletePrescription, deleteReferral,
+  confirmAppointment,
+  createPrescription,
+  createReferral,
+  deleteFile,
+  deletePrescription,
+  deleteReferral,
+  downloadFile,
   fetchAppointment,
-  updatePrescription, updateReferral
+  updateAppointment,
+  updatePrescription,
+  updateReferral,
+  uploadFile
 } from '@/lib/axios';
 import type {
   AppointmentDetails,
   AppointmentDetailsDoctor,
   CreatePrescription,
-  Prescription, Referral,
-  UpdatePrescription, UpdateReferral
+  CreateReferral,
+  Prescription,
+  Referral,
+  UpdateAppointment,
+  UpdatePrescription,
+  UpdateReferral
 } from '@/lib/types';
 import {onMounted, ref} from 'vue';
 import {Card, CardContent, CardHeader} from '@/components/ui/card';
@@ -45,9 +57,20 @@ const editReferralFormRef = ref({} as UpdateReferral);
 const editReferralOriginalData = {} as UpdateReferral;
 const selectedReferralId = ref<number>(0);
 
+const editAppointmentFormRef = ref({} as UpdateAppointment);
+const editAppointmentOriginalData = {} as UpdateAppointment;
+
 const createMedicineFormSchema = toTypedSchema(z.object({
   medicineName: z.string().nonempty(t('medicineNameError')),
   dosage: z.string().nonempty(t('dosageError')),
+}));
+
+const createReferralFormSchema = toTypedSchema(z.object({
+  procedureName: z.string().nonempty(t('procedureNameError')),
+  procedureDescription: z.string().nonempty(t('procedureDescriptionError')),
+  doctorName: z.string().nonempty(t('doctorNameError')),
+  clinicName: z.string().nonempty(t('clinicNameError')),
+  clinicAddress: z.string().nonempty(t('clinicAddressError')),
 }));
 
 const editMedicineFormSchema = toTypedSchema(z.object({
@@ -61,6 +84,24 @@ const editReferralFormSchema = toTypedSchema(z.object({
   doctorName: z.string().nonempty(t('doctorNameError')),
   clinicName: z.string().nonempty(t('clinicNameError')),
   clinicAddress: z.string().nonempty(t('clinicAddressError')),
+}));
+
+const uploadFileFormSchema = toTypedSchema(z.object({
+  file: z.any()
+}));
+
+const editAppointmentFormSchema = toTypedSchema(z.object({
+  appointmentDate: z.string().nonempty(t('appointmentDateError')),
+  appointmentStartTime: z.string().nonempty(t('appointmentStartTimeError')),
+  appointmentEndTime: z.string().nonempty(t('appointmentEndTimeError')),
+  appointmentDescription: z.string().nonempty(t('descriptionError')),
+}).refine(data => {
+  const startTime = new Date(`${data.appointmentDate}T${data.appointmentStartTime}`);
+  const endTime = new Date(`${data.appointmentDate}T${data.appointmentEndTime}`);
+  return startTime < endTime;
+}, {
+  message: t('appointmentTimeError'),
+  path: ['appointmentEndTime'],
 }));
 
 onMounted(async () => {
@@ -104,7 +145,7 @@ const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString();
 };
 
-const createMedicine = async (values: any) => {
+const addPrescription = async (values: any) => {
   const dto = values as CreatePrescription;
   dto.appointmentId = Number(props.appointmentId);
   await handleRequest(
@@ -112,6 +153,19 @@ const createMedicine = async (values: any) => {
       dto,
       t('prescriptionCreated'),
       t('prescriptionCreateError'),
+      t,
+      201
+  );
+};
+
+const addReferral = async (values: any) => {
+  const dto = values as CreateReferral;
+  dto.appointmentId = Number(props.appointmentId);
+  await handleRequest(
+      (dto) => createReferral(dto),
+      dto,
+      t('referralCreated'),
+      t('referralCreateError'),
       t,
       201
   );
@@ -125,6 +179,19 @@ const setEditMedicineFormValues = (medicine: Prescription) => {
   selectedMedicineId.value = medicine.prescriptionId;
   editPrescriptionOriginalData.medicineName = medicine.medicineName;
   editPrescriptionOriginalData.dosage = medicine.dosage;
+};
+
+const setEditAppointmentFormValues = (appointment: AppointmentDetailsDoctor | AppointmentDetails) => {
+  editAppointmentFormRef.value = {
+    appointmentDate: appointment.appointmentDate,
+    appointmentStartTime: appointment.appointmentStartTime,
+    appointmentEndTime: appointment.appointmentEndTime,
+    appointmentDescription: appointment.description,
+  };
+  editAppointmentOriginalData.appointmentDate = appointment.appointmentDate;
+  editAppointmentOriginalData.appointmentStartTime = appointment.appointmentStartTime;
+  editAppointmentOriginalData.appointmentEndTime = appointment.appointmentEndTime;
+  editAppointmentOriginalData.appointmentDescription = appointment.description;
 };
 
 const setEditReferralFormValues = (referral: Referral) => {
@@ -164,7 +231,7 @@ const removePrescription = async (id: number) => {
   }
 };
 
-const removeReferral = async(id: number) => {
+const removeReferral = async (id: number) => {
   const response = await deleteReferral(id);
   if (response.status === 200) {
     toast.success(t('referralDeleted'), {
@@ -180,12 +247,70 @@ const removeReferral = async(id: number) => {
   }
 }
 
+const addFile = async (values: any) => {
+  const formData = new FormData();
+  formData.append('file', values.file);
+  formData.append('fileName', values.fileName);
+  await handleRequest(
+      () => uploadFile(Number(props.appointmentId), formData),
+      formData,
+      t('fileUploaded'),
+      t('fileUploadError'),
+      t,
+      201
+  );
+};
+
+const removeFile = async (id: number) => {
+  const response = await deleteFile(id);
+  if (response.status === 200) {
+    toast.success(t('fileDeleted'), {
+      autoClose: 2000,
+    });
+  } else {
+    toast.error(t('fileDeleteError'), {
+      autoClose: 3000,
+    });
+  }
+  setTimeout(() => {
+    window.location.reload();
+  }, 2000);
+}
+
+const getFile = async (id: number) => {
+  const response = await downloadFile(id);
+  if (response.status === 200) {
+    const fileName = response.data.fileName;
+    const content = atob(response.data.fileData);
+    const byteArray = new Uint8Array(content.length);
+    for (let i = 0; i < content.length; i++) {
+      byteArray[i] = content.charCodeAt(i);
+    }
+    const blob = new Blob([byteArray], {type: 'application/octet-stream'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } else {
+    console.error('Error while fetching file');
+  }
+};
+
+const onSubmitEditAppointment = async (values: any) => {
+  await handleSubmit(values, editAppointmentOriginalData, updateAppointment, Number(props.appointmentId), t('updateDataSuccess'), t('updateDataError'), t);
+}
+
 </script>
 
 <template>
-  <div class="container mx-auto p-4">
+  <div>
     <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4">
-      <Card v-if="appointment" class="shadow-lg rounded-lg overflow-hidden">
+
+      <Card v-if="appointment" class="shadow-lg rounded-lg overflow-hidden flex flex-col h-full">
         <CardHeader class="bg-blue-500 text-white p-4">
           <h2 class="text-xl font-semibold">{{ t('appointmentDetails') }}</h2>
         </CardHeader>
@@ -247,13 +372,60 @@ const removeReferral = async(id: number) => {
             </TableBody>
           </Table>
           <div v-if="!appointment.confirmed && !appointment.cancelled" class="flex gap-4 justify-center">
-            <Button @click="confirm(Number(appointmentId))" class="mt-4">{{ t('appointmentConfirmButton') }}</Button>
-            <Button @click="cancel(Number(appointmentId))" class="mt-4" variant='destructive'>
+            <Button @click="confirm(Number(appointmentId))" class="mt-4 flex-1 w-full">{{
+                t('appointmentConfirmButton')
+              }}
+            </Button>
+            <Button @click="cancel(Number(appointmentId))" class="mt-4 flex-1 w-full" variant='destructive'>
               {{ t('appointmentCancelButton') }}
             </Button>
-            <Button class="mt-4" variant='edit' v-if="role === 'DOCTOR'">
+            <Button class="mt-4 flex-1 w-full" variant='edit' v-if="role === 'DOCTOR'">
               {{ t('appointmentPayButton') }}
             </Button>
+            <div v-if="role === 'DOCTOR'" class="flex-1 w-full">
+              <Form v-slot="{ handleSubmit }" as="" :validation-schema="editAppointmentFormSchema" keep-values>
+                <Dialog>
+                  <DialogTrigger as-child>
+                    <Button variant="outline" @click="setEditAppointmentFormValues(appointment)"
+                            v-if="role === 'DOCTOR'" class="mt-4 flex-1 w-full">
+                      {{ t('editButton') }}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent class="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>{{ t('editButton') }}</DialogTitle>
+                    </DialogHeader>
+                    <form id="editDialogForm" @submit="handleSubmit($event, onSubmitEditAppointment)">
+                      <StyledFormItem inputName="appointmentDate" inputType="date"
+                                      :inputPlaceholder="t('appointmentDate')" labelFor="appointmentDate"
+                                      :labelPlaceholder="t('appointmentDate')" errorMessageName="appointmentDate"
+                                      :modelValue="editAppointmentFormRef.appointmentDate"/>
+                      <StyledFormItem inputName="appointmentStartTime" inputType="time"
+                                      :inputPlaceholder="t('appointmentStartTime')" labelFor="appointmentStartTime"
+                                      :labelPlaceholder="t('appointmentStartTime')"
+                                      errorMessageName="appointmentStartTime"
+                                      :modelValue="editAppointmentFormRef.appointmentStartTime"/>
+                      <StyledFormItem inputName="appointmentEndTime" inputType="time"
+                                      :inputPlaceholder="t('appointmentEndTime')" labelFor="appointmentEndTime"
+                                      :labelPlaceholder="t('appointmentEndTime')" errorMessageName="appointmentEndTime"
+                                      :modelValue="editAppointmentFormRef.appointmentEndTime"/>
+                      <StyledFormItem inputName="appointmentDescription" inputType="text"
+                                      :inputPlaceholder="t('appointmentDescription')" labelFor="appointmentDescription"
+                                      :labelPlaceholder="t('appointmentDescription')"
+                                      errorMessageName="appointmentDescription"
+                                      :modelValue="editAppointmentFormRef.appointmentDescription"/>
+                      <DialogFooter>
+                        <DialogTrigger as-child>
+                          <Button type="submit" form="editDialogForm" class="w-full">
+                            {{ t('saveChanges') }}
+                          </Button>
+                        </DialogTrigger>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </Form>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -274,7 +446,8 @@ const removeReferral = async(id: number) => {
                   <Form v-slot="{ handleSubmit }" as="" :validation-schema="editMedicineFormSchema" keep-values>
                     <Dialog>
                       <DialogTrigger as-child>
-                        <Button variant="outline" @click="setEditMedicineFormValues(prescription)" v-if="role === 'DOCTOR'">
+                        <Button variant="outline" @click="setEditMedicineFormValues(prescription)"
+                                v-if="role === 'DOCTOR'">
                           {{ t('editButton') }}
                         </Button>
                       </DialogTrigger>
@@ -283,8 +456,13 @@ const removeReferral = async(id: number) => {
                           <DialogTitle>{{ t('editButton') }}</DialogTitle>
                         </DialogHeader>
                         <form id="editDialogForm" @submit="handleSubmit($event, onSubmitEditMedicine)">
-                          <StyledFormItem inputName="medicineName" inputType="text" :inputPlaceholder="t('medicineName')" labelFor="medicineName" :labelPlaceholder="t('medicineName')" errorMessageName="medicineName" :modelValue="editPrescriptionFormRef.medicineName"/>
-                          <StyledFormItem inputName="dosage" inputType="text" :inputPlaceholder="t('dosage')" labelFor="dosage" :labelPlaceholder="t('dosage')" errorMessageName="dosage" :modelValue="editPrescriptionFormRef.dosage"/>
+                          <StyledFormItem inputName="medicineName" inputType="text"
+                                          :inputPlaceholder="t('medicineName')" labelFor="medicineName"
+                                          :labelPlaceholder="t('medicineName')" errorMessageName="medicineName"
+                                          :modelValue="editPrescriptionFormRef.medicineName"/>
+                          <StyledFormItem inputName="dosage" inputType="text" :inputPlaceholder="t('dosage')"
+                                          labelFor="dosage" :labelPlaceholder="t('dosage')" errorMessageName="dosage"
+                                          :modelValue="editPrescriptionFormRef.dosage"/>
                           <DialogFooter>
                             <DialogTrigger as-child>
                               <Button type="submit" form="editDialogForm">
@@ -296,16 +474,19 @@ const removeReferral = async(id: number) => {
                       </DialogContent>
                     </Dialog>
                   </Form>
-                  <Button variant='destructive' @click="removePrescription(prescription.prescriptionId)">{{ t('deleteButton') }}</Button>
+                  <Button variant='destructive' @click="removePrescription(prescription.prescriptionId)">
+                    {{ t('deleteButton') }}
+                  </Button>
                 </TableCell>
               </TableRow>
             </TableBody>
           </Table>
         </CardContent>
-        <Form v-slot="{ handleSubmit }" as="" keep-values :validation-schema="createMedicineFormSchema" v-if="role === 'DOCTOR'">
+        <Form v-slot="{ handleSubmit }" as="" keep-values :validation-schema="createMedicineFormSchema"
+              v-if="role === 'DOCTOR'">
           <Dialog>
             <DialogTrigger as-child>
-              <Button class="m-4">
+              <Button class="m-4 mx-auto w-1/2">
                 {{ t('createButton') }}
               </Button>
             </DialogTrigger>
@@ -313,9 +494,12 @@ const removeReferral = async(id: number) => {
               <DialogHeader>
                 <DialogTitle>{{ t('createButton') }}</DialogTitle>
               </DialogHeader>
-              <form id="createDialogForm" @submit="handleSubmit($event, createMedicine)">
-                <StyledFormItem inputName="medicineName" inputType="text" :inputPlaceholder="t('medicineName')" labelFor="medicineName" :labelPlaceholder="t('medicineName')" errorMessageName="medicineName"/>
-                <StyledFormItem inputName="dosage" inputType="text" :inputPlaceholder="t('dosage')" labelFor="dosage" :labelPlaceholder="t('dosage')" errorMessageName="dosage"/>
+              <form id="createDialogForm" @submit="handleSubmit($event, addPrescription)">
+                <StyledFormItem inputName="medicineName" inputType="text" :inputPlaceholder="t('medicineName')"
+                                labelFor="medicineName" :labelPlaceholder="t('medicineName')"
+                                errorMessageName="medicineName"/>
+                <StyledFormItem inputName="dosage" inputType="text" :inputPlaceholder="t('dosage')" labelFor="dosage"
+                                :labelPlaceholder="t('dosage')" errorMessageName="dosage"/>
                 <DialogFooter>
                   <DialogTrigger as-child>
                     <Button type="submit" form="createDialogForm">
@@ -345,7 +529,7 @@ const removeReferral = async(id: number) => {
                   <strong>{{ t('clinicAddress') }}:</strong> {{ referral.clinicAddress }}
                 </TableCell>
                 <TableCell class="flex justify-end gap-2" v-if="role === 'DOCTOR'">
-                  <Form v-slot="{ handleSubmit }" as="" :validation-schema="editPrescriptionFormRef" keep-values>
+                  <Form v-slot="{ handleSubmit }" as="" :validation-schema="editReferralFormSchema" keep-values>
                     <Dialog>
                       <DialogTrigger as-child>
                         <Button variant="outline" @click="setEditReferralFormValues(referral)" v-if="role === 'DOCTOR'">
@@ -357,11 +541,25 @@ const removeReferral = async(id: number) => {
                           <DialogTitle>{{ t('editButton') }}</DialogTitle>
                         </DialogHeader>
                         <form id="editDialogForm" @submit="handleSubmit($event, onSubmitEditReferral)">
-                          <StyledFormItem inputName="procedureName" inputType="text" :inputPlaceholder="t('procedureName')" labelFor="procedureName" :labelPlaceholder="t('procedureName')" errorMessageName="procedureName" :modelValue="editReferralFormRef.procedureName"/>
-                          <StyledFormItem inputName="procedureDescription" inputType="text" :inputPlaceholder="t('procedureDescription')" labelFor="procedureDescription" :labelPlaceholder="t('procedureDescription')" errorMessageName="procedureDescription" :modelValue="editReferralFormRef.procedureDescription"/>
-                          <StyledFormItem inputName="doctorName" inputType="text" :inputPlaceholder="t('doctorName')" labelFor="doctorName" :labelPlaceholder="t('doctorName')" errorMessageName="doctorName" :modelValue="editReferralFormRef.doctorName"/>
-                          <StyledFormItem inputName="clinicName" inputType="text" :inputPlaceholder="t('clinicName')" labelFor="clinicName" :labelPlaceholder="t('clinicName')" errorMessageName="clinicName" :modelValue="editReferralFormRef.clinicName"/>
-                          <StyledFormItem inputName="clinicAddress" inputType="text" :inputPlaceholder="t('clinicAddress')" labelFor="clinicAddress" :labelPlaceholder="t('clinicAddress')" errorMessageName="clinicAddress" :modelValue="editReferralFormRef.clinicAddress"/>
+                          <StyledFormItem inputName="procedureName" inputType="text"
+                                          :inputPlaceholder="t('procedureName')" labelFor="procedureName"
+                                          :labelPlaceholder="t('procedureName')" errorMessageName="procedureName"
+                                          :modelValue="editReferralFormRef.procedureName"/>
+                          <StyledFormItem inputName="procedureDescription" inputType="text"
+                                          :inputPlaceholder="t('procedureDescription')" labelFor="procedureDescription"
+                                          :labelPlaceholder="t('procedureDescription')"
+                                          errorMessageName="procedureDescription"
+                                          :modelValue="editReferralFormRef.procedureDescription"/>
+                          <StyledFormItem inputName="doctorName" inputType="text" :inputPlaceholder="t('doctorName')"
+                                          labelFor="doctorName" :labelPlaceholder="t('doctorName')"
+                                          errorMessageName="doctorName" :modelValue="editReferralFormRef.doctorName"/>
+                          <StyledFormItem inputName="clinicName" inputType="text" :inputPlaceholder="t('clinicName')"
+                                          labelFor="clinicName" :labelPlaceholder="t('clinicName')"
+                                          errorMessageName="clinicName" :modelValue="editReferralFormRef.clinicName"/>
+                          <StyledFormItem inputName="clinicAddress" inputType="text"
+                                          :inputPlaceholder="t('clinicAddress')" labelFor="clinicAddress"
+                                          :labelPlaceholder="t('clinicAddress')" errorMessageName="clinicAddress"
+                                          :modelValue="editReferralFormRef.clinicAddress"/>
                           <DialogFooter>
                             <DialogTrigger as-child>
                               <Button type="submit" form="editDialogForm">
@@ -373,15 +571,55 @@ const removeReferral = async(id: number) => {
                       </DialogContent>
                     </Dialog>
                   </Form>
-                  <Button variant='destructive' @click="removeReferral(referral.referralId)">{{ t('deleteButton') }}</Button>
+                  <Button variant='destructive' @click="removeReferral(referral.referralId)">{{
+                      t('deleteButton')
+                    }}
+                  </Button>
                 </TableCell>
               </TableRow>
             </TableBody>
           </Table>
-          <div class="flex justify-center mt-auto" v-if="role === 'DOCTOR'">
-            <Button variant='default'>{{ t('createButton') }}</Button>
-          </div>
         </CardContent>
+        <Form v-slot="{ handleSubmit }" as="" keep-values :validation-schema="createReferralFormSchema"
+              v-if="role === 'DOCTOR'">
+          <Dialog>
+            <DialogTrigger as-child>
+              <Button class="m-4 mx-auto w-1/2">
+                {{ t('createButton') }}
+              </Button>
+            </DialogTrigger>
+            <DialogContent class="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{{ t('createButton') }}</DialogTitle>
+              </DialogHeader>
+              <form id="createDialogForm" @submit="handleSubmit($event, addReferral)">
+                <StyledFormItem inputName="procedureName" inputType="text" :inputPlaceholder="t('procedureName')"
+                                labelFor="procedureName" :labelPlaceholder="t('procedureName')"
+                                errorMessageName="procedureName"/>
+                <StyledFormItem inputName="procedureDescription" inputType="text"
+                                :inputPlaceholder="t('procedureDescription')" labelFor="procedureDescription"
+                                :labelPlaceholder="t('procedureDescription')" errorMessageName="procedureDescription"/>
+                <StyledFormItem inputName="doctorName" inputType="text" :inputPlaceholder="t('doctorName')"
+                                labelFor="doctorName" :labelPlaceholder="t('doctorName')"
+                                errorMessageName="doctorName"/>
+                <StyledFormItem inputName="clinicName" inputType="text" :inputPlaceholder="t('clinicName')"
+                                labelFor="clinicName" :labelPlaceholder="t('clinicName')"
+                                errorMessageName="clinicName"/>
+                <StyledFormItem inputName="clinicAddress" inputType="text" :inputPlaceholder="t('clinicAddress')"
+                                labelFor="clinicAddress" :labelPlaceholder="t('clinicAddress')"
+                                errorMessageName="clinicAddress"/>
+                <DialogFooter>
+                  <DialogTrigger as-child>
+                    <Button type="submit" form="createDialogForm">
+                      {{ t('saveChanges') }}
+                    </Button>
+                  </DialogTrigger>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </Form>
+
       </Card>
 
       <Card v-if="appointment.files" class="shadow-lg rounded-lg overflow-hidden flex flex-col h-full">
@@ -399,17 +637,45 @@ const removeReferral = async(id: number) => {
                     <strong>{{ t('updatedAtLabel') }}:</strong> {{ formatDate(file.updatedAt) }}
                   </div>
                 </TableCell>
-                <TableCell class="flex justify-end gap-2" v-if="role === 'DOCTOR'">
-                  <Button variant='edit'>{{ t('editButton') }}</Button>
-                  <Button variant='destructive'>{{ t('deleteButton') }}</Button>
+                <TableCell class="flex justify-end gap-2">
+                  <Button variant='destructive' @click="removeFile(file.fileId)">{{ t('deleteButton') }}</Button>
+                  <Button @click="getFile(file.fileId)">{{ t('downloadButton') }}</Button>
                 </TableCell>
               </TableRow>
             </TableBody>
           </Table>
-          <div class="flex justify-center mt-auto" v-if="role === 'DOCTOR'">
-            <Button variant='default'>{{ t('uploadButton') }}</Button>
-          </div>
         </CardContent>
+        <Form v-slot="{ handleSubmit }" as="" keep-values :validation-schema="uploadFileFormSchema">
+          <Dialog>
+            <DialogTrigger as-child>
+              <Button class="m-4 mx-auto w-1/2">
+                {{ t('uploadButton') }}
+              </Button>
+            </DialogTrigger>
+            <DialogContent class="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{{ t('createButton') }}</DialogTitle>
+              </DialogHeader>
+              <form id="createDialogForm" @submit="handleSubmit($event, addFile)">
+                <StyledFormItem
+                    inputName="file"
+                    inputType="file"
+                    inputPlaceholder="Wybierz plik"
+                    labelFor="file"
+                    labelPlaceholder="Wybierz plik"
+                    errorMessageName="file"
+                />
+                <DialogFooter>
+                  <DialogTrigger as-child>
+                    <Button type="submit" form="createDialogForm">
+                      {{ t('saveChanges') }}
+                    </Button>
+                  </DialogTrigger>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </Form>
       </Card>
     </div>
   </div>

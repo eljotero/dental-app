@@ -393,5 +393,18 @@
   "referralDeleted": "Skierowanie zostało pomyślnie usunięte",
   "referralDeleteError": "Wystąpił błąd podczas usuwania skierowania",
   "referralCreated": "Skierowanie zostało pomyślnie dodane",
-  "referralCreateError": "Wystąpił błąd podczas dodawania skierowania"
+  "referralCreateError": "Wystąpił błąd podczas dodawania skierowania",
+  "medicineNameError": "Nazwa leku jest wymagana",
+  "dosageError": "Dawkowanie jest wymagane",
+  "procedureNameError": "Nazwa zabiegu jest wymagana",
+  "procedureDescriptionError": "Opis zabiegu jest wymagany",
+  "doctorNameError": "Imię lekarza jest wymagane",
+  "clinicNameError": "Nazwa kliniki jest wymagana",
+  "clinicAddressError": "Adres kliniki jest wymagany",
+  "fileDeleted": "Plik został pomyślnie usunięty",
+  "fileDeleteError": "Wystąpił błąd podczas usuwania pliku",
+  "downloadButton": "Pobierz",
+  "uploadButton": "Dodaj plik",
+  "appointmentDescription": "Opis wizyty",
+  "appointmentTimeError": "Godzina rozpoczęcia musi być wcześniejsza niż godzina zakończenia"
 }

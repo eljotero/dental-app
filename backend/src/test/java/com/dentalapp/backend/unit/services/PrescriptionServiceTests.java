@@ -76,7 +76,7 @@ public class PrescriptionServiceTests {
     public void testAddPrescription() {
         CreatePrescriptionsDto createPrescriptionsDto = new CreatePrescriptionsDto();
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
-        createPrescriptionDto.setMedicine("Medicine");
+        createPrescriptionDto.setMedicineName("Medicine");
         createPrescriptionDto.setDosage("Dosage");
         createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
         List<Prescription> result = prescriptionService.addPrescriptions(createPrescriptionsDto, new Appointment());
@@ -88,7 +88,7 @@ public class PrescriptionServiceTests {
     public void testUpdatePrescription() {
         UpdatePrescriptionDto updatePrescriptionDto = new UpdatePrescriptionDto();
         updatePrescriptionDto.setDosage("Dosage");
-        updatePrescriptionDto.setMedicine("Medicine");
+        updatePrescriptionDto.setMedicineName("Medicine");
         when(prescriptionRepository.findById(1L)).thenReturn(Optional.of(new Prescription()));
         prescriptionService.updatePrescription(1L, updatePrescriptionDto);
         verify(prescriptionRepository, times(1)).save(any(Prescription.class));

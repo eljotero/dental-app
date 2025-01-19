@@ -1,10 +1,7 @@
 package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
-import com.dentalapp.backend.model.appointment.dtos.CreateAppointmentDto;
-import com.dentalapp.backend.model.appointment.dtos.GetAppointmentDto;
-import com.dentalapp.backend.model.appointment.dtos.GetAppointmentDtoV2;
-import com.dentalapp.backend.model.appointment.dtos.UpdateAppointmentDto;
+import com.dentalapp.backend.model.appointment.dtos.*;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.services.AppointmentService;
 import jakarta.validation.Valid;
@@ -38,13 +35,18 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getAppointmentByIdDto(id));
     }
 
+    @GetMapping("/doctor/{id}")
+    public ResponseEntity<GetAppointmentDtoV4> getAppointmentByIdV4(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.getAppointmentByIdDtoV4(id));
+    }
+
     @GetMapping("/patient")
     public ResponseEntity<List<GetAppointmentDto>> getPatientAppointments(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(appointmentService.getPatientAppointments(jwtService.extractEmail(token.substring(7))));
     }
 
     @GetMapping("/doctor")
-    public ResponseEntity<List<Appointment>> getDoctorAppointments(@RequestHeader("Authorization") String token, @RequestParam(required = false) LocalDate date) {
+    public ResponseEntity<List<GetAppointmentDtoV3>> getDoctorAppointments(@RequestHeader("Authorization") String token, @RequestParam(required = false) LocalDate date) {
         return ResponseEntity.ok(appointmentService.getDoctorAppointments(jwtService.extractEmail(token.substring(7)), date));
     }
 
@@ -60,9 +62,9 @@ public class AppointmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Appointment created");
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<String> updateAppointment(@PathVariable Long id, @RequestBody UpdateAppointmentDto updateAppointmentDto) {
-        appointmentService.updateAppointment(updateAppointmentDto, id);
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateAppointment(@PathVariable Long id, @RequestBody UpdateAppointmentDto updateAppointmentDto, @RequestHeader("Authorization") String token) {
+        appointmentService.updateAppointment(updateAppointmentDto, id, jwtService.extractEmail(token.substring(7)));
         return ResponseEntity.ok("Appointment updated");
     }
 

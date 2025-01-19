@@ -40,6 +40,7 @@ public class ReferralMapper {
 
     public static GetReferralDto toGetReferralDto(Referral referral) {
         GetReferralDto getReferralDto = new GetReferralDto();
+        getReferralDto.setReferralId(referral.getReferralId());
         getReferralDto.setProcedureName(referral.getProcedureName());
         getReferralDto.setProcedureDescription(referral.getProcedureDescription());
         getReferralDto.setDoctorName(referral.getDoctorName());

@@ -7,7 +7,6 @@ export const handleSubmit = async (values: any, originalData: any, updateFunctio
             dto[key] = values[key];
         }
     }
-    console.log(dto);
     if (Object.keys(dto).length === 0) {
         toast.info(t('noDataToUpdate'), {
             autoClose: 2000,

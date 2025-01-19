@@ -393,5 +393,18 @@
   "referralDeleted": "Referral has been deleted",
   "referralDeleteError": "Referral deletion failed",
   "referralCreated": "Referral has been created",
-  "referralCreateError": "Referral creation failed"
+  "referralCreateError": "Referral creation failed",
+  "medicineNameError": "Medicine name is required",
+  "dosageError": "Dosage is required",
+  "procedureNameError": "Procedure name is required",
+  "procedureDescriptionError": "Procedure description is required",
+  "doctorNameError": "Doctor's name is required",
+  "clinicNameError": "Clinic name is required",
+  "clinicAddressError": "Clinic address is required",
+  "fileDeleted": "File has been deleted",
+  "fileDeleteError": "File deletion failed",
+  "downloadButton": "Download",
+  "uploadButton": "Upload",
+  "appointmentDescription": "Appointment description",
+  "appointmentTimeError": "Appointment start time must be before end time"
 }

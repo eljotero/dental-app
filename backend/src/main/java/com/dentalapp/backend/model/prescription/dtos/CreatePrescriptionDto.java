@@ -1,6 +1,7 @@
 package com.dentalapp.backend.model.prescription.dtos;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatePrescriptionDto {
+    @NotNull(message = "Appointment ID is required")
+    private Long appointmentId;
+
     @NotBlank(message = "Medicine is required")
-    private String medicine;
+    private String medicineName;
 
     @NotBlank(message = "Dosage is required")
     private String dosage;

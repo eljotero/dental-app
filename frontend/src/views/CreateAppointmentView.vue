@@ -90,19 +90,17 @@ const submitFinalForm = async (values: any) => {
     appointmentStartTime: appointmentStartTime,
     appointmentEndTime: appointmentEndTime,
   };
-  console.log(appointment);
+  const response = await createAppointment(appointment);
 
-  // const response = await createAppointment(appointment);
-  //
-  // if (response.status === 201) {
-  //   toast.success(t('appointmentCreated'), {
-  //     autoClose: 2000,
-  //   });
-  // } else {
-  //   toast.error(t('appointmentCreateError'), {
-  //     autoClose: 3000,
-  //   });
-  // }
+  if (response.status === 201) {
+    toast.success(t('appointmentCreated'), {
+      autoClose: 2000,
+    });
+  } else {
+    toast.error(t('appointmentCreateError'), {
+      autoClose: 3000,
+    });
+  }
 };
 
 const addOneHour = (time: string): string => {

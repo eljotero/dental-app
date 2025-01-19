@@ -84,7 +84,7 @@ public class PrescriptionControllerTests {
     public void testCreatePrescriptions() {
         CreatePrescriptionsDto createPrescriptionsDto = new CreatePrescriptionsDto();
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
-        createPrescriptionDto.setMedicine("Medicine");
+        createPrescriptionDto.setMedicineName("Medicine");
         createPrescriptionDto.setDosage("Dosage");
         createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
         createPrescriptionsDto.setAppointmentId(1L);
@@ -97,7 +97,7 @@ public class PrescriptionControllerTests {
     public void testUpdatePrescription() {
         UpdatePrescriptionDto updatePrescriptionDto = new UpdatePrescriptionDto();
         updatePrescriptionDto.setDosage("Dosage");
-        updatePrescriptionDto.setMedicine("Medicine");
+        updatePrescriptionDto.setMedicineName("Medicine");
         ResponseEntity<String> response = prescriptionController.updatePrescription(1L, updatePrescriptionDto);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals("Prescription updated successfully", response.getBody());

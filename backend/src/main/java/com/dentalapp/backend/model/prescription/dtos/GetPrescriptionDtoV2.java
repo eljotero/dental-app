@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetPrescriptionDtoV2 {
+    private Long prescriptionId;
     private String medicineName;
     private String dosage;
 }

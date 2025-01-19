@@ -147,6 +147,15 @@ export interface UpdatePrescription {
     dosage?: string;
 }
 
+export interface CreateReferral {
+    appointmentId: number;
+    procedureName: string;
+    procedureDescription: string;
+    doctorName: string;
+    clinicName: string;
+    clinicAddress: string;
+}
+
 export interface Referral {
     referralId: number;
     procedureName: string;
@@ -186,4 +195,11 @@ export interface FileDetails {
     fileName: string;
     uploadedAt: string;
     updatedAt: string;
+}
+
+export interface UpdateAppointment {
+    appointmentDate?: string;
+    appointmentStartTime?: string;
+    appointmentEndTime?: string;
+    appointmentDescription?: string;
 }

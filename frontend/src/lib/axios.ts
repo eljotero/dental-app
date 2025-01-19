@@ -5,7 +5,7 @@ import type {
     UpdateUserProfile,
     CreateAppointment,
     UpdateTreatment,
-    CreateTreatment, UpdatePrescription, CreatePrescription
+    CreateTreatment, UpdatePrescription, CreatePrescription, CreateReferral, UpdateAppointment
 } from './types';
 import store from "@/store";
 
@@ -193,6 +193,47 @@ export const updateReferral = async(id: number, data: any) => {
 
 export const deleteReferral = async(id: number) => {
     return axiosInstance.delete(`/api/referrals/${id}`, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const createReferral = async(data: CreateReferral) => {
+    return axiosInstance.post('/api/referrals/add', data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const deleteFile = async (id: number) => {
+    return axiosInstance.delete(`/api/files/${id}`, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const uploadFile = async (id: number, formData: FormData) => {
+    return axiosInstance.post(`/api/files/upload?id=${id}`, formData, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`,
+            'Content-Type': 'multipart/form-data',
+        }
+    });
+};
+
+export const downloadFile = async (id: number) => {
+    return axiosInstance.get(`/api/files/${id}`, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const updateAppointment = async (id: number, data: UpdateAppointment) => {
+    return axiosInstance.put(`/api/appointments/${id}`, data, {
         headers: {
             Authorization: `Bearer ${store.getters.getUserToken}`
         }
