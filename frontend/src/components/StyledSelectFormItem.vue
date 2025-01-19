@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import {ErrorMessage, Field} from "vee-validate";
 
+interface Option {
+  value: string | number;
+  label: string;
+}
+
 const props = defineProps({
   inputName: {
     type: String,
@@ -19,7 +24,7 @@ const props = defineProps({
     required: true
   },
   options: {
-    type: Array,
+    type: Array as () => Option[],
     required: true
   }
 });

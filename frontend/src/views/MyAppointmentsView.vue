@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { fetchMyAppointments } from '@/lib/axios';
-import { useI18n } from "vue-i18n";
-import { onMounted, ref, watch } from "vue";
+import {fetchMyAppointments} from '@/lib/axios';
+import {useI18n} from "vue-i18n";
+import {onMounted, ref, watch} from "vue";
 import type {Appointment, DoctorAppointments} from '@/lib/types';
 import router from '@/router';
 import FullCalendar from '@fullcalendar/vue3';
@@ -10,8 +10,9 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import store from "@/store";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import type {CalendarOptions} from "@fullcalendar/core";
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const role = store.getters.getRole;
 
@@ -29,7 +30,7 @@ const calendarEvents = ref<CalendarEvent[]>([]);
 onMounted(async () => {
   const response = await fetchMyAppointments();
   if (response.status === 200) {
-    if(role === 'DOCTOR') {
+    if (role === 'DOCTOR') {
       doctorAppointments.value = response.data;
       calendarEvents.value = doctorAppointments.value.map(appointment => ({
         id: appointment.appointmentId.toString(),
@@ -46,11 +47,11 @@ onMounted(async () => {
 });
 
 const showMore = (appointmentId: number) => {
-  const url = router.resolve({ name: 'appointment', params: { appointmentId: appointmentId } }).href;
+  const url = router.resolve({name: 'appointment', params: {appointmentId: appointmentId}}).href;
   window.open(url, '_blank');
 }
 
-const calendarOptions = ref({
+const calendarOptions = ref<CalendarOptions>({
   plugins: [
     dayGridPlugin,
     timeGridPlugin,
@@ -94,7 +95,7 @@ watch(calendarEvents, (newEvents) => {
 
 <template>
   <div class='calendar-container' v-if="role === 'DOCTOR'">
-    <FullCalendar :options="calendarOptions" />
+    <FullCalendar :options="calendarOptions"/>
   </div>
   <div v-if="role=='PATIENT'">
     <div class="container mx-auto p-4">
