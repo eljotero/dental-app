@@ -2,7 +2,6 @@ package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.referral.dtos.CreateReferralDto;
-import com.dentalapp.backend.model.referral.dtos.CreateReferralsDto;
 import com.dentalapp.backend.model.referral.dtos.UpdateReferralDto;
 import com.dentalapp.backend.model.referral.entity.Referral;
 import com.dentalapp.backend.model.referral.exception.ReferralNotFoundException;
@@ -82,12 +81,10 @@ public class ReferralServiceTests {
     public void testCreateReferral() {
         Appointment appointment = new Appointment();
         appointment.setAppointmentId(1L);
-        CreateReferralsDto createReferralsDto = new CreateReferralsDto();
         CreateReferralDto createReferralDto = new CreateReferralDto();
-        createReferralsDto.setCreateReferralDtoList(List.of(createReferralDto));
-        createReferralsDto.setAppointmentId(1L);
-        when(appointmentService.getAppointmentById(createReferralsDto.getAppointmentId())).thenReturn(appointment);
-        referralService.createReferral(createReferralsDto);
+        createReferralDto.setAppointmentId(1L);
+        when(appointmentService.getAppointmentById(createReferralDto.getAppointmentId())).thenReturn(appointment);
+        referralService.createReferral(createReferralDto);
         verify(referralRepository).saveAll(any());
         verify(appointmentService).saveAppointment(appointment);
     }

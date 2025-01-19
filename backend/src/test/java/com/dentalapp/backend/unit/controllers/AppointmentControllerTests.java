@@ -4,6 +4,7 @@ import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.AppointmentController;
 import com.dentalapp.backend.model.appointment.dtos.*;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.referral.entity.Referral;
@@ -24,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +52,12 @@ public class AppointmentControllerTests {
 
     private Referral referral;
 
+    private File file;
+
+    String token;
+
+    String email;
+
     @BeforeEach
     public void setUp() {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
@@ -68,6 +76,11 @@ public class AppointmentControllerTests {
 
         referral = new Referral();
 
+        file = new File();
+
+        token = "Bearer test@mail.com";
+        email = "test@mail.com";
+
         appointment = new Appointment();
         appointment.setAppointmentId(1L);
         appointment.setAppointmentDate(LocalDate.of(2021, 1, 1));
@@ -78,6 +91,8 @@ public class AppointmentControllerTests {
         appointment.setInvoice(invoice);
         appointment.setPrescriptions(List.of(prescription));
         appointment.setReferrals(List.of(referral));
+
+        appointment.setFiles(List.of(file));
     }
 
     @Test
@@ -131,16 +146,20 @@ public class AppointmentControllerTests {
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
-//    @Test
-//    public void testGetDoctorAppointments() {
-//        String doctorEmail = "test2@mail.com";
-//        when(jwtService.extractEmail("test")).thenReturn(doctorEmail);
-//        when(appointmentService.getDoctorAppointments(doctorEmail, null)).thenReturn(List.of(appointment));
-//        ResponseEntity<List<Appointment>> response = appointmentController.getDoctorAppointments("Bearer test", null);
-//        verify(appointmentService).getDoctorAppointments(doctorEmail, null);
-//        Assertions.assertEquals(List.of(appointment), response.getBody());
-//        Assertions.assertEquals(200, response.getStatusCode().value());
-//    }
+    @Test
+    public void testGetDoctorAppointments() {
+        String doctorEmail = "test2@mail.com";
+        when(jwtService.extractEmail("test")).thenReturn(doctorEmail);
+        when(appointmentService.getDoctorAppointments(doctorEmail, null)).thenReturn(List.of(AppointmentMapper.toGetAppointmentDtoV3(appointment)));
+        ResponseEntity<List<GetAppointmentDtoV3>> response = appointmentController.getDoctorAppointments("Bearer test", null);
+        verify(appointmentService).getDoctorAppointments(doctorEmail, null);
+        GetAppointmentDtoV3 getAppointmentDtoV3 = AppointmentMapper.toGetAppointmentDtoV3(appointment);
+        Assertions.assertEquals(getAppointmentDtoV3.getAppointmentId(), Objects.requireNonNull(response.getBody()).getFirst().getAppointmentId());
+        Assertions.assertEquals(getAppointmentDtoV3.getAppointmentDate(), response.getBody().getFirst().getAppointmentDate());
+        Assertions.assertEquals(getAppointmentDtoV3.getAppointmentStartTime(), response.getBody().getFirst().getAppointmentStartTime());
+        Assertions.assertEquals(getAppointmentDtoV3.getAppointmentEndTime(), response.getBody().getFirst().getAppointmentEndTime());
+        Assertions.assertEquals(200, response.getStatusCode().value());
+    }
 
     @Test
     public void testCancelAppointment() {
@@ -152,8 +171,6 @@ public class AppointmentControllerTests {
 
     @Test
     public void testCreateAppointment() {
-        String token = "Bearer test@mail.com";
-        String email = "test@mail.com";
         CreateAppointmentDto createAppointmentDto = new CreateAppointmentDto();
         createAppointmentDto.setDoctorId(1L);
         createAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
@@ -174,8 +191,9 @@ public class AppointmentControllerTests {
         updateAppointmentDto.setAppointmentStartTime("12:00");
         updateAppointmentDto.setAppointmentEndTime("13:00");
         updateAppointmentDto.setAppointmentDescription("test");
-        ResponseEntity<String> response = appointmentController.updateAppointment(1L, updateAppointmentDto);
-        verify(appointmentService).updateAppointment(updateAppointmentDto, 1L);
+        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
+        ResponseEntity<String> response = appointmentController.updateAppointment(1L, updateAppointmentDto, token);
+        verify(appointmentService).updateAppointment(updateAppointmentDto, 1L, email);
         Assertions.assertEquals(ResponseEntity.ok("Appointment updated"), response);
     }
 

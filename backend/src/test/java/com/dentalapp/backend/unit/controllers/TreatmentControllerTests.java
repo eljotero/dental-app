@@ -67,7 +67,7 @@ public class TreatmentControllerTests {
         createTreatmentDto.setTreatmentName(null);
         createTreatmentDto.setTreatmentDescription(null);
         createTreatmentDto.setTreatmentPrice(-100L);
-        Assertions.assertEquals(3, validator.validate(createTreatmentDto).size());
+        Assertions.assertEquals(5, validator.validate(createTreatmentDto).size());
         createTreatmentDto.setTreatmentName("");
         createTreatmentDto.setTreatmentDescription("");
         Assertions.assertEquals(3, validator.validate(createTreatmentDto).size());
@@ -75,7 +75,6 @@ public class TreatmentControllerTests {
         updateTreatmentDto.setTreatmentPrice(-100L);
         Assertions.assertEquals(1, validator.validate(updateTreatmentDto).size());
     }
-
 
     @Test
     public void testGetAllTreatments() {

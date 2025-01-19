@@ -86,7 +86,7 @@ public class ReferralControllerTests {
         createReferralDto.setProcedureDescription(null);
         createReferralDto.setProcedureName(null);
         createReferralDto.setClinicName(null);
-        Assertions.assertEquals(3, validator.validate(createReferralDto).size());
+        Assertions.assertEquals(4, validator.validate(createReferralDto).size());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class ReferralControllerTests {
 
     @Test
     public void testCreateReferral() {
-        ResponseEntity<String> response = referralController.createReferral(createReferralsDto);
+        ResponseEntity<String> response = referralController.createReferral(createReferralDto);
         Assertions.assertEquals(201, response.getStatusCode().value());
         Assertions.assertEquals("Referral created successfully", response.getBody());
     }

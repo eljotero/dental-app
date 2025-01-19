@@ -124,7 +124,7 @@ public class TreatmentServiceTests {
     public void testDeleteTreatment() {
         when(treatmentRepository.findById(1L)).thenReturn(Optional.of(treatment));
         treatmentService.deleteTreatment(1L);
-        verify(treatmentRepository).save(any());
+        verify(treatmentRepository).delete(treatment);
     }
 
     @Test
