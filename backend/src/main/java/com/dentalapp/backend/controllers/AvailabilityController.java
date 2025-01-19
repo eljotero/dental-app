@@ -73,8 +73,11 @@ public class AvailabilityController {
         return ResponseEntity.ok("Availability updated successfully");
     }
 
-    @GetMapping("/slots/{doctorId}/{date}")
-    public ResponseEntity<Map<String, String>> getAvailableSlots(@PathVariable Long doctorId, @PathVariable LocalDate date) {
-        return ResponseEntity.ok(availableSlotsService.getAvailableSlots(doctorId, date));
+    @GetMapping("/slots/{doctorId}")
+    public ResponseEntity<Map<LocalDate, Map<String, String>>> getAvailableSlots(
+            @PathVariable Long doctorId,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate) {
+        return ResponseEntity.ok(availableSlotsService.getAvailableSlots(doctorId, startDate, endDate));
     }
 }

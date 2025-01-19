@@ -46,6 +46,6 @@ const emit = defineEmits(['update:modelValue']);
         :value="modelValue"
         @input="event => emit('update:modelValue', event.target.value)"
     />
-    <ErrorMessage :name="errorMessageName"/>
+    <ErrorMessage :name="errorMessageName" class="text-red-500"/>
   </div>
 </template>

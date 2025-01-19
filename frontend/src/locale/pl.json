@@ -378,5 +378,20 @@
   "treatmentDeleted": "Zabieg został pomyślnie usunięty",
   "treatmentDeleteError": "Wystąpił błąd podczas usuwania zabiegu",
   "appointmentPayButton": "Opłać",
-  "availableTimeSlots": "Dostępne terminy wizyt"
+  "availableTimeSlots": "Dostępne terminy wizyt",
+  "filesLabel": "Pliki",
+  "fileName": "Nazwa pliku",
+  "uploadedAtLabel": "Data dodania",
+  "updatedAtLabel": "Data aktualizacji",
+  "patientName": "Imię pacjenta",
+  "patientLastName": "Nazwisko pacjenta",
+  "patientPhoneNumber": "Numer telefonu pacjenta",
+  "prescriptionDeleted": "Recepta została pomyślnie usunięta",
+  "prescriptionDeleteError": "Wystąpił błąd podczas usuwania recepty",
+  "prescriptionCreated": "Recepta została pomyślnie dodana",
+  "prescriptionCreateError": "Wystąpił błąd podczas dodawania recepty",
+  "referralDeleted": "Skierowanie zostało pomyślnie usunięte",
+  "referralDeleteError": "Wystąpił błąd podczas usuwania skierowania",
+  "referralCreated": "Skierowanie zostało pomyślnie dodane",
+  "referralCreateError": "Wystąpił błąd podczas dodawania skierowania"
 }

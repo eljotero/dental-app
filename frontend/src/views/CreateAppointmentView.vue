@@ -11,7 +11,6 @@ import 'vue3-toastify/dist/index.css';
 import { useI18n } from "vue-i18n";
 import {Button} from "@/components/ui/button";
 import StyledSelectFormItem from "@/components/StyledSelectFormItem.vue";
-import StyledFormItem from "@/components/StyledFormItem.vue";
 
 const { t } = useI18n();
 
@@ -29,10 +28,11 @@ const finalSchema = toTypedSchema(z.object({
 const doctors = ref<GetDoctorDto[]>([]);
 const doctorOptions = ref<Option[]>([]);
 const slots = ref<TimeSlots>({});
-const isSlotsVisible = ref(false);
 const selectedDoctorId = ref("");
 const selectedDate = ref("");
 const selectedTime = ref("");
+const startDate = ref(new Date());
+const endDate = ref(new Date());
 
 onMounted(async () => {
   const response = await getDoctorsForAppointment();
@@ -45,33 +45,42 @@ onMounted(async () => {
   } else {
     console.error("Error while fetching doctors for appointment");
   }
+  endDate.value.setDate(endDate.value.getDate() + 5);
 });
 
+const formatDate = (date: Date): string => {
+  return date.toISOString().split('T')[0];
+};
+
+
+const updateDateRange = (days: number) => {
+  startDate.value.setDate(startDate.value.getDate() + days);
+  endDate.value.setDate(endDate.value.getDate() + days);
+  fetchTimeSlots({ doctorId: selectedDoctorId.value });
+};
+
 const fetchTimeSlots = async (values: any) => {
-  if (values.doctorId && values.date) {
-    const response = await getDoctorsAvailability(values.doctorId, values.date);
+  if (values.doctorId) {
+    const formattedStartDate = formatDate(startDate.value);
+    const formattedEndDate = formatDate(endDate.value);
+    const response = await getDoctorsAvailability(values.doctorId, formattedStartDate, formattedEndDate);
     if (response.status === 200) {
       slots.value = response.data;
       selectedDoctorId.value = values.doctorId;
-      selectedDate.value = values.date;
-      if (Object.keys(response.data).length > 0) {
-        isSlotsVisible.value = true;
-      } else {
-        toast.error(t('noSlotsError'), {
-          autoClose: 3000,
-        });
-      }
+      console.log(slots.value);
     } else {
       console.error("Error while fetching time slots");
     }
   }
 };
 
-const selectTime = (time: string) => {
-  selectedTime.value = time;
+const selectTime = (time: number, date: string) => {
+  selectedTime.value = time.toString();
+  selectedDate.value = date.toString();
 };
 
 const submitFinalForm = async (values: any) => {
+  console.log(selectedTime);
   const appointmentStartTime = values.time;
   const appointmentEndTime = addOneHour(appointmentStartTime);
 
@@ -81,18 +90,19 @@ const submitFinalForm = async (values: any) => {
     appointmentStartTime: appointmentStartTime,
     appointmentEndTime: appointmentEndTime,
   };
+  console.log(appointment);
 
-  const response = await createAppointment(appointment);
-
-  if (response.status === 201) {
-    toast.success(t('appointmentCreated'), {
-      autoClose: 2000,
-    });
-  } else {
-    toast.error(t('appointmentCreateError'), {
-      autoClose: 3000,
-    });
-  }
+  // const response = await createAppointment(appointment);
+  //
+  // if (response.status === 201) {
+  //   toast.success(t('appointmentCreated'), {
+  //     autoClose: 2000,
+  //   });
+  // } else {
+  //   toast.error(t('appointmentCreateError'), {
+  //     autoClose: 3000,
+  //   });
+  // }
 };
 
 const addOneHour = (time: string): string => {
@@ -108,24 +118,26 @@ const addOneHour = (time: string): string => {
         <h1 class="text-2xl font-bold mb-4 text-center">{{ t('createAppointmentHeader') }}</h1>
         <Form :schema="formSchema" @submit="fetchTimeSlots" class="space-y-4">
           <StyledSelectFormItem :options="doctorOptions" inputName="doctorId" labelFor="doctorId" :labelPlaceholder="t('selectDoctor')" :label="t('selectDoctor')" errorMessageName="doctorId" />
-          <StyledFormItem inputName="date" inputType="date" inputPlaceholder="YYYY-MM-DD" labelFor="date" :labelPlaceholder="t('selectDate')" :label="t('selectDate')" errorMessageName="date" />
           <div class="flex justify-center">
             <Button type="submit" class="mt-4">{{ t('searchButton') }}</Button>
           </div>
         </Form>
       </div>
       <div class="w-1/2 pl-4 flex-1 flex flex-col">
-        <div v-if="isSlotsVisible" class="flex-1">
+        <div class="flex-1">
           <h2 class="text-xl font-bold text-center mb-4">{{ t('availableTimeSlots') }}</h2>
-          <div class="grid grid-rows-3 gap-4 content-center">
-            <Button
-                v-for="time in Object.keys(slots)"
-                :key="time"
-                @click="selectTime(time)"
-                class="p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-700 w-1/2 mx-auto"
-            >
-              {{ time }}
-            </Button>
+          <div v-for="(times, date) in slots" :key="date" class="mb-4">
+            <h3 class="text-lg font-semibold">{{ date }}</h3>
+            <div class="grid grid-rows-3 gap-4 content-center">
+              <Button
+                  v-for="(endTime, startTime) in times"
+                  :key="startTime"
+                  @click="selectTime(startTime, date)"
+                  class="p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-700 w-1/2 mx-auto"
+              >
+                {{ startTime }} - {{ endTime }}
+              </Button>
+            </div>
           </div>
           <Form :schema="finalSchema" @submit="submitFinalForm" class="space-y-4 mt-4">
             <input type="hidden" name="time" v-model="selectedTime" />
@@ -135,6 +147,10 @@ const addOneHour = (time: string): string => {
               <Button type="submit" class="mt-4">{{ t('confirmAppointmentCreateButton') }}</Button>
             </div>
           </Form>
+          <div class="flex justify-between mt-4">
+            <Button @click="updateDateRange(-5)" class="bg-gray-500 text-white rounded-lg hover:bg-gray-700">{{ t('previous5Days') }}</Button>
+            <Button @click="updateDateRange(+5)" class="bg-gray-500 text-white rounded-lg hover:bg-gray-700">{{ t('next5Days') }}</Button>
+          </div>
         </div>
       </div>
     </Card>

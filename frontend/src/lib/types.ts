@@ -101,19 +101,67 @@ export interface AppointmentDetails {
     confirmed: boolean;
     prescriptions: Prescription[];
     referrals: Referral[];
+    files: FileDetails[];
+}
+
+export interface AppointmentDetailsDoctor {
+    [key: string]: any;
+    patientName: string;
+    patientLastName: string;
+    patientPhoneNumber: string;
+    appointmentDate: string;
+    appointmentStartTime: string;
+    appointmentEndTime: string;
+    description: string;
+    cancelled: boolean;
+    paid: boolean;
+    confirmed: boolean;
+    prescriptions: Prescription[];
+    referrals: Referral[];
+    files: FileDetails[];
+}
+
+export interface DoctorAppointments {
+    [key: string]: any;
+    appointmentId: number;
+    patientInfo: string;
+    appointmentDate: string;
+    appointmentStartTime: string;
+    appointmentEndTime: string;
 }
 
 export interface Prescription {
+    prescriptionId: number;
     medicineName: string;
     dosage: string;
 }
 
+export interface CreatePrescription {
+    appointmentId: number;
+    medicineName: string;
+    dosage: string;
+}
+
+export interface UpdatePrescription {
+    medicineName?: string;
+    dosage?: string;
+}
+
 export interface Referral {
+    referralId: number;
     procedureName: string;
     procedureDescription: string;
     doctorName: string;
     clinicName: string;
     clinicAddress: string;
+}
+
+export interface UpdateReferral {
+    procedureName?: string;
+    procedureDescription?: string;
+    doctorName?: string;
+    clinicName?: string;
+    clinicAddress?: string;
 }
 
 export interface GetDoctorDto {
@@ -131,4 +179,11 @@ export interface CreateAppointment {
     appointmentDate: string;
     appointmentStartTime: string;
     appointmentEndTime: string;
+}
+
+export interface FileDetails {
+    fileId: number;
+    fileName: string;
+    uploadedAt: string;
+    updatedAt: string;
 }

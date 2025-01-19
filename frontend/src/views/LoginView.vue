@@ -3,7 +3,7 @@ import {CardContent, CardTitle} from "@/components/ui/card";
 import {useI18n} from "vue-i18n";
 import {toTypedSchema} from "@vee-validate/zod";
 import {z} from "zod";
-import type {LoginDto} from "../lib/types.ts";
+import type {LoginDto} from "@/lib/types";
 import {Form} from "vee-validate";
 import {Button} from "@/components/ui/button";
 import router from "@/router";

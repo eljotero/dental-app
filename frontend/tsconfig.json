@@ -1,5 +1,7 @@
 {
-  "files": [],
+  "files": [
+    "node_modules/@types/node/globals.d.ts"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"
@@ -13,5 +15,10 @@
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "src/types/**/*.d.ts"
+  ]
 }

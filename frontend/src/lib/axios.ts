@@ -5,7 +5,7 @@ import type {
     UpdateUserProfile,
     CreateAppointment,
     UpdateTreatment,
-    CreateTreatment
+    CreateTreatment, UpdatePrescription, CreatePrescription
 } from './types';
 import store from "@/store";
 
@@ -96,11 +96,19 @@ export const fetchMyAppointments = async () => {
 }
 
 export const fetchAppointment = async (id: number) => {
-    return axiosInstance.get(`/api/appointments/${id}`, {
-        headers: {
-            Authorization: `Bearer ${store.getters.getUserToken}`
-        }
-    });
+    if(store.getters.getRole === 'PATIENT') {
+        return axiosInstance.get(`/api/appointments/${id}`, {
+            headers: {
+                Authorization: `Bearer ${store.getters.getUserToken}`
+            }
+        });
+    } else {
+        return axiosInstance.get(`/api/appointments/doctor/${id}`, {
+            headers: {
+                Authorization: `Bearer ${store.getters.getUserToken}`
+            }
+        });
+    }
 }
 
 export const confirmAppointment = async (id: number) => {
@@ -127,8 +135,8 @@ export const getDoctorsForAppointment = async() => {
     });
 }
 
-export const getDoctorsAvailability = async(id: number, date: string) => {
-    return axiosInstance.get(`/api/availability/slots/${id}/${date}`, {
+export const getDoctorsAvailability = async(id: number, startDate: string, endDate: string) => {
+    return axiosInstance.get(`/api/availability/slots/${id}?startDate=${startDate}&endDate=${endDate}`, {
         headers: {
             Authorization: `Bearer ${store.getters.getUserToken}`
         }
@@ -145,6 +153,46 @@ export const createAppointment = async(data: CreateAppointment) => {
 
 export const changeLanguage = async(language: string) => {
     return axiosInstance.post('/api/user/change-language', {language}, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const createPrescription = async(data: CreatePrescription) => {
+    return axiosInstance.post('/api/prescriptions/add', data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const updatePrescription = async(id: number, data: UpdatePrescription) => {
+    return axiosInstance.put(`/api/prescriptions/${id}`, data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const deletePrescription = async(id: number) => {
+    return axiosInstance.delete(`/api/prescriptions/${id}`, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const updateReferral = async(id: number, data: any) => {
+    return axiosInstance.put(`/api/referrals/${id}`, data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const deleteReferral = async(id: number) => {
+    return axiosInstance.delete(`/api/referrals/${id}`, {
         headers: {
             Authorization: `Bearer ${store.getters.getUserToken}`
         }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type {UserProfile} from '@/lib/types';
-import {getUserProfile} from '@/lib/axios';
+import type {UserProfile, UpdateUserProfile} from '@/lib/types';
+import {getUserProfile, updateProfile} from '@/lib/axios';
 import {onMounted, ref} from 'vue';
 import {Card, CardContent, CardTitle} from "@/components/ui/card";
 import {Button} from '@/components/ui/button';
@@ -12,17 +12,22 @@ import {Form} from 'vee-validate';
 import 'vue3-toastify/dist/index.css';
 import StyledFormItem from "@/components/StyledFormItem.vue";
 import StyledSelectFormItem from "@/components/StyledSelectFormItem.vue";
+import {toast} from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 
 const {t} = useI18n();
 
 const userProfileRef = ref<UserProfile>({} as UserProfile);
 const originalData = {} as UserProfile;
-const countries = useCountries();
-const sexes = [
+import {computed} from 'vue';
+
+const sexes = computed(() => [
   {value: 'false', label: t('sexFemale')},
   {value: 'true', label: t('sexMale')},
-]
+]);
+
+const countries = computed(() => useCountries());
 
 const formSchema = toTypedSchema(z.object({
   firstName: z.string().nonempty(t('firstNameError')),
@@ -78,29 +83,28 @@ onMounted(async () => {
 });
 
 const onSubmit = async (values: any) => {
-  console.log(values);
-  // const dto: UpdateUserProfile = {};
-  // for (const key in values) {
-  //   if (values[key] !== originalData[key]) {
-  //     dto[key] = values[key];
-  //   }
-  // }
-  // if (Object.keys(dto).length === 0) {
-  //   toast.info(t('noDataToUpdate'), {
-  //     autoClose: 2000,
-  //   });
-  //   return;
-  // }
-  // const response = await updateProfile(dto);
-  // if (response.status === 200) {
-  //   toast.success(t('updateDataSuccess'), {
-  //     autoClose: 2000,
-  //   });
-  // } else {
-  //   toast.error(t('updateDataError'), {
-  //     autoClose: 3000,
-  //   });
-  // }
+  const dto: UpdateUserProfile = {};
+  for (const key in values) {
+    if (values[key] !== originalData[key]) {
+      dto[key] = values[key];
+    }
+  }
+  if (Object.keys(dto).length === 0) {
+    toast.info(t('noDataToUpdate'), {
+      autoClose: 2000,
+    });
+    return;
+  }
+  const response = await updateProfile(dto);
+  if (response.status === 200) {
+    toast.success(t('updateDataSuccess'), {
+      autoClose: 2000,
+    });
+  } else {
+    toast.error(t('updateDataError'), {
+      autoClose: 3000,
+    });
+  }
 }
 </script>
 
@@ -142,7 +146,7 @@ const onSubmit = async (values: any) => {
             errorMessageName="phoneNumber"
         />
         <StyledSelectFormItem :options="sexes" inputName="sex" labelFor="sex" labelPlaceholder="Sex" errorMessageName="sex"/>
-        <StyledSelectFormItem :options="countries" inputName="country" labelFor="country" labelPlaceholder="Country" errorMessageName="country"/>
+        <StyledSelectFormItem :options="countries" inputName="country" :labelFor="t('countryLabel')" :labelPlaceholder="t('countryLabel')" errorMessageName="country"/>
         <StyledFormItem
             inputName="city"
             inputType="text"

@@ -7,6 +7,7 @@ export const handleSubmit = async (values: any, originalData: any, updateFunctio
             dto[key] = values[key];
         }
     }
+    console.log(dto);
     if (Object.keys(dto).length === 0) {
         toast.info(t('noDataToUpdate'), {
             autoClose: 2000,
@@ -19,6 +20,9 @@ export const handleSubmit = async (values: any, originalData: any, updateFunctio
             toast.success(successMessage, {
                 autoClose: 2000,
             });
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         } else {
             toast.error(errorMessage, {
                 autoClose: 3000,
