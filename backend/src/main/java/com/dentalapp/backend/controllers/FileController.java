@@ -1,6 +1,7 @@
 package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.file.dtos.GetDownloadFileDto;
 import com.dentalapp.backend.model.file.dtos.GetFileDto;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
@@ -27,7 +28,7 @@ public class FileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<byte[]> getFileById(@PathVariable Long id) {
+    public ResponseEntity<GetDownloadFileDto> getFileById(@PathVariable Long id) {
         return ResponseEntity.ok(fileService.getFileById(id));
     }
 
@@ -51,6 +52,7 @@ public class FileController {
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateFile(@PathVariable Long id, @RequestParam("file") MultipartFile multipartFile) throws IOException {
+        System.out.println(multipartFile);
         fileService.updateFile(id, multipartFile);
         return ResponseEntity.status(200).body("File updated successfully");
     }

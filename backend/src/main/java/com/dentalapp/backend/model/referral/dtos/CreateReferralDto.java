@@ -1,6 +1,7 @@
 package com.dentalapp.backend.model.referral.dtos;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateReferralDto {
+
+    @NotNull(message = "Appointment ID is required")
+    private Long appointmentId;
 
     @NotBlank(message = "Procedure name is required")
     private String procedureName;

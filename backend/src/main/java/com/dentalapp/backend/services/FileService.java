@@ -2,6 +2,7 @@ package com.dentalapp.backend.services;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.file.dtos.FileMapper;
+import com.dentalapp.backend.model.file.dtos.GetDownloadFileDto;
 import com.dentalapp.backend.model.file.dtos.GetFileDto;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.file.exceptions.FileIsEmptyException;
@@ -24,9 +25,9 @@ public class FileService {
         this.fileRepository = fileRepository;
     }
 
-    public byte[] getFileById(Long id) {
+    public GetDownloadFileDto getFileById(Long id) {
         File file =  fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));
-        return file.getFileData();
+        return FileMapper.toGetDownloadFileDto(file);
     }
 
     @Transactional

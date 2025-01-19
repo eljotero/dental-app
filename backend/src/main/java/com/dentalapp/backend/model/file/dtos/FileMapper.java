@@ -34,4 +34,11 @@ public class FileMapper {
         getFileDto.setUploadedAt(String.valueOf(file.getUploadedAt()));
         return getFileDto;
     }
+
+    public static GetDownloadFileDto toGetDownloadFileDto(File file) {
+        GetDownloadFileDto getDownloadFileDto = new GetDownloadFileDto();
+        getDownloadFileDto.setFileName(file.getFileName());
+        getDownloadFileDto.setFileData(file.getFileData());
+        return getDownloadFileDto;
+    }
 }

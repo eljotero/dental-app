@@ -1,6 +1,7 @@
 package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
+import com.dentalapp.backend.model.referral.dtos.CreateReferralDto;
 import com.dentalapp.backend.model.referral.dtos.CreateReferralsDto;
 import com.dentalapp.backend.model.referral.dtos.UpdateReferralDto;
 import com.dentalapp.backend.model.referral.entity.Referral;
@@ -44,8 +45,8 @@ public class ReferralController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> createReferral(@Valid @RequestBody CreateReferralsDto createReferralsDto) {
-        referralService.createReferral(createReferralsDto);
+    public ResponseEntity<String> createReferral(@Valid @RequestBody CreateReferralDto createReferralDto) {
+        referralService.createReferral(createReferralDto);
         return ResponseEntity.status(201).body("Referral created successfully");
     }
 

@@ -1,6 +1,7 @@
 package com.dentalapp.backend.services;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.referral.dtos.CreateReferralDto;
 import com.dentalapp.backend.model.referral.dtos.CreateReferralsDto;
 import com.dentalapp.backend.model.referral.dtos.ReferralMapper;
 import com.dentalapp.backend.model.referral.dtos.UpdateReferralDto;
@@ -10,6 +11,7 @@ import com.dentalapp.backend.model.referral.repository.ReferralRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,9 +44,11 @@ public class ReferralService {
     }
 
     @Transactional
-    public void createReferral(CreateReferralsDto createReferralsDto) {
-        Appointment appointment = appointmentService.getAppointmentById(createReferralsDto.getAppointmentId());
-        List<Referral> referrals = createReferralsDto.getCreateReferralDtoList().stream().map(dto -> ReferralMapper.toEntity(dto, appointment)).collect(Collectors.toList());
+    public void createReferral(CreateReferralDto createReferralDto) {
+        Appointment appointment = appointmentService.getAppointmentById(createReferralDto.getAppointmentId());
+        Referral referral = ReferralMapper.toEntity(createReferralDto, appointment);
+        List<Referral> referrals = new ArrayList<>();
+        referrals.add(referral);
         referralRepository.saveAll(referrals);
         appointment.setReferrals(referrals);
         appointmentService.saveAppointment(appointment);
