@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdatePrescriptionDto {
-    private String medicine;
+    private String medicineName;
     private String dosage;
 }

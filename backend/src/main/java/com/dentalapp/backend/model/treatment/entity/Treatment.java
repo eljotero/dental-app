@@ -25,7 +25,4 @@ public class Treatment {
 
     @Column(name = "treatment_price", nullable = false)
     private Long treatmentPrice;
-
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
 }

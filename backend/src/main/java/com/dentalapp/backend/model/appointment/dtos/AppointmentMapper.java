@@ -1,6 +1,7 @@
 package com.dentalapp.backend.model.appointment.dtos;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.file.dtos.FileMapper;
 import com.dentalapp.backend.model.prescription.dtos.PrescriptionMapper;
 import com.dentalapp.backend.model.referral.dtos.ReferralMapper;
 
@@ -23,8 +24,8 @@ public class AppointmentMapper {
         if (updateAppointmentDto.getAppointmentDate() != null) {
             appointment.setAppointmentDate(updateAppointmentDto.getAppointmentDate());
         }
-        if (updateAppointmentDto.getDescription() != null) {
-            appointment.setDescription(updateAppointmentDto.getDescription());
+        if (updateAppointmentDto.getAppointmentDescription() != null) {
+            appointment.setDescription(updateAppointmentDto.getAppointmentDescription());
         }
         if (updateAppointmentDto.getAppointmentStartTime() != null) {
             appointment.setAppointmentStartTime(LocalTime.parse(updateAppointmentDto.getAppointmentStartTime()));
@@ -53,6 +54,35 @@ public class AppointmentMapper {
         getAppointmentDtoV2.setPaid(appointment.getInvoice().getIsPaid());
         getAppointmentDtoV2.setPrescriptions(appointment.getPrescriptions().stream().map(PrescriptionMapper::toGetPrescriptionDtoV2).collect(Collectors.toCollection(ArrayList::new)));
         getAppointmentDtoV2.setReferrals(appointment.getReferrals().stream().map(ReferralMapper::toGetReferralDto).collect(Collectors.toCollection(ArrayList::new)));
+        getAppointmentDtoV2.setFiles(appointment.getFiles().stream().map(FileMapper::toGetFileDto).collect(Collectors.toCollection(ArrayList::new)));
         return getAppointmentDtoV2;
+    }
+
+    public static GetAppointmentDtoV3 toGetAppointmentDtoV3(Appointment appointment) {
+        GetAppointmentDtoV3 getAppointmentDtoV3 = new GetAppointmentDtoV3();
+        getAppointmentDtoV3.setAppointmentId(appointment.getAppointmentId());
+        getAppointmentDtoV3.setPatientInfo(appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName());
+        getAppointmentDtoV3.setAppointmentDate(appointment.getAppointmentDate());
+        getAppointmentDtoV3.setAppointmentStartTime(appointment.getAppointmentStartTime().toString());
+        getAppointmentDtoV3.setAppointmentEndTime(appointment.getAppointmentEndTime().toString());
+        return getAppointmentDtoV3;
+    }
+
+    public static GetAppointmentDtoV4 toGetAppointmentDtoV4(Appointment appointment) {
+        GetAppointmentDtoV4 getAppointmentDtoV4 = new GetAppointmentDtoV4();
+        getAppointmentDtoV4.setPatientName(appointment.getPatient().getFirstName());
+        getAppointmentDtoV4.setPatientLastName(appointment.getPatient().getLastName());
+        getAppointmentDtoV4.setPatientPhoneNumber(appointment.getPatient().getPhoneNumber());
+        getAppointmentDtoV4.setAppointmentDate(appointment.getAppointmentDate());
+        getAppointmentDtoV4.setAppointmentStartTime(appointment.getAppointmentStartTime().toString());
+        getAppointmentDtoV4.setAppointmentEndTime(appointment.getAppointmentEndTime().toString());
+        getAppointmentDtoV4.setDescription(appointment.getDescription());
+        getAppointmentDtoV4.setConfirmed(appointment.getIsConfirmed());
+        getAppointmentDtoV4.setCancelled(appointment.getIsCancelled());
+        getAppointmentDtoV4.setPaid(appointment.getInvoice().getIsPaid());
+        getAppointmentDtoV4.setPrescriptions(appointment.getPrescriptions().stream().map(PrescriptionMapper::toGetPrescriptionDtoV2).collect(Collectors.toCollection(ArrayList::new)));
+        getAppointmentDtoV4.setReferrals(appointment.getReferrals().stream().map(ReferralMapper::toGetReferralDto).collect(Collectors.toCollection(ArrayList::new)));
+        getAppointmentDtoV4.setFiles(appointment.getFiles().stream().map(FileMapper::toGetFileDto).collect(Collectors.toCollection(ArrayList::new)));
+        return getAppointmentDtoV4;
     }
 }

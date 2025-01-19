@@ -1,6 +1,7 @@
 package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
+import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.dtos.GetPrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
@@ -41,7 +42,7 @@ public class PrescriptionController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> createPrescriptions(@Valid @RequestBody CreatePrescriptionsDto createPrescriptionsDto) {
+    public ResponseEntity<String> createPrescriptions(@Valid @RequestBody CreatePrescriptionDto createPrescriptionsDto) {
         appointmentService.addPrescriptionsToAppointment(createPrescriptionsDto.getAppointmentId(), createPrescriptionsDto);
         return ResponseEntity.status(201).body("Prescriptions added successfully");
     }

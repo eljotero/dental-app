@@ -130,4 +130,11 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
+
+    @Transactional
+    public void changeLanguage(String email, String language) {
+        User user = getUser(email);
+        user.setLanguage(language);
+        userRepository.save(user);
+    }
 }

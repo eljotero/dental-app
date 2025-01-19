@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetReferralDto {
+    private Long referralId;
     private String procedureName;
     private String procedureDescription;
     private String doctorName;

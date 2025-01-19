@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class UpdateTreatmentDto {
 
-    private String name;
+    private String treatmentName;
 
-    private String description;
+    private String treatmentDescription;
 
     @Positive(message = "Price must be positive")
-    private Long price;
+    private Long treatmentPrice;
 }

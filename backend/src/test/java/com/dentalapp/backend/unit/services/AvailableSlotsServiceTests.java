@@ -34,7 +34,9 @@ public class AvailableSlotsServiceTests {
 
     private Long doctorId;
 
-    private LocalDate date;
+    private LocalDate startDate;
+
+    private LocalDate endDate;
 
     private Availability availability;
 
@@ -43,13 +45,16 @@ public class AvailableSlotsServiceTests {
     @BeforeEach
     public void setUp() {
         doctorId = 1L;
-        date = LocalDate.of(2024, 1, 1);
+        startDate = LocalDate.of(2024, 1, 1);
+        endDate = LocalDate.of(2024, 1, 1);
 
         availability = new Availability();
         availability.setAvailabilityStartTime(LocalTime.of(8, 0));
         availability.setAvailabilityEndTime(LocalTime.of(16, 0));
         availability.setBrakeTimeStart(LocalTime.of(12, 0));
         availability.setBrakeTimeEnd(LocalTime.of(13, 0));
+        availability.setAvailabilityDate(startDate);
+        availability.setIsConfirmed(true);
 
         appointment = new Appointment();
         appointment.setAppointmentStartTime(LocalTime.of(9, 0));
@@ -57,45 +62,49 @@ public class AvailableSlotsServiceTests {
 
     @Test
     public void testGetAvailableSlots() {
-        when(availabilityService.getDoctorAvailability(doctorId, date)).thenReturn(List.of(availability));
-        when(appointmentService.getDoctorsAppointmentsByDate(doctorId, date)).thenReturn(List.of(appointment));
+        when(availabilityService.getDoctorAvailability(doctorId, startDate)).thenReturn(List.of(availability));
+        when(appointmentService.getDoctorsAppointmentsByDate(doctorId, startDate)).thenReturn(List.of(appointment));
 
-        Map<String, String> availableSlots = availableSlotsService.getAvailableSlots(doctorId, date);
+        Map<LocalDate, Map<String, String>> availableSlots = availableSlotsService.getAvailableSlots(doctorId, startDate, endDate);
 
-        Assertions.assertEquals(6, availableSlots.size());
-        Assertions.assertEquals("09:00", availableSlots.get("08:00"));
-        Assertions.assertEquals("11:00", availableSlots.get("10:00"));
-        Assertions.assertEquals("12:00", availableSlots.get("11:00"));
-        Assertions.assertEquals("14:00", availableSlots.get("13:00"));
-        Assertions.assertEquals("15:00", availableSlots.get("14:00"));
-        Assertions.assertEquals("16:00", availableSlots.get("15:00"));
+        Assertions.assertEquals(1, availableSlots.size());
+        Map<String, String> slots = availableSlots.get(startDate);
+        Assertions.assertEquals("09:00", slots.get("08:00"));
+        Assertions.assertEquals("11:00", slots.get("10:00"));
+        Assertions.assertEquals("12:00", slots.get("11:00"));
+        Assertions.assertEquals("14:00", slots.get("13:00"));
+        Assertions.assertEquals("15:00", slots.get("14:00"));
+        Assertions.assertEquals("16:00", slots.get("15:00"));
     }
 
     @Test
     public void testGetAvailableSlotsWithNoAvailability() {
-        when(availabilityService.getDoctorAvailability(doctorId, date)).thenReturn(List.of());
-        when(appointmentService.getDoctorsAppointmentsByDate(doctorId, date)).thenReturn(List.of());
+        when(availabilityService.getDoctorAvailability(doctorId, startDate)).thenReturn(List.of());
+        when(appointmentService.getDoctorsAppointmentsByDate(doctorId, startDate)).thenReturn(List.of());
 
-        Map<String, String> availableSlots = availableSlotsService.getAvailableSlots(doctorId, date);
+        Map<LocalDate, Map<String, String>> availableSlots = availableSlotsService.getAvailableSlots(doctorId, startDate, endDate);
 
-        Assertions.assertEquals(0, availableSlots.size());
+        Assertions.assertEquals(1, availableSlots.size());
+        Map<String, String> slots = availableSlots.get(startDate);
+        Assertions.assertNotNull(slots);
+        Assertions.assertTrue(slots.isEmpty());
     }
 
     @Test
     public void testGetAvailableSlotsWithNoAppointments() {
-        when(availabilityService.getDoctorAvailability(doctorId, date)).thenReturn(List.of(availability));
-        when(appointmentService.getDoctorsAppointmentsByDate(doctorId, date)).thenReturn(List.of());
+        when(availabilityService.getDoctorAvailability(doctorId, startDate)).thenReturn(List.of(availability));
+        when(appointmentService.getDoctorsAppointmentsByDate(doctorId, startDate)).thenReturn(List.of());
 
-        Map<String, String> availableSlots = availableSlotsService.getAvailableSlots(doctorId, date);
+        Map<LocalDate, Map<String, String>> availableSlots = availableSlotsService.getAvailableSlots(doctorId, startDate, endDate);
 
-        Assertions.assertEquals(7, availableSlots.size());
-
-        Assertions.assertEquals("09:00", availableSlots.get("08:00"));
-        Assertions.assertEquals("10:00", availableSlots.get("09:00"));
-        Assertions.assertEquals("11:00", availableSlots.get("10:00"));
-        Assertions.assertEquals("12:00", availableSlots.get("11:00"));
-        Assertions.assertEquals("14:00", availableSlots.get("13:00"));
-        Assertions.assertEquals("15:00", availableSlots.get("14:00"));
-        Assertions.assertEquals("16:00", availableSlots.get("15:00"));
+        Assertions.assertEquals(1, availableSlots.size());
+        Map<String, String> slots = availableSlots.get(startDate);
+        Assertions.assertNotNull(slots);
+        Assertions.assertEquals("09:00", slots.get("08:00"));
+        Assertions.assertEquals("11:00", slots.get("10:00"));
+        Assertions.assertEquals("12:00", slots.get("11:00"));
+        Assertions.assertEquals("14:00", slots.get("13:00"));
+        Assertions.assertEquals("15:00", slots.get("14:00"));
+        Assertions.assertEquals("16:00", slots.get("15:00"));
     }
 }

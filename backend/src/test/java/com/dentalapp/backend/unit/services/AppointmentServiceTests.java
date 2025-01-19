@@ -9,7 +9,6 @@ import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
-import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.referral.entity.Referral;
 import com.dentalapp.backend.model.user.entity.User;
@@ -81,17 +80,23 @@ public class AppointmentServiceTests {
 
     private Referral referral;
 
+    private String doctorEmail;
+
     @BeforeEach
     public void setUp() {
+        doctorEmail = "test@mail.com";
+
         patient = new User();
         patient.setUserId(1L);
         patient.setUserType(UserType.PATIENT);
         patient.setEmail("test@mail.com");
+        patient.setFirstName("test");
+        patient.setLastName("test");
 
         doctor = new User();
         doctor.setUserId(2L);
         doctor.setUserType(UserType.DOCTOR);
-        doctor.setEmail("test2@mail.com");
+        doctor.setEmail(doctorEmail);
         doctor.setFirstName("test");
         doctor.setLastName("test");
 
@@ -106,6 +111,8 @@ public class AppointmentServiceTests {
         appointment1 = new Appointment();
         appointment1.setAppointmentStartTime(LocalTime.of(14, 0));
         appointment1.setAppointmentEndTime(LocalTime.of(15, 0));
+        appointment1.setDoctor(doctor);
+        appointment1.setPatient(patient);
         appointment.setAppointmentDate(LocalDate.of(2021, 1, 1));
 
         appointments = List.of(appointment, appointment1);
@@ -119,7 +126,7 @@ public class AppointmentServiceTests {
         updateAppointmentDto = new UpdateAppointmentDto();
         updateAppointmentDto.setDoctorId(doctor.getUserId());
         updateAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
-        updateAppointmentDto.setDescription("test");
+        updateAppointmentDto.setAppointmentDescription("test");
         updateAppointmentDto.setAppointmentStartTime("12:00");
         updateAppointmentDto.setAppointmentEndTime("13:00");
 
@@ -172,7 +179,15 @@ public class AppointmentServiceTests {
     public void testGetDoctorAppointments() {
         when(userService.getDoctorByEmail(doctor.getEmail())).thenReturn(doctor);
         when(appointmentRepository.findAllByDoctorId(doctor.getUserId())).thenReturn(appointments);
-        Assertions.assertEquals(appointments, appointmentService.getDoctorAppointments(doctor.getEmail(), null));
+        List<GetAppointmentDtoV3> expected = appointments.stream()
+                .map(AppointmentMapper::toGetAppointmentDtoV3)
+                .toList();
+        List<GetAppointmentDtoV3> result = appointmentService.getDoctorAppointments(doctor.getEmail(), null);
+        Assertions.assertEquals(expected.getFirst().getAppointmentDate(), result.getFirst().getAppointmentDate());
+        Assertions.assertEquals(expected.getFirst().getAppointmentStartTime(), result.getFirst().getAppointmentStartTime());
+        Assertions.assertEquals(expected.getFirst().getAppointmentEndTime(), result.getFirst().getAppointmentEndTime());
+        Assertions.assertEquals(expected.getFirst().getPatientInfo(), result.getFirst().getPatientInfo());
+        Assertions.assertEquals(expected.getFirst().getAppointmentId(), result.getFirst().getAppointmentId());
     }
 
     @Test
@@ -180,7 +195,15 @@ public class AppointmentServiceTests {
         LocalDate date = LocalDate.of(2021, 1, 1);
         when(userService.getDoctorByEmail(doctor.getEmail())).thenReturn(doctor);
         when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), date)).thenReturn(appointments);
-        Assertions.assertEquals(appointments, appointmentService.getDoctorAppointments(doctor.getEmail(), date));
+        List<GetAppointmentDtoV3> expected = appointments.stream()
+                .map(AppointmentMapper::toGetAppointmentDtoV3)
+                .toList();
+        List<GetAppointmentDtoV3> result = appointmentService.getDoctorAppointments(doctor.getEmail(), date);
+        Assertions.assertEquals(expected.getFirst().getAppointmentDate(), result.getFirst().getAppointmentDate());
+        Assertions.assertEquals(expected.getFirst().getAppointmentStartTime(), result.getFirst().getAppointmentStartTime());
+        Assertions.assertEquals(expected.getFirst().getAppointmentEndTime(), result.getFirst().getAppointmentEndTime());
+        Assertions.assertEquals(expected.getFirst().getPatientInfo(), result.getFirst().getPatientInfo());
+        Assertions.assertEquals(expected.getFirst().getAppointmentId(), result.getFirst().getAppointmentId());
     }
 
     @Test
@@ -240,20 +263,27 @@ public class AppointmentServiceTests {
     @Test
     public void testUpdateAppointment() {
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
-        when(userService.getDoctorById(doctor.getUserId())).thenReturn(doctor);
-        appointmentService.updateAppointment(updateAppointmentDto, 1L);
+        appointmentService.updateAppointment(updateAppointmentDto, 1L, doctorEmail);
         verify(appointmentRepository).save(any(Appointment.class));
     }
 
     @Test
     public void testUpdateAppointmentDoctorIsBusy() {
+        appointment.setAppointmentDate(LocalDate.of(2021, 1, 1));
+        appointment.setAppointmentStartTime(LocalTime.of(12, 0));
+        appointment.setAppointmentEndTime(LocalTime.of(13, 0));
+        appointment.setAppointmentId(1L);
+
         appointment1.setAppointmentDate(LocalDate.of(2021, 1, 1));
         appointment1.setAppointmentStartTime(LocalTime.of(12, 0));
         appointment1.setAppointmentEndTime(LocalTime.of(13, 0));
         appointment1.setAppointmentId(2L);
+
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
-        when(appointmentRepository.findAllByDoctorIdAndDate(doctor.getUserId(), updateAppointmentDto.getAppointmentDate())).thenReturn(appointments);
-        Assertions.assertThrows(IllegalAppointmentDate.class, () -> appointmentService.updateAppointment(updateAppointmentDto, 1L));
+        when(userService.getDoctorByEmail(doctorEmail)).thenReturn(doctor);
+        when(appointmentRepository.findAllByDoctorAndDate(doctor, updateAppointmentDto.getAppointmentDate())).thenReturn(List.of(appointment1));
+
+        Assertions.assertThrows(IllegalAppointmentDate.class, () -> appointmentService.updateAppointment(updateAppointmentDto, 1L, doctorEmail));
     }
 
     @Test
@@ -279,15 +309,13 @@ public class AppointmentServiceTests {
 
     @Test
     public void testAddPrescriptionsToAppointment() {
-        CreatePrescriptionsDto createPrescriptionsDto = new CreatePrescriptionsDto();
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
-        createPrescriptionDto.setMedicine("Medicine");
+        createPrescriptionDto.setMedicineName("Medicine");
         createPrescriptionDto.setDosage("Dosage");
-        createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
         Prescription prescription = new Prescription();
-        when(prescriptionService.addPrescriptions(createPrescriptionsDto, appointment)).thenReturn(List.of(prescription));
+        when(prescriptionService.addPrescriptions(createPrescriptionDto, appointment)).thenReturn(List.of(prescription));
         when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
-        appointmentService.addPrescriptionsToAppointment(1L, createPrescriptionsDto);
+        appointmentService.addPrescriptionsToAppointment(1L, createPrescriptionDto);
         verify(appointmentRepository).save(any(Appointment.class));
     }
 

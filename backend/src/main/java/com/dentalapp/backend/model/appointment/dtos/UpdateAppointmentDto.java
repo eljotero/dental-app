@@ -28,7 +28,7 @@ public class UpdateAppointmentDto {
 
     private String appointmentEndTime;
 
-    private String description;
+    private String appointmentDescription;
 
     private User doctor;
 }

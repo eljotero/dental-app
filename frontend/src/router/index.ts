@@ -22,7 +22,7 @@ const router = createRouter({
         {
             path: '/priceList',
             name: 'priceList',
-            component: () => import('../views/PriceListView.vue'),
+            component: () => import('../views/TreatmentsListView.vue'),
         },
         {
             path: '/profile',

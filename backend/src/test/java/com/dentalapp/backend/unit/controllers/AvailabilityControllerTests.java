@@ -23,6 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -157,11 +158,12 @@ public class AvailabilityControllerTests {
     @Test
     public void testGetAvailableSlots() {
         Long doctorId = 1L;
-        LocalDate date = LocalDate.of(2021, 10, 10);
-        Map<String, String> availableSlots = Map.of("09:00", "10:00");
-        when(availableSlotsService.getAvailableSlots(doctorId, date)).thenReturn(availableSlots);
-        ResponseEntity<Map<String, String>> response = availabilityController.getAvailableSlots(doctorId, date);
-        verify(availableSlotsService).getAvailableSlots(doctorId, date);
+        LocalDate startDate = LocalDate.of(2021, 10, 10);
+        LocalDate endDate = LocalDate.of(2021, 10, 15);
+        Map<LocalDate, Map<String, String>> availableSlots = Map.of(LocalDate.of(2021, 10, 10), new LinkedHashMap<>());
+        when(availableSlotsService.getAvailableSlots(doctorId, startDate, endDate)).thenReturn(availableSlots);
+        ResponseEntity<Map<LocalDate, Map<String, String>>> response = availabilityController.getAvailableSlots(doctorId, startDate, endDate);
+        verify(availableSlotsService).getAvailableSlots(doctorId, startDate, endDate);
         Assertions.assertEquals(ResponseEntity.ok(availableSlots), response);
         Assertions.assertEquals(200, response.getStatusCode().value());
     }

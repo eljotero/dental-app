@@ -52,7 +52,7 @@ public class PrescriptionControllerTests {
         Assertions.assertEquals(2, validator.validate(createPrescriptionsDto).size());
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
         createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
-        Assertions.assertEquals(2, validator.validate(createPrescriptionDto).size());
+        Assertions.assertEquals(3, validator.validate(createPrescriptionDto).size());
     }
 
     @Test
@@ -82,13 +82,11 @@ public class PrescriptionControllerTests {
 
     @Test
     public void testCreatePrescriptions() {
-        CreatePrescriptionsDto createPrescriptionsDto = new CreatePrescriptionsDto();
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
-        createPrescriptionDto.setMedicine("Medicine");
+        createPrescriptionDto.setMedicineName("Medicine");
         createPrescriptionDto.setDosage("Dosage");
-        createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
-        createPrescriptionsDto.setAppointmentId(1L);
-        ResponseEntity<String> response = prescriptionController.createPrescriptions(createPrescriptionsDto);
+        createPrescriptionDto.setAppointmentId(1L);
+        ResponseEntity<String> response = prescriptionController.createPrescriptions(createPrescriptionDto);
         Assertions.assertEquals(201, response.getStatusCode().value());
         Assertions.assertEquals("Prescriptions added successfully", response.getBody());
     }
@@ -97,7 +95,7 @@ public class PrescriptionControllerTests {
     public void testUpdatePrescription() {
         UpdatePrescriptionDto updatePrescriptionDto = new UpdatePrescriptionDto();
         updatePrescriptionDto.setDosage("Dosage");
-        updatePrescriptionDto.setMedicine("Medicine");
+        updatePrescriptionDto.setMedicineName("Medicine");
         ResponseEntity<String> response = prescriptionController.updatePrescription(1L, updatePrescriptionDto);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals("Prescription updated successfully", response.getBody());

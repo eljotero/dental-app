@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
-    @Query("SELECT t FROM Treatment t WHERE t.isActive = true")
+    @Query("SELECT t FROM Treatment t")
     List<Treatment> findAll();
 
-    @Query("SELECT t FROM Treatment t WHERE t.treatmentId = ?1 AND t.isActive = true")
+    @Query("SELECT t FROM Treatment t WHERE t.treatmentId = ?1")
     Optional<Treatment> findById(Long id);
 
-    @Query("SELECT t FROM Treatment t WHERE t.treatmentName = ?1 AND t.isActive = true")
+    @Query("SELECT t FROM Treatment t WHERE t.treatmentName = ?1")
     Optional<Treatment> findByName(String name);
 }

@@ -1,5 +1,6 @@
 package com.dentalapp.backend.model.appointment.dtos;
 
+import com.dentalapp.backend.model.file.dtos.GetFileDto;
 import com.dentalapp.backend.model.prescription.dtos.GetPrescriptionDtoV2;
 import com.dentalapp.backend.model.referral.dtos.GetReferralDto;
 import lombok.AllArgsConstructor;
@@ -27,4 +28,5 @@ public class GetAppointmentDtoV2 {
     private boolean isPaid;
     private ArrayList<GetPrescriptionDtoV2> prescriptions;
     private ArrayList<GetReferralDto> referrals;
+    private ArrayList<GetFileDto> files;
 }

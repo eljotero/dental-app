@@ -4,6 +4,8 @@ import LanguageSwitcher from "@/views/NavigationView.vue";
 </script>
 
 <template>
-  <LanguageSwitcher/>
-  <RouterView />
+  <div class="mt-24">
+    <LanguageSwitcher/>
+    <RouterView />
+  </div>
 </template>

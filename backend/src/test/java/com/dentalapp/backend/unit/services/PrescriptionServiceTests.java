@@ -2,7 +2,6 @@ package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
-import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.dtos.GetPrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
@@ -74,12 +73,10 @@ public class PrescriptionServiceTests {
 
     @Test
     public void testAddPrescription() {
-        CreatePrescriptionsDto createPrescriptionsDto = new CreatePrescriptionsDto();
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
-        createPrescriptionDto.setMedicine("Medicine");
+        createPrescriptionDto.setMedicineName("Medicine");
         createPrescriptionDto.setDosage("Dosage");
-        createPrescriptionsDto.setCreatePrescriptionsDtoList(List.of(createPrescriptionDto));
-        List<Prescription> result = prescriptionService.addPrescriptions(createPrescriptionsDto, new Appointment());
+        List<Prescription> result = prescriptionService.addPrescriptions(createPrescriptionDto, new Appointment());
         verify(prescriptionRepository, times(1)).save(any(Prescription.class));
         Assertions.assertEquals(1, result.size());
     }
@@ -88,7 +85,7 @@ public class PrescriptionServiceTests {
     public void testUpdatePrescription() {
         UpdatePrescriptionDto updatePrescriptionDto = new UpdatePrescriptionDto();
         updatePrescriptionDto.setDosage("Dosage");
-        updatePrescriptionDto.setMedicine("Medicine");
+        updatePrescriptionDto.setMedicineName("Medicine");
         when(prescriptionRepository.findById(1L)).thenReturn(Optional.of(new Prescription()));
         prescriptionService.updatePrescription(1L, updatePrescriptionDto);
         verify(prescriptionRepository, times(1)).save(any(Prescription.class));

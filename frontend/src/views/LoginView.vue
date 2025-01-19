@@ -3,8 +3,7 @@ import {CardContent, CardTitle} from "@/components/ui/card";
 import {useI18n} from "vue-i18n";
 import {toTypedSchema} from "@vee-validate/zod";
 import {z} from "zod";
-import type {LoginDto} from "../lib/types.ts";
-import FormFieldComponent from "@/components/FormFieldComponent.vue";
+import type {LoginDto} from "@/lib/types";
 import {Form} from "vee-validate";
 import {Button} from "@/components/ui/button";
 import router from "@/router";
@@ -13,6 +12,7 @@ import {toast} from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
 import store from "@/store";
 import { ref } from 'vue';
+import StyledFormItem from "@/components/StyledFormItem.vue";
 
 const {t} = useI18n();
 const email = ref('');
@@ -39,7 +39,7 @@ const onSubmit = async (values: any) => {
     }
   } catch (error: any) {
     if(error.status === 403) {
-      toast.error(t('accountNotConfirmedError'), {
+      toast.error(t('wrongPasswordError'), {
         autoClose: 3000,
       });
       return;
@@ -75,9 +75,8 @@ const refreshPassword = async() => {
     <CardContent>
       <CardTitle>{{ t('login') }}</CardTitle>
       <Form @submit="onSubmit" :validation-schema="formSchema" class="form-container">
-        <FormFieldComponent v-model="email" name="email" type="email" :label="t('emailLabel')" :placeholder="t('emailPlaceholder')"/>
-        <FormFieldComponent name="password" type="password" :label="t('passwordLabel')"
-                            :placeholder="t('passwordPlaceholder')"/>
+        <StyledFormItem inputName="email" inputType="email" :inputPlaceholder="t('emailPlaceholder')" labelFor="email" :labelPlaceholder="t('emailLabel')" errorMessageName="email"/>
+        <StyledFormItem inputName="password" inputType="password" :inputPlaceholder="t('passwordPlaceholder')" labelFor="password" :labelPlaceholder="t('passwordLabel')" errorMessageName="password"/>
         <Button type="submit" class="submit-button">
           {{ t('login') }}
         </Button>
