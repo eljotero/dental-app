@@ -124,7 +124,7 @@ public class PaymentControllerTests {
         payForAppointmentDto.setPrice(100L);
         payForAppointmentDto.setPaymentType("CASH");
         ResponseEntity<String> response = paymentController.payInvoice(1L, payForAppointmentDto);
-        verify(invoiceService).payInvoice(1L, payForAppointmentDto);
+        verify(paymentService).payForAppointment(1L, payForAppointmentDto);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals("Appointment paid successfully", response.getBody());
     }

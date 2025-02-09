@@ -7,6 +7,7 @@ import com.dentalapp.backend.services.InvoiceService;
 import com.dentalapp.backend.services.PaymentService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ public class PaymentController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<List<Invoice>> getAllInvoices(@RequestParam(required = false) String status, @RequestParam(required = false) String method, @RequestParam(required = false) LocalDate date) {
         Specification<Invoice> specification = Specification.where(null);
         if(status != null) {
@@ -59,7 +61,7 @@ public class PaymentController {
 
     @PostMapping("/{id}/pay")
     public ResponseEntity<String> payInvoice(@PathVariable Long id, @RequestBody PayForAppointmentDto payForAppointmentDto) {
-        invoiceService.payInvoice(id, payForAppointmentDto);
+        paymentService.payForAppointment(id, payForAppointmentDto);
         return ResponseEntity.ok("Appointment paid successfully");
     }
 }

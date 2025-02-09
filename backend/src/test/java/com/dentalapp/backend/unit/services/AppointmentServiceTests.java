@@ -365,4 +365,24 @@ public class AppointmentServiceTests {
         Assertions.assertThrows(AppointmentNotFoundException.class, () -> appointmentService.getAppointmentByIdDto(1L));
     }
 
+    @Test
+    public void testGetAppointmentByIdDtoV4() {
+        when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
+        GetAppointmentDtoV4 expectedDto = AppointmentMapper.toGetAppointmentDtoV4(appointment);
+        GetAppointmentDtoV4 result = appointmentService.getAppointmentByIdDtoV4(1L);
+        Assertions.assertEquals(result.getAppointmentDate(), expectedDto.getAppointmentDate());
+        Assertions.assertEquals(result.getAppointmentStartTime(), expectedDto.getAppointmentStartTime());
+        Assertions.assertEquals(result.getAppointmentEndTime(), expectedDto.getAppointmentEndTime());
+        Assertions.assertEquals(result.getDescription(), expectedDto.getDescription());
+        Assertions.assertEquals(result.isCancelled(), expectedDto.isCancelled());
+        Assertions.assertEquals(result.isConfirmed(), expectedDto.isConfirmed());
+        Assertions.assertEquals(result.isPaid(), expectedDto.isPaid());
+    }
+
+    @Test
+    public void testIsUsersAppointment() {
+        when(appointmentRepository.findById(1L)).thenReturn(java.util.Optional.of(appointment));
+        Assertions.assertEquals(true, appointmentService.isUsersAppointment(1L, doctorEmail));
+    }
+
 }

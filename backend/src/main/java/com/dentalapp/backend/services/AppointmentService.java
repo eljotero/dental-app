@@ -136,17 +136,16 @@ public class AppointmentService {
         Appointment appointment = getAppointmentById(appointmentId);
         appointment.setIsCancelled(true);
         appointmentRepository.save(appointment);
-        String appointmentDetails = "Appointment with " + appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName() + " on " + appointment.getAppointmentDate() + " at " + appointment.getAppointmentStartTime();
-        emailSenderService.sendAppointmentCancellationEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointmentDetails);
+        emailSenderService.sendAppointmentCancellationEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointment, appointment.getPatient().getLanguage(), "PATIENT");
+        emailSenderService.sendAppointmentCancellationEmail(appointment.getDoctor().getEmail(), appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName(), appointment, appointment.getDoctor().getLanguage(), "DOCTOR");
     }
 
     @Scheduled(cron = "0 0 8 * * *")
     public void getNonApprovedAppointments() {
         List<Appointment> appointmentList = appointmentRepository.findUnconfirmedAppointments();
         for (Appointment appointment : appointmentList) {
-            String appointmentDetails = "Appointment with " + appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName() + " on " + appointment.getAppointmentDate() + " at " + appointment.getAppointmentStartTime();
             String confirmationLink = "http://localhost:8080/api/appointments/confirm/" + appointment.getAppointmentId();
-            emailSenderService.sendAppointmentConfirmationEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointmentDetails, confirmationLink);
+            emailSenderService.sendAppointmentConfirmationEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointment, confirmationLink, appointment.getPatient().getLanguage());
         }
     }
 
@@ -155,6 +154,8 @@ public class AppointmentService {
         Appointment appointment = getAppointmentById(appointmentId);
         appointment.setIsConfirmed(true);
         appointmentRepository.save(appointment);
+        emailSenderService.sendAppointmentConfirmedEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointment, appointment.getPatient().getLanguage(), "PATIENT");
+        emailSenderService.sendAppointmentConfirmedEmail(appointment.getDoctor().getEmail(), appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName(), appointment, appointment.getDoctor().getLanguage(), "DOCTOR");
     }
 
     @Transactional
@@ -176,6 +177,15 @@ public class AppointmentService {
         File file = fileService.saveFile(multipartFile, appointment);
         appointment.getFiles().add(file);
         appointmentRepository.save(appointment);
+    }
+
+    public boolean isUsersAppointment(Long appointmentId, String email) {
+        Appointment appointment = getAppointmentById(appointmentId);
+        return appointment.getPatient().getEmail().equals(email) || appointment.getDoctor().getEmail().equals(email);
+    }
+
+    public List<Appointment> getAppointmentsByDateRange(LocalDate startDate, LocalDate endDate) {
+        return appointmentRepository.findAllByDateBetween(startDate, endDate);
     }
 
     private boolean hasDoctorAppointmentAtTime(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime) {

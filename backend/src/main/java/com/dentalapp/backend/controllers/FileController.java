@@ -8,6 +8,7 @@ import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.FileService;
 import com.dentalapp.backend.services.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,29 +29,34 @@ public class FileController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated() and @fileService.isUsersFile(#id, authentication.principal.username)")
     public ResponseEntity<GetDownloadFileDto> getFileById(@PathVariable Long id) {
         return ResponseEntity.ok(fileService.getFileById(id));
     }
 
     @GetMapping("/appointment/{id}")
+    @PreAuthorize("isAuthenticated() and @appointmentService.isUsersAppointment(#id, authentication.principal.username)")
     public ResponseEntity<List<GetFileDto>> getFilesByAppointmentId(@PathVariable Long id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
         return ResponseEntity.ok(fileService.getFilesByAppointmentId(appointment));
     }
 
     @GetMapping("/user/{id}")
+    @PreAuthorize("isAuthenticated() and @appointmentService.isUsersAppointment(#id, authentication.principal.username)")
     public ResponseEntity<List<GetFileDto>> getPatientFiles(@PathVariable Long id) {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(fileService.getFilesByUserId(user));
     }
 
     @PostMapping("/upload")
+    @PreAuthorize("isAuthenticated() and @appointmentService.isUsersAppointment(#id, authentication.principal.username)")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("id") Long id) throws IOException {
         appointmentService.uploadFileToAppointment(id, multipartFile);
         return ResponseEntity.status(201).body("File uploaded successfully");
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated() and @appointmentService.isUsersAppointment(#id, authentication.principal.username)")
     public ResponseEntity<String> updateFile(@PathVariable Long id, @RequestParam("file") MultipartFile multipartFile) throws IOException {
         System.out.println(multipartFile);
         fileService.updateFile(id, multipartFile);
@@ -58,6 +64,7 @@ public class FileController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated() and @fileService.isUsersFile(#id, authentication.principal.username)")
     public ResponseEntity<String> deleteFile(@PathVariable Long id) {
         fileService.deleteFile(id);
         return ResponseEntity.status(200).body("File deleted successfully");

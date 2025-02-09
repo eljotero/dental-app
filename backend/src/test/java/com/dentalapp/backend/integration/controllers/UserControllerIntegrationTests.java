@@ -42,7 +42,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"DOCTOR"})
     public void testGetAllUsers() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/user/all"))
                 .andExpect(status().isOk())

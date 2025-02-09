@@ -40,24 +40,15 @@ public class AvailabilityService {
 
 
     @Transactional
-    public void addDoctorAvailability(CreateAvailabilityDto createAvailabilityDto, String email) {
+    public void addDoctorAvailability(AvailabilityDayDto createAvailabilityDto, String email) {
         User doctor = userService.getDoctorByEmail(email);
         createAvailabilityDto.setDoctor(doctor);
-        for (AvailabilityDayDto availabilityDayDto : createAvailabilityDto.getAvailabilityDays()) {
-            if (!isAvailabilityExists(availabilityDayDto, doctor)) {
-                Availability availability = AvailabilityMapper.toAvailability(availabilityDayDto, doctor);
-                availabilityRepository.save(availability);
-            } else {
-                throw new AvailabilityAlreadyExistsException("Availability already exists");
-            }
+        if (!isAvailabilityExists(createAvailabilityDto, doctor)) {
+            Availability availability = AvailabilityMapper.toAvailability(createAvailabilityDto, doctor);
+            availabilityRepository.save(availability);
+        } else {
+            throw new AvailabilityAlreadyExistsException("Availability already exists");
         }
-    }
-
-    @Transactional
-    public void confirmAvailability(Long id) {
-        Availability availability = availabilityRepository.findById(id).orElseThrow(() -> new AvailabilityNotFoundException("Availability not found"));
-        availability.setIsConfirmed(true);
-        availabilityRepository.save(availability);
     }
 
     @Transactional
@@ -68,12 +59,22 @@ public class AvailabilityService {
     }
 
     @Transactional
+    public void deleteAvailability(Long id) {
+        availabilityRepository.deleteById(id);
+    }
+
+    @Transactional
     public boolean isDoctorAvailable(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return availabilityRepository.isDeclared(doctor, date, startTime, endTime);
     }
 
+    public boolean isDoctorsAvailability(Long id, String email) {
+        Availability availability =  availabilityRepository.getAvailabilityByAvailabilityId(id);
+        return availability.getDoctor().getEmail().equals(email);
+    }
+
 
     private boolean isAvailabilityExists(AvailabilityDayDto availabilityDayDto, User doctor) {
-        return availabilityRepository.hasDoctorAvailability(doctor, availabilityDayDto.getDate());
+        return availabilityRepository.hasDoctorAvailability(doctor, availabilityDayDto.getDate(), LocalTime.parse(availabilityDayDto.getStartTime()), LocalTime.parse(availabilityDayDto.getEndTime()));
     }
 }

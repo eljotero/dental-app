@@ -3,7 +3,6 @@ package com.dentalapp.backend.unit.controllers;
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.AvailabilityController;
 import com.dentalapp.backend.model.availability.dtos.AvailabilityDayDto;
-import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
 import com.dentalapp.backend.model.availability.entity.Availability;
@@ -50,9 +49,7 @@ public class AvailabilityControllerTests {
 
     private String token;
 
-    private CreateAvailabilityDto createAvailabilityDto;
-
-    private AvailabilityDayDto availabilityDayDto;
+    private AvailabilityDayDto createAvailabilityDto;
 
     private UpdateAvailabilityDto updateAvailabilityDto;
 
@@ -65,12 +62,10 @@ public class AvailabilityControllerTests {
         email = "test@mail.com";
         token = "Bearer token";
 
-        createAvailabilityDto = new CreateAvailabilityDto();
-        availabilityDayDto = new AvailabilityDayDto();
-        availabilityDayDto.setDate(LocalDate.of(2021, 10, 10));
-        availabilityDayDto.setStartTime("09:00");
-        availabilityDayDto.setEndTime("17:00");
-        createAvailabilityDto.setAvailabilityDays(List.of(availabilityDayDto));
+        createAvailabilityDto = new AvailabilityDayDto();
+        createAvailabilityDto.setDate(LocalDate.of(2021, 10, 10));
+        createAvailabilityDto.setStartTime("09:00");
+        createAvailabilityDto.setEndTime("17:00");
 
         updateAvailabilityDto = new UpdateAvailabilityDto();
         updateAvailabilityDto.setStartTime("09:00");
@@ -117,14 +112,11 @@ public class AvailabilityControllerTests {
 
     @Test
     public void testValidation() {
-        createAvailabilityDto.setAvailabilityDays(null);
-        Assertions.assertEquals(1, validator.validate(createAvailabilityDto).size());
 
-        availabilityDayDto.setDate(null);
-        availabilityDayDto.setStartTime(null);
-        availabilityDayDto.setEndTime(null);
-        createAvailabilityDto.setAvailabilityDays(List.of(availabilityDayDto));
-        Assertions.assertEquals(0, validator.validate(createAvailabilityDto).size());
+        createAvailabilityDto.setDate(null);
+        createAvailabilityDto.setStartTime(null);
+        createAvailabilityDto.setEndTime(null);
+        Assertions.assertEquals(3, validator.validate(createAvailabilityDto).size());
 
         updateAvailabilityDto.setStartTime("10:00");
         updateAvailabilityDto.setEndTime("09:00");
@@ -137,14 +129,6 @@ public class AvailabilityControllerTests {
         ResponseEntity<String> response = availabilityController.addDoctorAvailability(token, createAvailabilityDto);
         verify(availabilityService).addDoctorAvailability(createAvailabilityDto, email);
         Assertions.assertEquals(ResponseEntity.status(201).body("Availability added successfully"), response);
-    }
-
-    @Test
-    public void testConfirmAvailabilityValidation() {
-        ResponseEntity<String> response = availabilityController.confirmAvailability(1L);
-        verify(availabilityService).confirmAvailability(1L);
-        Assertions.assertEquals(ResponseEntity.ok("Availability confirmed successfully"), response);
-        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test

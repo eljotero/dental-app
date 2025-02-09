@@ -145,7 +145,7 @@ const onSubmit = async (values: any) => {
             :labelPlaceholder="t('phoneNumberLabel')"
             errorMessageName="phoneNumber"
         />
-        <StyledSelectFormItem :options="sexes" inputName="sex" labelFor="sex" labelPlaceholder="Sex" errorMessageName="sex"/>
+        <StyledSelectFormItem :options="sexes" inputName="sex" :labelFor="t('sexLabel')" :labelPlaceholder="t('sexLabel')" errorMessageName="sex"/>
         <StyledSelectFormItem :options="countries" inputName="country" :labelFor="t('countryLabel')" :labelPlaceholder="t('countryLabel')" errorMessageName="country"/>
         <StyledFormItem
             inputName="city"

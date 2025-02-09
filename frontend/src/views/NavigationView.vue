@@ -61,6 +61,15 @@ watchEffect(() => {
       <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && currentRoute !== '/appointments' && isLoggedIn && currentRoute !== '/adminPanel'">
         <NavigationMenuLink href="/appointments" class="nav-link">{{ t('myAppointments') }}</NavigationMenuLink>
       </NavigationMenuItem>
+      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && currentRoute !== '/supplies' && role === 'DOCTOR'">
+        <NavigationMenuLink href="/supplies" class="nav-link">{{ t('supplies') }}</NavigationMenuLink>
+      </NavigationMenuItem>
+      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && currentRoute !== '/availabilities' && role === 'DOCTOR'">
+        <NavigationMenuLink href="/availabilities" class="nav-link">{{ t('availabilities') }}</NavigationMenuLink>
+      </NavigationMenuItem>
+      <NavigationMenuItem v-if="currentRoute !== '/login' && currentRoute !== '/register' && currentRoute !== '/reports' && role === 'DOCTOR'">
+        <NavigationMenuLink href="/reports" class="nav-link">{{ t('reports') }}</NavigationMenuLink>
+      </NavigationMenuItem>
       <NavigationMenuItem v-if="currentLang !== 'en'">
         <button @click="setLanguage('en')" class="lang-button mr-2">{{t('enLang')}}</button>
       </NavigationMenuItem>

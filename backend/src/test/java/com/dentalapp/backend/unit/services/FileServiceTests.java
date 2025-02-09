@@ -1,11 +1,13 @@
 package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.file.dtos.GetFileDto;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.file.exceptions.FileIsEmptyException;
 import com.dentalapp.backend.model.file.exceptions.FileNameAlreadyExists;
 import com.dentalapp.backend.model.file.exceptions.FileNotFoundException;
 import com.dentalapp.backend.model.file.repository.FileRepository;
+import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.FileService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,5 +114,35 @@ public class FileServiceTests {
     public void testDeleteFileNotFound() {
         when(fileRepository.findById(anyLong())).thenReturn(Optional.empty());
         Assertions.assertThrows(FileNotFoundException.class, () -> fileService.deleteFile(1L));
+    }
+
+    @Test
+    public void testGetFilesByUserId() {
+        User user = new User();
+        when(fileRepository.findFilesByUser(user)).thenReturn(List.of(new File()));
+        List<GetFileDto> result = fileService.getFilesByUserId(user);
+        Assertions.assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testIsUsersFile() {
+        Appointment appointment = new Appointment();
+        User user = new User();
+        user.setEmail("test@mail.com");
+        User doctor = new User();
+        doctor.setEmail("test2@mail.com");
+        appointment.setDoctor(doctor);
+        appointment.setPatient(user);
+        File file = new File();;
+        file.setAppointment(appointment);
+        when(fileRepository.findById(anyLong())).thenReturn(Optional.of(file));
+        Assertions.assertTrue(fileService.isUsersFile(1L, user.getEmail()));
+        Assertions.assertTrue(fileService.isUsersFile(1L, doctor.getEmail()));
+    }
+
+    @Test
+    public void testIsUsersFileNotFound() {
+        when(fileRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Assertions.assertThrows(FileNotFoundException.class, () -> fileService.isUsersFile(1L, "test@mail.com"));
     }
 }

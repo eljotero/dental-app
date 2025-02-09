@@ -44,6 +44,26 @@ const router = createRouter({
             path: '/createAppointment',
             name: 'createAppointment',
             component: () => import('../views/CreateAppointmentView.vue')
+        },
+        {
+            path: "/reset-password",
+            name: "reset-password",
+            component: () => import("../views/ResetPasswordView.vue")
+        },
+        {
+            path: "/supplies",
+            name: "supplies",
+            component: () => import("../views/SuppliesView.vue")
+        },
+        {
+            path: "/availabilities",
+            name: "availabilities",
+            component: () => import("../views/AvailabilitiesView.vue")
+        },
+        {
+            path: "/reports",
+            name: "reports",
+            component: () => import("../views/ReportsView.vue")
         }
     ],
 })

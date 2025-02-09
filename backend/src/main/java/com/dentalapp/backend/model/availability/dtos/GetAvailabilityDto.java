@@ -20,9 +20,5 @@ public class GetAvailabilityDto {
 
     LocalTime endTime;
 
-    LocalTime brakeTimeStart;
-
-    LocalTime brakeTimeEnd;
-
     boolean isConfirmed;
 }

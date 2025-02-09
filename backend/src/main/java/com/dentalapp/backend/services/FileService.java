@@ -70,6 +70,11 @@ public class FileService {
         fileRepository.deleteById(id);
     }
 
+    public boolean isUsersFile(Long id, String email) {
+        File file = fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));
+        return file.getAppointment().getPatient().getEmail().equals(email) || file.getAppointment().getDoctor().getEmail().equals(email);
+    }
+
     private boolean doesFileNameExist(String fileName) {
         return fileRepository.findByFileName(fileName).isPresent();
     }

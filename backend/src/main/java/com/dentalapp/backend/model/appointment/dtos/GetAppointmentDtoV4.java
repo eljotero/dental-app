@@ -26,6 +26,9 @@ public class GetAppointmentDtoV4 {
     private boolean isConfirmed;
     private boolean isCancelled;
     private boolean isPaid;
+    private String paymentDate;
+    private String paymentMethod;
+    private Long paymentAmount;
     private ArrayList<GetPrescriptionDtoV2> prescriptions;
     private ArrayList<GetReferralDto> referrals;
     private ArrayList<GetFileDto> files;

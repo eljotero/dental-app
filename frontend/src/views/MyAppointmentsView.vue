@@ -2,7 +2,7 @@
 import {fetchMyAppointments} from '@/lib/axios';
 import {useI18n} from "vue-i18n";
 import {onMounted, ref, watch} from "vue";
-import type {Appointment, DoctorAppointments} from '@/lib/types';
+import type {Appointment, CalendarEvent, DoctorAppointments} from '@/lib/types';
 import router from '@/router';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -19,12 +19,6 @@ const role = store.getters.getRole;
 const appointments = ref<Appointment[]>([]);
 const doctorAppointments = ref<DoctorAppointments[]>([]);
 
-type CalendarEvent = {
-  id: string;
-  title: string;
-  start: string;
-  end: string;
-};
 const calendarEvents = ref<CalendarEvent[]>([]);
 
 onMounted(async () => {
@@ -85,12 +79,23 @@ const calendarOptions = ref<CalendarOptions>({
     weekday: 'long'
   },
   firstDay: 1,
-  locale: t('locale'),
+  locale: 'pl',
 });
 
 watch(calendarEvents, (newEvents) => {
   calendarOptions.value.events = newEvents;
 });
+
+watch(() => {
+  return store.getters.getLanguage;
+}, (newLang) => {
+  if(newLang === 'en') {
+    calendarOptions.value.locale = 'en';
+  } else {
+    calendarOptions.value.locale = 'pl';
+  }
+});
+
 </script>
 
 <template>

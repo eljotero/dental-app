@@ -8,8 +8,8 @@ import {
   deletePrescription,
   deleteReferral,
   downloadFile,
-  fetchAppointment,
-  updateAppointment,
+  fetchAppointment, payForAppointment,
+  updateAppointment, updateAppointmentPrice,
   updatePrescription,
   updateReferral,
   uploadFile
@@ -23,7 +23,8 @@ import type {
   Referral,
   UpdateAppointment,
   UpdatePrescription,
-  UpdateReferral
+  UpdateReferral,
+  PayAppointment
 } from '@/lib/types';
 import {onMounted, ref} from 'vue';
 import {Card, CardContent, CardHeader} from '@/components/ui/card';
@@ -39,6 +40,7 @@ import {Form} from "@/components/ui/form";
 import {toTypedSchema} from "@vee-validate/zod";
 import * as z from 'zod';
 import {handleRequest, handleSubmit} from '@/lib/functions';
+import StyledSelectFormItem from "@/components/StyledSelectFormItem.vue";
 
 const {t} = useI18n();
 
@@ -73,6 +75,11 @@ const createReferralFormSchema = toTypedSchema(z.object({
   clinicAddress: z.string().nonempty(t('clinicAddressError')),
 }));
 
+const createPaymentFormSchema = toTypedSchema(z.object({
+  price: z.number().positive(t('priceError')),
+  paymentType: z.string().nonempty(t('paymentTypeError'))
+}));
+
 const editMedicineFormSchema = toTypedSchema(z.object({
   medicineName: z.string().nonempty(t('medicineNameError')),
   dosage: z.string().nonempty(t('dosageError')),
@@ -95,6 +102,7 @@ const editAppointmentFormSchema = toTypedSchema(z.object({
   appointmentStartTime: z.string().nonempty(t('appointmentStartTimeError')),
   appointmentEndTime: z.string().nonempty(t('appointmentEndTimeError')),
   appointmentDescription: z.string().nonempty(t('descriptionError')),
+  price: z.number().positive(t('priceError'))
 }).refine(data => {
   const startTime = new Date(`${data.appointmentDate}T${data.appointmentStartTime}`);
   const endTime = new Date(`${data.appointmentDate}T${data.appointmentEndTime}`);
@@ -187,11 +195,13 @@ const setEditAppointmentFormValues = (appointment: AppointmentDetailsDoctor | Ap
     appointmentStartTime: appointment.appointmentStartTime,
     appointmentEndTime: appointment.appointmentEndTime,
     appointmentDescription: appointment.description,
+    price: appointment.paymentAmount
   };
   editAppointmentOriginalData.appointmentDate = appointment.appointmentDate;
   editAppointmentOriginalData.appointmentStartTime = appointment.appointmentStartTime;
   editAppointmentOriginalData.appointmentEndTime = appointment.appointmentEndTime;
   editAppointmentOriginalData.appointmentDescription = appointment.description;
+  editAppointmentOriginalData.price = appointment.paymentAmount;
 };
 
 const setEditReferralFormValues = (referral: Referral) => {
@@ -301,7 +311,38 @@ const getFile = async (id: number) => {
 };
 
 const onSubmitEditAppointment = async (values: any) => {
-  await handleSubmit(values, editAppointmentOriginalData, updateAppointment, Number(props.appointmentId), t('updateDataSuccess'), t('updateDataError'), t);
+  if (values.price !== editAppointmentOriginalData.price) {
+    const price = Number(values.price);
+    await handleRequest(
+        () => updateAppointmentPrice(Number(props.appointmentId), price),
+        { price },
+        t('updateDataSuccess'),
+        t('updateDataError'),
+        t,
+        200
+    );
+    delete values.price;
+  }
+  const newDto = { ...values };
+  await handleSubmit(newDto, editAppointmentOriginalData, updateAppointment, Number(props.appointmentId), t('updateDataSuccess'), t('updateDataError'), t);
+};
+
+const paymentTypes = [
+  {value: 'CASH', label: t('paymentTypeCash')},
+  {value: 'CARD', label: t('paymentTypeCard')}
+];
+
+const onSubmitCreatePayment = async(values: any) => {
+  const dto = values as PayAppointment;
+  dto.paymentDate = new Date().toISOString().split('T')[0];
+  await handleRequest(
+      () => payForAppointment(Number(props.appointmentId), dto),
+      dto,
+      t('paymentSuccess'),
+      t('paymentError'),
+      t,
+      200
+  );
 }
 
 </script>
@@ -357,13 +398,25 @@ const onSubmitEditAppointment = async (values: any) => {
                 <TableCell class="font-bold">{{ t('description') }}</TableCell>
                 <TableCell>{{ appointment.description }}</TableCell>
               </TableRow>
+              <TableRow v-if="!appointment.paid">
+                <TableCell class="font-bold">{{ t('paid') }}</TableCell>
+                <TableCell>{{ appointment.paid ? t('yes') : t('no') }}</TableCell>
+              </TableRow>
+              <TableRow v-if="appointment.paymentDate">
+                <TableCell class="font-bold">{{ t('paymentDateLabel') }}</TableCell>
+                <TableCell>{{ appointment.paymentDate }}</TableCell>
+              </TableRow>
+              <TableRow v-if="appointment.paymentAmount > -1">
+                <TableCell class="font-bold" >{{ t('paymentAmountLabel') }}</TableCell>
+                <TableCell>{{ appointment.paymentAmount }} zł</TableCell>
+              </TableRow>
+              <TableRow v-if="appointment.paymentMethod">
+                <TableCell class="font-bold">{{ t('paymentTypeLabel') }}</TableCell>
+                <TableCell>{{ appointment.paymentMethod === 'Cash' ? t('paymentTypeCash') : t('paymentTypeCard') }}</TableCell>
+              </TableRow>
               <TableRow>
                 <TableCell class="font-bold">{{ t('canceled') }}</TableCell>
                 <TableCell>{{ appointment.cancelled ? t('yes') : t('no') }}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-bold">{{ t('paid') }}</TableCell>
-                <TableCell>{{ appointment.paid ? t('yes') : t('no') }}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell class="font-bold">{{ t('confirmed') }}</TableCell>
@@ -379,9 +432,40 @@ const onSubmitEditAppointment = async (values: any) => {
             <Button @click="cancel(Number(appointmentId))" class="mt-4 flex-1 w-full" variant='destructive'>
               {{ t('appointmentCancelButton') }}
             </Button>
-            <Button class="mt-4 flex-1 w-full" variant='edit' v-if="role === 'DOCTOR'">
-              {{ t('appointmentPayButton') }}
-            </Button>
+            <div v-if="role === 'DOCTOR'" class="flex-1 w-full">
+              <Form v-slot="{ handleSubmit }" as="" keep-values :validation-schema="createPaymentFormSchema">
+                <Dialog>
+                  <DialogTrigger as-child>
+                    <Button class="mt-4 flex-1 w-full">
+                      {{ t('appointmentPayButton') }}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent class="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>{{ t('appointmentPayButton') }}</DialogTitle>
+                    </DialogHeader>
+                    <form id="createDialogForm" @submit="handleSubmit($event, onSubmitCreatePayment)">
+                      <StyledFormItem
+                          inputName="price"
+                          inputType="number"
+                          :inputPlaceholder="t('paymentPricePlaceholder')"
+                          labelFor="price"
+                          :labelPlaceholder="t('paymentPriceLabelPlaceholder')"
+                          errorMessageName="price"
+                      />
+                      <StyledSelectFormItem inputName="paymentType" labelFor="paymentType" :label="t('paymentLabel')" :labelPlaceholder="t('paymentLabelPlaceholder')" :options="paymentTypes" errorMessageName="paymentType"/>
+                      <DialogFooter>
+                        <DialogTrigger as-child>
+                          <Button type="submit" form="createDialogForm">
+                            {{ t('saveChanges') }}
+                          </Button>
+                        </DialogTrigger>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </Form>
+            </div>
             <div v-if="role === 'DOCTOR'" class="flex-1 w-full">
               <Form v-slot="{ handleSubmit }" as="" :validation-schema="editAppointmentFormSchema" keep-values>
                 <Dialog>
@@ -414,6 +498,11 @@ const onSubmitEditAppointment = async (values: any) => {
                                       :labelPlaceholder="t('appointmentDescription')"
                                       errorMessageName="appointmentDescription"
                                       :modelValue="editAppointmentFormRef.appointmentDescription"/>
+                      <StyledFormItem inputName="price" inputType="number"
+                                      :inputPlaceholder="t('paymentPricePlaceholder')" labelFor="price"
+                                      :labelPlaceholder="t('paymentPricePlaceholder')"
+                                      errorMessageName="price"
+                                      :modelValue="editAppointmentFormRef.price"/>
                       <DialogFooter>
                         <DialogTrigger as-child>
                           <Button type="submit" form="editDialogForm" class="w-full">

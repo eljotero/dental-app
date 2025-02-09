@@ -54,7 +54,6 @@ public class AvailableSlotsServiceTests {
         availability.setBrakeTimeStart(LocalTime.of(12, 0));
         availability.setBrakeTimeEnd(LocalTime.of(13, 0));
         availability.setAvailabilityDate(startDate);
-        availability.setIsConfirmed(true);
 
         appointment = new Appointment();
         appointment.setAppointmentStartTime(LocalTime.of(9, 0));

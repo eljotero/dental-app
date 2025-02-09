@@ -115,6 +115,9 @@ export interface AppointmentDetailsDoctor {
     description: string;
     cancelled: boolean;
     paid: boolean;
+    paymentDate?: string;
+    paymentMethod?: string;
+    paymentAmount?: number;
     confirmed: boolean;
     prescriptions: Prescription[];
     referrals: Referral[];
@@ -202,4 +205,80 @@ export interface UpdateAppointment {
     appointmentStartTime?: string;
     appointmentEndTime?: string;
     appointmentDescription?: string;
+    price?: number;
+    paymentMethod?: string;
+}
+
+export interface MeetingSlot {
+    date: Date | string;
+    [key: string]: any;
+}
+
+export interface MeetingsDay {
+    date: Date | string;
+    slots: MeetingSlot[];
+    [key: string]: any;
+}
+
+export interface PayAppointment {
+    price: number;
+    paymentType: string;
+    paymentDate: string;
+}
+
+export interface SupplyDetails {
+    supplyId: number;
+    name: string;
+    quantity: number;
+    link: string;
+}
+
+export interface CreateSupply {
+    name: string;
+    quantity: number;
+    link: string;
+}
+
+export interface UpdateSupply {
+    name?: string;
+    quantity?: number;
+    link?: string;
+}
+
+export interface Availability {
+    availabilityId: number;
+    date: string;
+    startTime: string;
+    endTime: string;
+    brakeTime?: string;
+    brakeTimeEnd?: string;
+}
+
+export type CalendarEvent = {
+    id: string;
+    title: string;
+    start: string;
+    end: string;
+};
+
+export interface CreateAvailability {
+    date: string;
+    startTime: string;
+    endTime: string;
+    brakeTimeStart?: string;
+    brakeTimeEnd?: string;
+}
+
+export interface PaymentTypeRatio {
+    CARD: number;
+    CASH: number;
+}
+
+export interface PatientVisitsByAgeGroup {
+    [ageGroup: string]: number;
+}
+
+export interface StatsData {
+    patientVisitsByAgeGroup: { name: string, total: number }[];
+    paymentTypeRatio: Record<string, number>;
 }

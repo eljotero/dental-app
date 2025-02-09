@@ -45,6 +45,7 @@ onMounted(async () => {
   } else {
     console.error("Error while fetching doctors for appointment");
   }
+  startDate.value.setDate(startDate.value.getDate() + 1);
   endDate.value.setDate(endDate.value.getDate() + 5);
 });
 
@@ -80,8 +81,7 @@ const selectTime = (time: number, date: string) => {
 };
 
 const submitFinalForm = async (values: any) => {
-  console.log(selectedTime);
-  const appointmentStartTime = values.time;
+  const appointmentStartTime = selectedTime.value;
   const appointmentEndTime = addOneHour(appointmentStartTime);
 
   const appointment: CreateAppointment = {
@@ -104,14 +104,15 @@ const submitFinalForm = async (values: any) => {
 };
 
 const addOneHour = (time: string): string => {
+  console.log(time);
   const [hours, minutes] = time.split(":").map(Number);
   return `${hours + 1}:${minutes.toString().padStart(2, "0")}`;
 };
 </script>
 
 <template>
-  <div class="container mx-auto p-4 mt-16 h-full">
-    <Card class="flex h-full justify-center items-center">
+  <div class="container mx-auto p-4 mt-20">
+    <Card class="flex h-full justify-center items-center max-h-96 mt-24">
       <div class="w-1/2 pr-4 flex-1 flex flex-col">
         <h1 class="text-2xl font-bold mb-4 text-center">{{ t('createAppointmentHeader') }}</h1>
         <Form :schema="formSchema" @submit="fetchTimeSlots" class="space-y-4">
@@ -121,20 +122,22 @@ const addOneHour = (time: string): string => {
           </div>
         </Form>
       </div>
-      <div class="w-1/2 pl-4 flex-1 flex flex-col">
+      <div class="w-1/2 pl-4 flex-1 flex flex-col overflow-y-auto">
         <div class="flex-1">
           <h2 class="text-xl font-bold text-center mb-4">{{ t('availableTimeSlots') }}</h2>
-          <div v-for="(times, date) in slots" :key="date" class="mb-4">
-            <h3 class="text-lg font-semibold">{{ date }}</h3>
-            <div class="grid grid-rows-3 gap-4 content-center">
-              <Button
-                  v-for="(endTime, startTime) in times"
-                  :key="startTime"
-                  @click="selectTime(startTime, date.toString())"
-                  class="p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-700 w-1/2 mx-auto"
-              >
-                {{ startTime }} - {{ endTime }}
-              </Button>
+          <div class="grid grid-cols-5 gap-4">
+            <div v-for="(times, date) in slots" :key="date" class="col-span-1 bg-gray-100 rounded-lg p-2 shadow-md">
+              <h3 class="text-center text-lg font-semibold mb-2">{{ date }}</h3>
+              <div class="grid grid-cols-1 gap-2">
+                <Button
+                    v-for="(endTime, startTime) in times"
+                    :key="startTime"
+                    @click="selectTime(startTime, date.toString())"
+                    class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+                >
+                  {{ startTime }}
+                </Button>
+              </div>
             </div>
           </div>
           <Form :schema="finalSchema" @submit="submitFinalForm" class="space-y-4 mt-4">

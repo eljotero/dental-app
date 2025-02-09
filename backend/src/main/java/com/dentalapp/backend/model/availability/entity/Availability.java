@@ -36,9 +36,6 @@ public class Availability {
     @Column(name = "availability_end_time", nullable = false)
     private LocalTime availabilityEndTime;
 
-    @Column(name = "is_confirmed", nullable = false)
-    private Boolean isConfirmed = false;
-
     @Column(name = "brake_time_start")
     private LocalTime brakeTimeStart;
 

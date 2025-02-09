@@ -12,10 +12,6 @@ public class AvailabilityMapper {
         availability.setAvailabilityStartTime(LocalTime.parse(availabilityDayDto.getStartTime()));
         availability.setAvailabilityEndTime(LocalTime.parse(availabilityDayDto.getEndTime()));
         availability.setDoctor(doctor);
-        if(availabilityDayDto.getBrakeTimeStart() != null && availabilityDayDto.getBrakeTimeEnd() != null) {
-            availability.setBrakeTimeStart(LocalTime.parse(availabilityDayDto.getBrakeTimeStart()));
-            availability.setBrakeTimeEnd(LocalTime.parse(availabilityDayDto.getBrakeTimeEnd()));
-        }
         return availability;
     }
 
@@ -25,11 +21,6 @@ public class AvailabilityMapper {
         availabilityDayDto.setDate(availability.getAvailabilityDate());
         availabilityDayDto.setStartTime(availability.getAvailabilityStartTime());
         availabilityDayDto.setEndTime(availability.getAvailabilityEndTime());
-        if(availability.getBrakeTimeStart() != null && availability.getBrakeTimeEnd() != null) {
-            availabilityDayDto.setBrakeTimeStart(availability.getBrakeTimeStart());
-            availabilityDayDto.setBrakeTimeEnd(availability.getBrakeTimeEnd());
-        }
-        availabilityDayDto.setConfirmed(availability.getIsConfirmed());
         return availabilityDayDto;
     }
 
@@ -39,12 +30,6 @@ public class AvailabilityMapper {
         }
         if(updateAvailabilityDto.getEndTime() != null) {
             availability.setAvailabilityEndTime(LocalTime.parse(updateAvailabilityDto.getEndTime()));
-        }
-        if(updateAvailabilityDto.getBrakeTimeStart() != null) {
-            availability.setBrakeTimeStart(LocalTime.parse(updateAvailabilityDto.getBrakeTimeStart()));
-        }
-        if(updateAvailabilityDto.getBrakeTimeEnd() != null) {
-            availability.setBrakeTimeEnd(LocalTime.parse(updateAvailabilityDto.getBrakeTimeEnd()));
         }
         return availability;
     }

@@ -5,7 +5,13 @@ import type {
     UpdateUserProfile,
     CreateAppointment,
     UpdateTreatment,
-    CreateTreatment, UpdatePrescription, CreatePrescription, CreateReferral, UpdateAppointment
+    CreateTreatment,
+    UpdatePrescription,
+    CreatePrescription,
+    CreateReferral,
+    UpdateAppointment,
+    PayAppointment,
+    CreateSupply, UpdateSupply, CreateAvailability
 } from './types';
 import store from "@/store";
 
@@ -120,7 +126,7 @@ export const confirmAppointment = async (id: number) => {
 }
 
 export const cancelAppointment = async (id: number) => {
-    return axiosInstance.post(`/api/appointments/cancel/${id}`, {
+    return axiosInstance.post(`/api/appointments/cancel/${id}`, {}, {
         headers: {
             Authorization: `Bearer ${store.getters.getUserToken}`
         }
@@ -234,6 +240,91 @@ export const downloadFile = async (id: number) => {
 
 export const updateAppointment = async (id: number, data: UpdateAppointment) => {
     return axiosInstance.put(`/api/appointments/${id}`, data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const setNewPassword = async (password: string, token: string) => {
+    return axiosInstance.post(`/api/user/change-password?token=${token}`, { password });
+}
+
+export const payForAppointment = async (id: number, data: PayAppointment) => {
+    return axiosInstance.post(`/api/payments/${id}/pay`, data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const updateAppointmentPrice = async (id: number, price: number) => {
+    return axiosInstance.patch(`/api/payments/${id}/price`, { price }, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const getSupplies = async () => {
+    return axiosInstance.get('/api/supply/all', {
+            headers: {
+                Authorization: `Bearer ${store.getters.getUserToken}`
+            }
+        }
+    );
+}
+
+export const createSupply = async (data: CreateSupply) => {
+    return axiosInstance.post('/api/supply/add', data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const updateSupply = async (id: number, data: UpdateSupply) => {
+    return axiosInstance.put(`/api/supply/${id}`, data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const deleteSupply = async (id: number) => {
+    return axiosInstance.delete(`/api/supply/${id}`, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const getAvailabilities = async () => {
+    return axiosInstance.get('/api/availability/doctor', {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const createAvailability = async (data: CreateAvailability) => {
+    return axiosInstance.post('/api/availability/add', data, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const deleteAvailability = async (id: number) => {
+    return axiosInstance.delete(`/api/availability/${id}`, {
+        headers: {
+            Authorization: `Bearer ${store.getters.getUserToken}`
+        }
+    });
+}
+
+export const getStatistics = async (startDate: Date) => {
+    return axiosInstance.get(`/api/statistics/all?startDate=${startDate}`, {
         headers: {
             Authorization: `Bearer ${store.getters.getUserToken}`
         }

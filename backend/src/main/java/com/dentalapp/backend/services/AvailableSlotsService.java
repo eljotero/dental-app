@@ -31,24 +31,13 @@ public class AvailableSlotsService {
             Map<String, String> timeSlots = new LinkedHashMap<>();
 
             for (Availability availability : availabilities) {
-                if (!availability.getIsConfirmed()) {
-                    continue;
-                }
-
                 LocalTime startTime = availability.getAvailabilityStartTime();
                 LocalTime endTime = availability.getAvailabilityEndTime();
-                LocalTime breakStart = availability.getBrakeTimeStart();
-                LocalTime breakEnd = availability.getBrakeTimeEnd();
 
                 while (startTime.isBefore(endTime)) {
                     LocalTime nextHour = startTime.plusHours(1);
-
-                    if (breakStart != null && breakEnd != null && !startTime.isBefore(breakStart) && startTime.isBefore(breakEnd)) {
-                        startTime = breakEnd;
-                    } else {
-                        timeSlots.put(startTime.toString(), nextHour.toString());
-                        startTime = nextHour;
-                    }
+                    timeSlots.put(startTime.toString(), nextHour.toString());
+                    startTime = nextHour;
                 }
             }
 

@@ -75,7 +75,7 @@ const refreshPassword = async() => {
     <CardContent>
       <CardTitle>{{ t('login') }}</CardTitle>
       <Form @submit="onSubmit" :validation-schema="formSchema" class="form-container">
-        <StyledFormItem inputName="email" inputType="email" :inputPlaceholder="t('emailPlaceholder')" labelFor="email" :labelPlaceholder="t('emailLabel')" errorMessageName="email"/>
+        <StyledFormItem v-model="email" inputName="email" inputType="email" :inputPlaceholder="t('emailPlaceholder')" labelFor="email" :labelPlaceholder="t('emailLabel')" errorMessageName="email"/>
         <StyledFormItem inputName="password" inputType="password" :inputPlaceholder="t('passwordPlaceholder')" labelFor="password" :labelPlaceholder="t('passwordLabel')" errorMessageName="password"/>
         <Button type="submit" class="submit-button">
           {{ t('login') }}

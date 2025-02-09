@@ -80,6 +80,11 @@ public class AppointmentMapper {
         getAppointmentDtoV4.setConfirmed(appointment.getIsConfirmed());
         getAppointmentDtoV4.setCancelled(appointment.getIsCancelled());
         getAppointmentDtoV4.setPaid(appointment.getInvoice().getIsPaid());
+        if(appointment.getInvoice().getIsPaid().equals(Boolean.TRUE)) {
+            getAppointmentDtoV4.setPaymentDate(appointment.getInvoice().getPaymentDate().toString());
+            getAppointmentDtoV4.setPaymentMethod(appointment.getInvoice().getPaymentMethod().toString());
+            getAppointmentDtoV4.setPaymentAmount(appointment.getInvoice().getPrice());
+        }
         getAppointmentDtoV4.setPrescriptions(appointment.getPrescriptions().stream().map(PrescriptionMapper::toGetPrescriptionDtoV2).collect(Collectors.toCollection(ArrayList::new)));
         getAppointmentDtoV4.setReferrals(appointment.getReferrals().stream().map(ReferralMapper::toGetReferralDto).collect(Collectors.toCollection(ArrayList::new)));
         getAppointmentDtoV4.setFiles(appointment.getFiles().stream().map(FileMapper::toGetFileDto).collect(Collectors.toCollection(ArrayList::new)));

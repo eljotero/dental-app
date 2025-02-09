@@ -51,9 +51,9 @@ public class UserService {
         user.setUserType(UserType.PATIENT);
         userRepository.save(user);
         String tokenCode = confirmationTokenService.saveConfirmationToken(user);
-        String link = "http://localhost:8080/api/user/confirm?token=" + tokenCode;
-        String userName = user.getFirstName() + user.getLastName();
-        emailSenderService.sendAccountConfirmationEmail(user.getEmail(), userName, link);
+        String link = "https://localhost:8080/api/user/confirm?token=" + tokenCode;
+        String userName = user.getFirstName() + " " + user.getLastName();
+        emailSenderService.sendAccountConfirmationEmail(user.getEmail(), userName, link, user.getLanguage());
     }
 
     @Transactional
@@ -119,9 +119,9 @@ public class UserService {
     public void resetPassword(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
         String tokenCode = confirmationTokenService.saveConfirmationToken(user);
-        String link = "http://localhost:8080/api/user/reset-password?token=" + tokenCode;
-        String userName = user.getFirstName() + user.getLastName();
-        emailSenderService.sendResetPasswordEmail(user.getEmail(), userName, link);
+        String link = "https://localhost:5173/reset-password?token=" + tokenCode;
+        String userName = user.getFirstName() + " " + user.getLastName();
+        emailSenderService.sendResetPasswordEmail(user.getEmail(), userName, link, user.getLanguage());
     }
 
     @Transactional

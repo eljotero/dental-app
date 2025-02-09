@@ -1,5 +1,6 @@
 package com.dentalapp.backend.model.availability.dtos;
 
+import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.utils.constraints.CreateTimesConstraint;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,5 @@ public class AvailabilityDayDto {
     @NotNull(message = "End time is required")
     private String endTime;
 
-    private String brakeTimeStart;
-
-    private String brakeTimeEnd;
+    User doctor;
 }
