@@ -1,5 +1,6 @@
 package com.dentalapp.backend;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.SpringApplication;
@@ -8,6 +9,8 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.nio.file.Paths;
 
 @SpringBootApplication
 @OpenAPIDefinition(
@@ -36,6 +39,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BackendApplication {
 
 	public static void main(String[] args) {
+		Dotenv dotenv = Dotenv.configure()
+				.directory(Paths.get("..").toString())
+				.load();
+		dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
