@@ -7,19 +7,19 @@ import com.dentalapp.backend.model.supplies.entity.Supply;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyAlreadyExistsException;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyNotFoundException;
 import com.dentalapp.backend.model.supplies.repository.SupplyRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class SupplyService {
 
     private final SupplyRepository supplyRepository;
 
-    public SupplyService(SupplyRepository supplyRepository) {
-        this.supplyRepository = supplyRepository;
-    }
+    private final SupplyMapper supplyMapper;
 
     public List<Supply> findAll() {
         return supplyRepository.findAll();
@@ -34,7 +34,7 @@ public class SupplyService {
         if (supplyRepository.findByName(createSupplyDto.getName()).isPresent()) {
             throw new SupplyAlreadyExistsException("Supply with name " + createSupplyDto.getName() + " already exists");
         }
-        Supply supply = SupplyMapper.toEntityCreate(createSupplyDto);
+        Supply supply = supplyMapper.toEntityCreate(createSupplyDto);
         supplyRepository.save(supply);
     }
 
@@ -44,7 +44,7 @@ public class SupplyService {
             throw new SupplyNotFoundException("Supply with id " + id + " not found");
         }
         Supply supply = supplyRepository.findById(id).get();
-        Supply supplyDB = SupplyMapper.toEntityUpdate(supply, updateSupplyDto);
+        Supply supplyDB = supplyMapper.toEntityUpdate(supply, updateSupplyDto);
         supplyRepository.save(supplyDB);
     }
 

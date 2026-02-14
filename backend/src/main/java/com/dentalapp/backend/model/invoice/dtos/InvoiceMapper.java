@@ -1,21 +1,19 @@
 package com.dentalapp.backend.model.invoice.dtos;
 
-import com.dentalapp.backend.model.enums.PaymentStatus;
 import com.dentalapp.backend.model.enums.PaymentMethod;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
-
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import java.time.LocalDate;
 
-public class InvoiceMapper {
+@Mapper(componentModel = "spring", imports = {PaymentMethod.class, LocalDate.class})
+public interface InvoiceMapper {
 
-    public static Invoice toDto(Invoice invoice, PayForAppointmentDto payForAppointmentDto, boolean isPriceSet) {
-        invoice.setPaymentMethod(PaymentMethod.valueOf(payForAppointmentDto.getPaymentType()));
-        invoice.setPaymentDate(LocalDate.parse(payForAppointmentDto.getPaymentDate()));
-        invoice.setPaymentStatus(PaymentStatus.PAID);
-        if(!isPriceSet) {
-            invoice.setPrice(payForAppointmentDto.getPrice());
-        }
-        invoice.setIsPaid(true);
-        return invoice;
-    }
+    @Mapping(target = "paymentMethod", expression = "java(PaymentMethod.valueOf(payForAppointmentDto.getPaymentType()))")
+    @Mapping(target = "paymentDate", expression = "java(LocalDate.parse(payForAppointmentDto.getPaymentDate()))")
+    @Mapping(target = "paymentStatus", constant = "PAID")
+    @Mapping(target = "price", expression = "java(isPriceSet ? invoice.getPrice() : payForAppointmentDto.getPrice())")
+    @Mapping(target = "isPaid", constant = "true")
+    Invoice toDto(@MappingTarget Invoice invoice, PayForAppointmentDto payForAppointmentDto, boolean isPriceSet);
 }

@@ -1,11 +1,10 @@
 package com.dentalapp.backend.model.availability.dtos;
 
 import com.dentalapp.backend.utils.constraints.UpdateTimesConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @UpdateTimesConstraint(

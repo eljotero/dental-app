@@ -7,6 +7,7 @@ import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException;
 import com.dentalapp.backend.model.invoice.repository.InvoiceRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
 
-    public InvoiceService(InvoiceRepository invoiceRepository) {
-        this.invoiceRepository = invoiceRepository;
-    }
+    private final InvoiceMapper invoiceMapper;
 
     public List<Invoice> findAllByQueryParams(Specification<Invoice> spec) {
         return invoiceRepository.findAll(spec);
@@ -53,7 +53,7 @@ public class InvoiceService {
     public void payInvoice(Long id, PayForAppointmentDto payForAppointmentDto) {
         Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         boolean isPriceSet = invoice.getPrice() != null;
-        Invoice invoiceDB = InvoiceMapper.toDto(invoice, payForAppointmentDto, isPriceSet);
+        Invoice invoiceDB = invoiceMapper.toDto(invoice, payForAppointmentDto, isPriceSet);
         invoiceRepository.save(invoiceDB);
     }
 

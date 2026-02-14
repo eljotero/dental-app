@@ -11,10 +11,11 @@ import java.time.LocalDateTime;
 @Table(name = "files")
 @Getter
 @Setter
+@SequenceGenerator(name="file_id_seq", sequenceName = "file_id_seq")
 public class File {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_id")
-    @SequenceGenerator(name = "file_id", sequenceName = "file_id", initialValue = 50, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_id_seq")
     @Column(name = "file_id")
     private Long fileId;
 
@@ -25,7 +26,7 @@ public class File {
     @Column(name = "file_name", nullable = false, unique = true)
     private String fileName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointment_id", nullable = false)
     private Appointment appointment;
 

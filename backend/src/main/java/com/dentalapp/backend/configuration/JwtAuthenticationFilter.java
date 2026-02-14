@@ -3,6 +3,7 @@ package com.dentalapp.backend.configuration;
 import com.dentalapp.backend.model.user.UserDetailService;
 import com.dentalapp.backend.model.user.exceptions.UserAuthenticationException;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,8 +54,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
+            return;
         } catch (UserAuthenticationException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access");
+            return;
+        } catch (JwtException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT token");
+            return;
         }
         filterChain.doFilter(request, response);
     }

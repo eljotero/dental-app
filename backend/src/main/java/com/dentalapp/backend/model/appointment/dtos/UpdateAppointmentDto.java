@@ -3,13 +3,12 @@ package com.dentalapp.backend.model.appointment.dtos;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.utils.constraints.UpdateTimesConstraint;
 import jakarta.validation.constraints.Future;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @UpdateTimesConstraint(

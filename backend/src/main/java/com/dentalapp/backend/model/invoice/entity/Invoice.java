@@ -12,10 +12,11 @@ import java.time.LocalDate;
 @Table(name = "invoices")
 @Getter
 @Setter
+@SequenceGenerator(name="invoice_id_seq", sequenceName = "invoice_id_seq")
 public class Invoice {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "invoice_id_seq")
-    @SequenceGenerator(name = "invoice_id_seq", sequenceName = "invoice_id_seq", initialValue = 50, allocationSize = 1)
     @Column(name = "invoice_id")
     private Long invoiceId;
 

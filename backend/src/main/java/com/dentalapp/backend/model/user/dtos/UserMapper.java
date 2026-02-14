@@ -1,77 +1,32 @@
 package com.dentalapp.backend.model.user.dtos;
 
 import com.dentalapp.backend.model.user.entity.User;
+import org.mapstruct.*;
 
-public class UserMapper {
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface UserMapper {
 
-    public static User toUser(CreateUserDto createUserDto) {
-        User user = new User();
-        user.setFirstName(createUserDto.getFirstName());
-        user.setLastName(createUserDto.getLastName());
-        user.setEmail(createUserDto.getEmail());
-        user.setPassword(createUserDto.getPassword());
-        user.setPhoneNumber(createUserDto.getPhoneNumber());
-        user.setSex(createUserDto.getSex());
-        user.setPersonalId(createUserDto.getPersonalIdNumber());
-        user.setCountry(createUserDto.getCountry());
-        user.setCity(createUserDto.getCity());
-        user.setAddress(createUserDto.getAddressLine());
-        user.setZipCode(createUserDto.getZipCode());
-        user.setDateOfBirth(createUserDto.getDateOfBirth());
-        user.setLanguage(createUserDto.getLanguage());
-        return user;
-    }
+    @Mapping(target = "address", source = "addressLine")
+    GetUserDto toGetUserDto(User user);
 
-    public static User toUpdateUser(User user, UpdateUserDto updateUserDto) {
-        if(updateUserDto.getFirstName() != null) {
-            user.setFirstName(updateUserDto.getFirstName());
-        }
-        if(updateUserDto.getLastName() != null) {
-            user.setLastName(updateUserDto.getLastName());
-        }
-        if(updateUserDto.getEmail() != null) {
-            user.setEmail(updateUserDto.getEmail());
-        }
-        if(updateUserDto.getPhoneNumber() != null) {
-            user.setPhoneNumber(updateUserDto.getPhoneNumber());
-        }
-        if(updateUserDto.getSex() != null) {
-            user.setSex(updateUserDto.getSex());
-        }
-        if(updateUserDto.getPersonalIdNumber() != null) {
-            user.setPersonalId(updateUserDto.getPersonalIdNumber());
-        }
-        if(updateUserDto.getCountry() != null) {
-            user.setCountry(updateUserDto.getCountry());
-        }
-        if(updateUserDto.getCity() != null) {
-            user.setCity(updateUserDto.getCity());
-        }
-        if(updateUserDto.getAddressLine() != null) {
-            user.setAddress(updateUserDto.getAddressLine());
-        }
-        if(updateUserDto.getZipCode() != null) {
-            user.setZipCode(updateUserDto.getZipCode());
-        }
-        if(updateUserDto.getDateOfBirth() != null) {
-            user.setDateOfBirth(updateUserDto.getDateOfBirth());
-        }
-        return user;
-    }
+    @Mapping(target = "language", ignore = true)
+    User toUser(CreateUserDto user);
 
-    public static LoginUserDtoResponse toResponse(User user, String token) {
-        LoginUserDtoResponse loginUserDtoResponse = new LoginUserDtoResponse();
-        loginUserDtoResponse.setToken(token);
-        loginUserDtoResponse.setRole(user.getUserType().name());
-        loginUserDtoResponse.setLanguage(user.getLanguage());
-        return loginUserDtoResponse;
-    }
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "userType", ignore = true)
+    @Mapping(target = "isEnabled", ignore = true)
+    @Mapping(target = "isAccountNonExpired", ignore = true)
+    @Mapping(target = "isAccountNonLocked", ignore = true)
+    @Mapping(target = "isCredentialsNonExpired", ignore = true)
+    @Mapping(target = "language", ignore = true)
+    User toUpdateUser(@MappingTarget User user, UpdateUserDto updateUserDto);
 
-    public static GetDoctorDto toGetDoctorDto(User user) {
-        GetDoctorDto getDoctorDto = new GetDoctorDto();
-        getDoctorDto.setDoctorId(user.getUserId());
-        getDoctorDto.setFirstName(user.getFirstName());
-        getDoctorDto.setLastName(user.getLastName());
-        return getDoctorDto;
-    }
+    @Mapping(target = "role", expression = "java(user.getUserType().name())")
+    @Mapping(target = "language", source = "user.language")
+    @Mapping(target = "token", source = "token")
+    LoginUserDtoResponse toResponse(User user, String token);
+
+    @Mapping(target = "doctorId", source = "userId")
+    GetDoctorDto toGetDoctorDto(User user);
 }

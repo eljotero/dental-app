@@ -1,7 +1,6 @@
 package com.dentalapp.backend.model.referral.entity;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,10 +9,11 @@ import lombok.Setter;
 @Table(name = "referrals")
 @Getter
 @Setter
+@SequenceGenerator(name="referral_id_seq", sequenceName = "referral_id_seq")
 public class Referral {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "referral_id_seq")
-    @SequenceGenerator(name = "referral_id_seq", sequenceName = "referral_id_seq", initialValue = 50, allocationSize = 1)
     @Column(name = "referral_id")
     private Long referralId;
 
@@ -32,8 +32,7 @@ public class Referral {
     @Column(name="clinic_address")
     private String clinicAddress;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointment_id", nullable = false)
-    @JsonIgnore
     private Appointment appointment;
 }

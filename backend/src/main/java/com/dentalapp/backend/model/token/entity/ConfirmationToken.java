@@ -7,16 +7,15 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Table(name = "tokens", indexes = {
-        @Index(name = "idx_token", columnList = "token")
-})
+@Table(name = "tokens")
 @Entity
 @Getter
 @Setter
+@SequenceGenerator(name="token_id_seq", sequenceName = "token_id_seq")
 public class ConfirmationToken {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "token_id_seq")
-    @SequenceGenerator(name = "token_id_seq", sequenceName = "token_id_seq", initialValue = 50, allocationSize = 1)
     @Column(name = "token_id")
     private Long tokenId;
 
@@ -32,7 +31,7 @@ public class ConfirmationToken {
     @Column(name = "confirmed_at")
     private LocalDateTime confirmedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

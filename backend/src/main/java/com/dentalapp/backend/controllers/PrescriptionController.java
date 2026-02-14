@@ -2,12 +2,12 @@ package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
-import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
 import com.dentalapp.backend.model.prescription.dtos.GetPrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.PrescriptionService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,16 +15,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/prescriptions")
+@AllArgsConstructor
 public class PrescriptionController {
-    private final PrescriptionService prescriptionService;
-    private final AppointmentService appointmentService;
-    private final JwtService jwtService;
 
-    public PrescriptionController(PrescriptionService prescriptionService, AppointmentService appointmentService, JwtService jwtService) {
-        this.prescriptionService = prescriptionService;
-        this.appointmentService = appointmentService;
-        this.jwtService = jwtService;
-    }
+    private final PrescriptionService prescriptionService;
+
+    private final AppointmentService appointmentService;
+
+    private final JwtService jwtService;
 
     @GetMapping("/all")
     public ResponseEntity<List<GetPrescriptionDto>> getAllPrescriptions() {

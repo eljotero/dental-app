@@ -2,9 +2,9 @@ package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.user.dtos.*;
-import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,16 +12,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
+@AllArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
     private final JwtService jwtService;
-
-    public UserController(UserService userService, JwtService jwtService) {
-        this.userService = userService;
-        this.jwtService = jwtService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody @Valid CreateUserDto createUserDto) {
@@ -42,18 +38,18 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<GetUserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<GetUserDto> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserByIdDto(id));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<User> getMe(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(userService.getUser(jwtService.extractEmail(token.substring(7))));
+    public ResponseEntity<GetUserDto> getMe(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(userService.getUserData(jwtService.extractEmail(token.substring(7))));
     }
 
     @GetMapping("/doctors")

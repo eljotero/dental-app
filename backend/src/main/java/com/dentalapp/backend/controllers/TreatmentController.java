@@ -4,6 +4,7 @@ import com.dentalapp.backend.model.treatment.dtos.CreateTreatmentDto;
 import com.dentalapp.backend.model.treatment.dtos.UpdateTreatmentDto;
 import com.dentalapp.backend.model.treatment.entity.Treatment;
 import com.dentalapp.backend.services.TreatmentService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,13 +12,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/services")
+@AllArgsConstructor
 public class TreatmentController {
 
     private final TreatmentService treatmentService;
-
-    public TreatmentController(TreatmentService treatmentService) {
-        this.treatmentService = treatmentService;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<Treatment>> getTreatments() {

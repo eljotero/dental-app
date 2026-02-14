@@ -4,12 +4,17 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetAppointmentDto {
+
     private Long appointmentId;
+
     private LocalDate appointmentDate;
+
     private String appointmentStartTime;
+
     private String appointmentEndTime;
 }

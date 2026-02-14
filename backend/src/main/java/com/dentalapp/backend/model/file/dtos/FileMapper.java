@@ -1,44 +1,53 @@
 package com.dentalapp.backend.model.file.dtos;
 
 import com.dentalapp.backend.model.file.entity.File;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 
-public class FileMapper {
-    public static File toEntity(MultipartFile multipartFile) throws IOException {
-        File file = new File();
-        file.setFileName(multipartFile.getOriginalFilename());
-        file.setFileData(multipartFile.getBytes());
-        file.setUploadedAt(LocalDateTime.now());
-        return file;
-    }
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface FileMapper {
 
-    public static File toUpdateEntity(File file, MultipartFile multipartFile) throws IOException {
-        if(!multipartFile.getName().equals(file.getFileName())) {
-            file.setFileName(multipartFile.getOriginalFilename());
+    @Mapping(target = "fileId", ignore = true)
+    @Mapping(target = "fileName", expression = "java(multipartFile.getOriginalFilename())")
+    @Mapping(target = "fileData", expression = "java(getBytes(multipartFile))")
+    @Mapping(target = "uploadedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "updatedAt", ignore = true)
+    File toEntity(MultipartFile multipartFile);
+
+    @Mapping(target = "fileId", ignore = true)
+    @Mapping(target = "fileName", expression = "java(shouldUpdateFileName(file, multipartFile) ? multipartFile.getOriginalFilename() : file.getFileName())")
+    @Mapping(target = "fileData", expression = "java(shouldUpdateFileData(file, multipartFile) ? getBytes(multipartFile) : file.getFileData())")
+    @Mapping(target = "uploadedAt", ignore = true)
+    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    File toUpdateEntity(@MappingTarget File file, MultipartFile multipartFile);
+
+    @Mapping(target = "uploadedAt", expression = "java(String.valueOf(file.getUploadedAt()))")
+    GetFileDto toGetFileDto(File file);
+
+    GetDownloadFileDto toGetDownloadFileDto(File file);
+
+    default byte[] getBytes(MultipartFile multipartFile) {
+        try {
+            return multipartFile.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading file bytes", e);
         }
-        if(!Arrays.equals(multipartFile.getBytes(), file.getFileData())) {
-            file.setFileData(multipartFile.getBytes());
+    }
+
+    default boolean shouldUpdateFileName(File file, MultipartFile multipartFile) {
+        return !multipartFile.getName().equals(file.getFileName());
+    }
+
+    default boolean shouldUpdateFileData(File file, MultipartFile multipartFile) {
+        try {
+            return !java.util.Arrays.equals(multipartFile.getBytes(), file.getFileData());
+        } catch (IOException e) {
+            throw new RuntimeException("Error comparing file data", e);
         }
-        file.setUpdatedAt(LocalDateTime.now());
-        return file;
-    }
-
-    public static GetFileDto toGetFileDto(File file) {
-        GetFileDto getFileDto = new GetFileDto();
-        getFileDto.setFileId(file.getFileId());
-        getFileDto.setFileName(file.getFileName());
-        getFileDto.setUploadedAt(String.valueOf(file.getUploadedAt()));
-        return getFileDto;
-    }
-
-    public static GetDownloadFileDto toGetDownloadFileDto(File file) {
-        GetDownloadFileDto getDownloadFileDto = new GetDownloadFileDto();
-        getDownloadFileDto.setFileName(file.getFileName());
-        getDownloadFileDto.setFileData(file.getFileData());
-        return getDownloadFileDto;
     }
 }

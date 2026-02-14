@@ -2,13 +2,12 @@ package com.dentalapp.backend.model.availability.dtos;
 
 import com.dentalapp.backend.utils.constraints.CreateTimesConstraint;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @CreateTimesConstraint(

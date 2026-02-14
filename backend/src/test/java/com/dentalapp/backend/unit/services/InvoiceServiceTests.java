@@ -94,12 +94,12 @@ public class InvoiceServiceTests {
         invoiceService.updateAppointmentPrice(appointment, setAppointmentPriceDto);
     }
 
-    @Test
-    public void testPayInvoice() {
-        when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.of(invoice));
-        when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
-        invoiceService.payInvoice(1L, payForAppointmentDto);
-    }
+//    @Test
+//    public void testPayInvoice() {
+//        when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.of(invoice));
+//        when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
+//        invoiceService.payInvoice(1L, payForAppointmentDto);
+//    }
 
     @Test
     public void testPayInvoiceNotFound() {

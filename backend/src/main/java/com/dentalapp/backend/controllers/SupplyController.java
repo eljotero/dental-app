@@ -5,6 +5,7 @@ import com.dentalapp.backend.model.supplies.dtos.UpdateSupplyDto;
 import com.dentalapp.backend.model.supplies.entity.Supply;
 import com.dentalapp.backend.services.SupplyService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/supply")
+@AllArgsConstructor
 public class SupplyController {
 
     private final SupplyService supplyService;
-
-    public SupplyController(SupplyService supplyService) {
-        this.supplyService = supplyService;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<Supply>> getAllSupplies() {

@@ -1,7 +1,6 @@
 package com.dentalapp.backend.unit.controllers;
 
 import com.dentalapp.backend.controllers.FileController;
-import com.dentalapp.backend.model.file.dtos.FileMapper;
 import com.dentalapp.backend.model.file.dtos.GetDownloadFileDto;
 import com.dentalapp.backend.model.file.dtos.GetFileDto;
 import com.dentalapp.backend.model.file.entity.File;
@@ -58,7 +57,7 @@ public class FileControllerTests {
 
     @Test
     public void testGetFileById(){
-        GetDownloadFileDto getDownloadFileDto = FileMapper.toGetDownloadFileDto(file);
+        GetDownloadFileDto getDownloadFileDto = new GetDownloadFileDto();
         when(fileService.getFileById(1L)).thenReturn(getDownloadFileDto);
         ResponseEntity<GetDownloadFileDto> response = fileController.getFileById(1L);
         Assertions.assertEquals(getDownloadFileDto, response.getBody());
@@ -100,7 +99,7 @@ public class FileControllerTests {
 
     @Test
     public void testGetPatientFiles() {
-        GetFileDto getFileDto = FileMapper.toGetFileDto(file);
+        GetFileDto getFileDto = new GetFileDto();
         when(userService.getUserById(1L)).thenReturn(user);
         when(fileService.getFilesByUserId(user)).thenReturn(List.of(getFileDto));
         ResponseEntity<List<GetFileDto>> response = fileController.getPatientFiles(1L);

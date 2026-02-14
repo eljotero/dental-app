@@ -8,6 +8,7 @@ import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.services.AvailabilityService;
 import com.dentalapp.backend.services.AvailableSlotsService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/availability")
+@AllArgsConstructor
 public class AvailabilityController {
 
     private final AvailabilityService availabilityService;
@@ -26,12 +28,6 @@ public class AvailabilityController {
     private final JwtService jwtService;
 
     private final AvailableSlotsService availableSlotsService;
-
-    public AvailabilityController(AvailabilityService availabilityService, JwtService jwtService, AvailableSlotsService availableSlotsService) {
-        this.availabilityService = availabilityService;
-        this.jwtService = jwtService;
-        this.availableSlotsService = availableSlotsService;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<GetAvailabilityDto>> getAllDoctorAvailability(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) Long id) {

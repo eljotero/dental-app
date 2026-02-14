@@ -5,37 +5,32 @@ import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.referral.entity.Referral;
 import com.dentalapp.backend.model.user.entity.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "appointments", indexes = {
-        @Index(name = "idx_patient_id_is_cancelled", columnList = "patient_id, is_cancelled"),
-        @Index(name = "idx_doctor_id_is_cancelled", columnList = "doctor_id, is_cancelled"),
-        @Index(name = "idx_date_is_cancelled", columnList = "appointment_date, is_cancelled"),
-        @Index(name="idx_doctor_id_date_is_cancelled", columnList = "doctor_id, appointment_date, is_cancelled"),
-        @Index(name = "idx_is_confirmed_date", columnList = "is_confirmed, appointment_date"),
-})
+@Table(name = "appointments")
+@SequenceGenerator(name="appointment_id_seq", sequenceName = "appointment_id_seq")
 @Getter
 @Setter
 public class Appointment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointment_id_seq")
-    @SequenceGenerator(name = "appointment_id_seq", sequenceName = "appointment_id_seq", initialValue = 50, allocationSize = 1)
     @Column(name = "appointment_id")
     private Long appointmentId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private User patient;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     private User doctor;
 
@@ -61,17 +56,15 @@ public class Appointment {
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
 
-    @OneToMany(mappedBy = "appointment")
-    private List<Prescription> prescriptions;
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Prescription> prescriptions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "appointment")
-    private List<Referral> referrals;
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Referral> referrals = new ArrayList<>();
 
-    @OneToMany(mappedBy = "appointment")
-    @JsonIgnore
-    private List<File> files;
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<File> files = new ArrayList<>();
 
     @Version
-    @JsonIgnore
     private Long version;
 }

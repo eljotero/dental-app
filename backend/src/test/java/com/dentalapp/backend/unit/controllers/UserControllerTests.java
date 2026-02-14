@@ -51,6 +51,8 @@ public class UserControllerTests {
 
     private User user;
 
+    private GetUserDto getUserDto;
+
 
     @BeforeEach
     public void setUp() {
@@ -93,6 +95,8 @@ public class UserControllerTests {
         user.setUserId(1L);
         user.setLanguage("en");
         user.setUserType(UserType.valueOf("PATIENT"));
+
+        getUserDto = new GetUserDto();
     }
 
     @Test
@@ -116,17 +120,17 @@ public class UserControllerTests {
         createUserDto.setAddressLine("");
         createUserDto.setZipCode("");
         createUserDto.setDateOfBirth(LocalDate.now().plusDays(1));
-        Assertions.assertEquals(16, validator.validate(createUserDto).size());
-        createUserDto.setEmail("test");
-        Assertions.assertEquals(16, validator.validate(createUserDto).size());
-        createUserDto.setPassword("pass");
         Assertions.assertEquals(15, validator.validate(createUserDto).size());
-        createUserDto.setPhoneNumber("123");
+        createUserDto.setEmail("test");
+        Assertions.assertEquals(15, validator.validate(createUserDto).size());
+        createUserDto.setPassword("pass");
         Assertions.assertEquals(14, validator.validate(createUserDto).size());
-        createUserDto.setPersonalIdNumber("123");
+        createUserDto.setPhoneNumber("123");
         Assertions.assertEquals(13, validator.validate(createUserDto).size());
-        createUserDto.setZipCode("123");
+        createUserDto.setPersonalIdNumber("123");
         Assertions.assertEquals(12, validator.validate(createUserDto).size());
+        createUserDto.setZipCode("123");
+        Assertions.assertEquals(11, validator.validate(createUserDto).size());
     }
 
     @Test
@@ -154,18 +158,19 @@ public class UserControllerTests {
 
     @Test
     public void testGetAllUsers() {
-        when(userService.getAllUsers()).thenReturn(List.of(user));
-        ResponseEntity<List<User>> response = userController.getAllUsers();
+        when(userService.getAllUsers()).thenReturn(List.of(getUserDto));
+        ResponseEntity<List<GetUserDto>> response = userController.getAllUsers();
         verify(userService).getAllUsers();
-        Assertions.assertEquals(ResponseEntity.ok(List.of(user)), response);
+        Assertions.assertEquals(ResponseEntity.ok(List.of(getUserDto)), response);
     }
 
     @Test
     public void testGetUserById() {
-        when(userService.getUserById(1L)).thenReturn(user);
-        ResponseEntity<User> response = userController.getUserById(1L);
-        verify(userService).getUserById(1L);
-        Assertions.assertEquals(ResponseEntity.ok(user), response);
+        when(userService.getUserByIdDto(1L)).thenReturn(getUserDto);
+        ResponseEntity<GetUserDto> response = userController.getUserById(1L);
+        verify(userService).getUserByIdDto(1L);
+        Assertions.assertEquals(ResponseEntity.ok(getUserDto), response);
+        Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -203,16 +208,16 @@ public class UserControllerTests {
         String token = "Bearer test@mail.com";
         String email = "test@mail.com";
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
-        when(userService.getUser(email)).thenReturn(user);
-        ResponseEntity<User> response = userController.getMe(token);
-        verify(userService).getUser(email);
-        Assertions.assertEquals(ResponseEntity.ok(user), response);
+        when(userService.getUserData(email)).thenReturn(getUserDto);
+        ResponseEntity<GetUserDto> response = userController.getMe(token);
+        verify(userService).getUserData(email);
+        Assertions.assertEquals(ResponseEntity.ok(getUserDto), response);
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
     public void testGetDoctors() {
-        GetDoctorDto getDoctorDto = UserMapper.toGetDoctorDto(user);
+        GetDoctorDto getDoctorDto = new GetDoctorDto();
         when(userService.getDoctors()).thenReturn(List.of(getDoctorDto));
         ResponseEntity<List<GetDoctorDto>> response = userController.getDoctors();
         verify(userService).getDoctors();

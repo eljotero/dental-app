@@ -2,50 +2,23 @@ package com.dentalapp.backend.model.referral.dtos;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.referral.entity.Referral;
+import org.mapstruct.*;
 
-public class ReferralMapper {
-    public static Referral toEntity(CreateReferralDto createReferralDto, Appointment appointment) {
-        Referral referral = new Referral();
-        referral.setProcedureName(createReferralDto.getProcedureName());
-        referral.setProcedureDescription(createReferralDto.getProcedureDescription());
-        if (createReferralDto.getDoctorName() != null) {
-            referral.setDoctorName(createReferralDto.getDoctorName());
-        }
-        referral.setClinicName(createReferralDto.getClinicName());
-        if (createReferralDto.getClinicAddress() != null) {
-            referral.setClinicAddress(createReferralDto.getClinicAddress());
-        }
-        referral.setAppointment(appointment);
-        return referral;
-    }
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface ReferralMapper {
 
-    public static Referral toUpdateEntity(Referral referral, UpdateReferralDto updateReferralDto) {
-        if (updateReferralDto.getProcedureName() != null) {
-            referral.setProcedureName(updateReferralDto.getProcedureName());
-        }
-        if (updateReferralDto.getProcedureDescription() != null) {
-            referral.setProcedureDescription(updateReferralDto.getProcedureDescription());
-        }
-        if (updateReferralDto.getDoctorName() != null) {
-            referral.setDoctorName(updateReferralDto.getDoctorName());
-        }
-        if (updateReferralDto.getClinicName() != null) {
-            referral.setClinicName(updateReferralDto.getClinicName());
-        }
-        if (updateReferralDto.getClinicAddress() != null) {
-            referral.setClinicAddress(updateReferralDto.getClinicAddress());
-        }
-        return referral;
-    }
+    @Mapping(target = "referralId", ignore = true)
+    @Mapping(target = "appointment", source = "appointment")
+    @Mapping(target = "procedureName", source = "dto.procedureName")
+    @Mapping(target = "procedureDescription", source = "dto.procedureDescription")
+    @Mapping(target = "doctorName", source = "dto.doctorName")
+    @Mapping(target = "clinicName", source = "dto.clinicName")
+    @Mapping(target = "clinicAddress", source = "dto.clinicAddress")
+    Referral toEntity(CreateReferralDto dto, Appointment appointment);
 
-    public static GetReferralDto toGetReferralDto(Referral referral) {
-        GetReferralDto getReferralDto = new GetReferralDto();
-        getReferralDto.setReferralId(referral.getReferralId());
-        getReferralDto.setProcedureName(referral.getProcedureName());
-        getReferralDto.setProcedureDescription(referral.getProcedureDescription());
-        getReferralDto.setDoctorName(referral.getDoctorName());
-        getReferralDto.setClinicName(referral.getClinicName());
-        getReferralDto.setClinicAddress(referral.getClinicAddress());
-        return getReferralDto;
-    }
+    @Mapping(target = "referralId", ignore = true)
+    @Mapping(target = "appointment", ignore = true)
+    Referral toUpdateEntity(@MappingTarget Referral referral, UpdateReferralDto updateReferralDto);
+
+    GetReferralDto toGetReferralDto(Referral referral);
 }
