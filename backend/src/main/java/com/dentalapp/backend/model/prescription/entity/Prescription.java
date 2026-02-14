@@ -1,7 +1,6 @@
 package com.dentalapp.backend.model.prescription.entity;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,10 +9,11 @@ import lombok.Setter;
 @Table(name = "prescriptions")
 @Getter
 @Setter
+@SequenceGenerator(name = "prescription_id_seq", sequenceName = "prescription_id_seq")
 public class Prescription {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "prescription_id_seq")
-    @SequenceGenerator(name = "prescription_id_seq", sequenceName = "prescription_id_seq", initialValue = 50, allocationSize = 1)
     @Column(name = "prescription_id")
     private Long prescriptionId;
 
@@ -23,8 +23,7 @@ public class Prescription {
     @Column(name = "dosage", nullable = false)
     private String dosage;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointment_id", nullable = false)
-    @JsonIgnore
     private Appointment appointment;
 }

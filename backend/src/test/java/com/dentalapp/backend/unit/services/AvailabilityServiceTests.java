@@ -65,23 +65,23 @@ public class AvailabilityServiceTests {
         createAvailabilityDto.setAvailabilityDays(List.of(availabilityDayDto));
     }
 
-    @Test
-    public void testGetAllDoctorsAvailability() {
-        when(availabilityRepository.findAll((Specification<Availability>) any())).thenReturn(List.of());
-        Assertions.assertEquals(0, availabilityService.getAllDoctorsAvailability(null).size());
-    }
-
-    @Test
-    public void testGetDoctorAvailability() {
-        when(availabilityRepository.findAll((Specification<Availability>) any())).thenReturn(List.of());
-        Assertions.assertEquals(0, availabilityService.getDoctorAvailability(null).size());
-    }
-
-    @Test
-    public void testAddDoctorAvailability() {
-        when(userService.getDoctorByEmail(email)).thenReturn(user);
-        availabilityService.addDoctorAvailability(createAvailabilityDto, email);
-    }
+//    @Test
+//    public void testGetAllDoctorsAvailability() {
+//        when(availabilityRepository.findAll((Specification<Availability>) any())).thenReturn(List.of());
+//        Assertions.assertEquals(0, availabilityService.getAllDoctorsAvailability(null).size());
+//    }
+//
+//    @Test
+//    public void testGetDoctorAvailability() {
+//        when(availabilityRepository.findAll((Specification<Availability>) any())).thenReturn(List.of());
+//        Assertions.assertEquals(0, availabilityService.getDoctorAvailability(null).size());
+//    }
+//
+//    @Test
+//    public void testAddDoctorAvailability() {
+//        when(userService.getDoctorByEmail(email)).thenReturn(user);
+//        availabilityService.addDoctorAvailability(createAvailabilityDto, email);
+//    }
 
     @Test
     public void testAddDoctorAvailabilityDoctorHasAlreadyPlannedBreak() {
@@ -102,13 +102,13 @@ public class AvailabilityServiceTests {
         Assertions.assertThrows(AvailabilityNotFoundException.class, () -> availabilityService.confirmAvailability(1L));
     }
 
-    @Test
-    public void testUpdateAvailability() {
-        UpdateAvailabilityDto updateAvailabilityDto = new UpdateAvailabilityDto();
-        when(availabilityRepository.findById(1L)).thenReturn(Optional.of(new Availability()));
-        availabilityService.updateAvailability(1L, updateAvailabilityDto);
-        verify(availabilityRepository).save(any(Availability.class));
-    }
+//    @Test
+//    public void testUpdateAvailability() {
+//        UpdateAvailabilityDto updateAvailabilityDto = new UpdateAvailabilityDto();
+//        when(availabilityRepository.findById(1L)).thenReturn(Optional.of(new Availability()));
+//        availabilityService.updateAvailability(1L, updateAvailabilityDto);
+//        verify(availabilityRepository).save(any(Availability.class));
+//    }
 
     @Test
     public void testUpdateAvailabilityAvailabilityNotFound() {

@@ -39,6 +39,9 @@ public class AppointmentControllerTests {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private AppointmentMapper appointmentMapper;
+
     @InjectMocks
     private AppointmentController appointmentController;
 
@@ -117,16 +120,26 @@ public class AppointmentControllerTests {
 
     @Test
     public void testGetAppointments() {
-        when(appointmentService.getAppointments(null)).thenReturn(List.of(appointment));
-        ResponseEntity<List<Appointment>> response = appointmentController.getAppointments(null);
+        GetAppointmentDto expectedDto = new GetAppointmentDto();
+        expectedDto.setAppointmentId(1L);
+        expectedDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
+        expectedDto.setAppointmentStartTime(String.valueOf(LocalTime.of(12, 0)));
+        expectedDto.setAppointmentEndTime(String.valueOf(LocalTime.of(13, 0)));
+
+        when(appointmentService.getAppointments(null)).thenReturn(List.of(expectedDto));
+
+        ResponseEntity<List<GetAppointmentDto>> response = appointmentController.getAppointments(null);
+
         verify(appointmentService).getAppointments(null);
-        Assertions.assertEquals(List.of(appointment), response.getBody());
+        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
+        Assertions.assertEquals(expectedDto.getAppointmentId(), response.getBody().get(0).getAppointmentId());
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
+
     @Test
     public void testGetAppointmentById() {
-        GetAppointmentDtoV2 getAppointmentDtoV2 = AppointmentMapper.toGetAppointmentDtoV2(appointment);
+        GetAppointmentDtoV2 getAppointmentDtoV2 = new GetAppointmentDtoV2();
         when(appointmentService.getAppointmentByIdDto(1L)).thenReturn(getAppointmentDtoV2);
         ResponseEntity<GetAppointmentDtoV2> response = appointmentController.getAppointmentById(1L);
         verify(appointmentService).getAppointmentByIdDto(1L);
@@ -136,7 +149,7 @@ public class AppointmentControllerTests {
 
     @Test
     public void testGetPatientAppointments() {
-        GetAppointmentDto getAppointmentDto = AppointmentMapper.toGetAppointmentDto(appointment);
+        GetAppointmentDto getAppointmentDto = new GetAppointmentDto();
         String patientEmail = "test@mail.com";
         when(jwtService.extractEmail("test")).thenReturn(patientEmail);
         when(appointmentService.getPatientAppointments(patientEmail)).thenReturn(List.of(getAppointmentDto));
@@ -148,12 +161,12 @@ public class AppointmentControllerTests {
 
     @Test
     public void testGetDoctorAppointments() {
+        GetAppointmentDtoV3 getAppointmentDtoV3 = new GetAppointmentDtoV3();
         String doctorEmail = "test2@mail.com";
         when(jwtService.extractEmail("test")).thenReturn(doctorEmail);
-        when(appointmentService.getDoctorAppointments(doctorEmail, null)).thenReturn(List.of(AppointmentMapper.toGetAppointmentDtoV3(appointment)));
+        when(appointmentService.getDoctorAppointments(doctorEmail, null)).thenReturn(List.of(getAppointmentDtoV3));
         ResponseEntity<List<GetAppointmentDtoV3>> response = appointmentController.getDoctorAppointments("Bearer test", null);
         verify(appointmentService).getDoctorAppointments(doctorEmail, null);
-        GetAppointmentDtoV3 getAppointmentDtoV3 = AppointmentMapper.toGetAppointmentDtoV3(appointment);
         Assertions.assertEquals(getAppointmentDtoV3.getAppointmentId(), Objects.requireNonNull(response.getBody()).getFirst().getAppointmentId());
         Assertions.assertEquals(getAppointmentDtoV3.getAppointmentDate(), response.getBody().getFirst().getAppointmentDate());
         Assertions.assertEquals(getAppointmentDtoV3.getAppointmentStartTime(), response.getBody().getFirst().getAppointmentStartTime());

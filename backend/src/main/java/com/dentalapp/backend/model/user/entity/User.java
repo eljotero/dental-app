@@ -1,7 +1,6 @@
 package com.dentalapp.backend.model.user.entity;
 
 import com.dentalapp.backend.model.enums.UserType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,17 +13,14 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "users", indexes = {
-        @Index(name = "idx_email", columnList = "email"),
-        @Index(name = "idx_user_type", columnList = "user_type"),
-        @Index(name = "idx_email_user_type", columnList = "email, user_type")
-})
+@Table(name = "users")
 @Getter
 @Setter
+@SequenceGenerator(name="user_id_seq", sequenceName = "user_id_seq")
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
-    @SequenceGenerator(name = "user_id_seq", sequenceName = "user_id_seq", initialValue = 50, allocationSize = 1)
     @Column(name = "user_id")
     private Long userId;
 
@@ -38,7 +34,6 @@ public class User implements UserDetails {
     private String email;
 
     @Column(name = "password", nullable = false)
-    @JsonIgnore
     private String password;
 
     @Column(name = "phone_number", nullable = false)
@@ -48,8 +43,7 @@ public class User implements UserDetails {
     private Boolean sex;
 
     @Column(name = "personal_id_number", nullable = false)
-    @JsonIgnore
-    private String personalId;
+    private String personalIdNumber;
 
     @Column(name = "country", nullable = false)
     private String country;
@@ -58,12 +52,11 @@ public class User implements UserDetails {
     private String city;
 
     @Column(name = "address_line", nullable = false)
-    private String address;
+    private String addressLine;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
-    @JsonIgnore
-    private UserType userType;
+    private UserType userType = UserType.PATIENT;
 
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
@@ -72,62 +65,51 @@ public class User implements UserDetails {
     private LocalDate dateOfBirth;
 
     @Column(name = "is_enabled", nullable = false)
-    @JsonIgnore
     private Boolean isEnabled = false;
 
     @Column(name = "is_non_expired", nullable = false)
-    @JsonIgnore
     private Boolean isAccountNonExpired = true;
 
     @Column(name = "is_non_locked", nullable = false)
-    @JsonIgnore
     private Boolean isAccountNonLocked = true;
 
     @Column(name = "is_credentials_non_expired", nullable = false)
-    @JsonIgnore
     private Boolean isCredentialsNonExpired = true;
 
-    @Column(name="language", nullable = false)
-    private String language;
+    @Column(name = "language", nullable = false)
+    private String language = "en";
 
     @Override
-    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + userType.name()));
     }
 
     @Override
-    @JsonIgnore
     public String getPassword() {
         return password;
     }
 
     @Override
-    @JsonIgnore
     public String getUsername() {
         return email;
     }
 
     @Override
-    @JsonIgnore
     public boolean isAccountNonExpired() {
         return isAccountNonExpired;
     }
 
     @Override
-    @JsonIgnore
     public boolean isAccountNonLocked() {
         return isAccountNonLocked;
     }
 
     @Override
-    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return isCredentialsNonExpired;
     }
 
     @Override
-    @JsonIgnore
     public boolean isEnabled() {
         return isEnabled;
     }

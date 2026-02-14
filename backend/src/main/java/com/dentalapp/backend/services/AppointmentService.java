@@ -8,9 +8,10 @@ import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
-import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
+import com.dentalapp.backend.model.prescription.dtos.PrescriptionMapper;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.user.entity.User;
+import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
@@ -35,38 +37,30 @@ public class AppointmentService {
 
     private final InvoiceService invoiceService;
 
-    private final PrescriptionService prescriptionService;
-
     private final FileService fileService;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, UserService userService, AvailabilityService availabilityService, EmailSenderService emailSenderService, InvoiceService invoiceService, PrescriptionService prescriptionService, FileService fileService) {
-        this.appointmentRepository = appointmentRepository;
-        this.userService = userService;
-        this.availabilityService = availabilityService;
-        this.emailSenderService = emailSenderService;
-        this.invoiceService = invoiceService;
-        this.prescriptionService = prescriptionService;
-        this.fileService = fileService;
-    }
+    private final AppointmentMapper appointmentMapper;
 
-    public List<Appointment> getAppointments(LocalDate date) {
+    private final PrescriptionMapper prescriptionMapper;
+
+    public List<GetAppointmentDto> getAppointments(LocalDate date) {
         if (date == null) {
-            return appointmentRepository.findAll();
+            return appointmentRepository.findAll().stream().map(appointmentMapper::toGetAppointmentDto).toList();
         }
-        return appointmentRepository.findAllByDate(date);
+        return appointmentRepository.findAllByDate(date).stream().map(appointmentMapper::toGetAppointmentDto).toList();
     }
 
     public List<GetAppointmentDto> getPatientAppointments(String patientEmail) {
         Long patientId = userService.getPatientByEmail(patientEmail).getUserId();
-        return appointmentRepository.findAllByPatientId(patientId).stream().map(AppointmentMapper::toGetAppointmentDto).toList();
+        return appointmentRepository.findAllByPatientId(patientId).stream().map(appointmentMapper::toGetAppointmentDto).toList();
     }
 
     public List<GetAppointmentDtoV3> getDoctorAppointments(String doctorEmail, LocalDate date) {
         Long doctorId = userService.getDoctorByEmail(doctorEmail).getUserId();
         if(date == null) {
-            return appointmentRepository.findAllByDoctorId(doctorId).stream().map(AppointmentMapper::toGetAppointmentDtoV3).toList();
+            return appointmentRepository.findAllByDoctorId(doctorId).stream().map(appointmentMapper::toGetAppointmentDtoV3).toList();
         }
-        return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date).stream().map(AppointmentMapper::toGetAppointmentDtoV3).toList();
+        return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date).stream().map(appointmentMapper::toGetAppointmentDtoV3).toList();
     }
 
     public List<Appointment> getDoctorAppointmentsByDate(String doctorEmail, LocalDate date) {
@@ -81,13 +75,13 @@ public class AppointmentService {
     @Transactional
     public GetAppointmentDtoV2 getAppointmentByIdDto(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
-        return AppointmentMapper.toGetAppointmentDtoV2(appointment);
+        return appointmentMapper.toGetAppointmentDtoV2(appointment);
     }
 
     @Transactional
     public GetAppointmentDtoV4 getAppointmentByIdDtoV4(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
-        return AppointmentMapper.toGetAppointmentDtoV4(appointment);
+        return appointmentMapper.toGetAppointmentDtoV4(appointment);
     }
 
     public Appointment getAppointmentById(Long appointmentId) {
@@ -110,7 +104,7 @@ public class AppointmentService {
         }
         createAppointmentDto.setPatient(patient);
         createAppointmentDto.setDoctor(doctor);
-        Appointment appointment = AppointmentMapper.toAppointment(createAppointmentDto);
+        Appointment appointment = appointmentMapper.toAppointment(createAppointmentDto);
         Invoice invoice = invoiceService.createInvoice();
         appointment.setInvoice(invoice);
         appointmentRepository.save(appointment);
@@ -127,7 +121,7 @@ public class AppointmentService {
             }
         });
         appointment.setDoctor(doctor);
-        Appointment appointmentDB = AppointmentMapper.toUpdateAppointment(appointment, updateAppointmentDto);
+        Appointment appointmentDB = appointmentMapper.toUpdateAppointment(appointment, updateAppointmentDto);
         appointmentRepository.save(appointmentDB);
     }
 
@@ -160,8 +154,8 @@ public class AppointmentService {
     @Transactional
     public void addPrescriptionsToAppointment(Long appointmentId, CreatePrescriptionDto createPrescriptionsDto) {
         Appointment appointment = getAppointmentById(appointmentId);
-        List<Prescription> prescriptionList = prescriptionService.addPrescriptions(createPrescriptionsDto, appointment);
-        appointment.setPrescriptions(prescriptionList);
+        Prescription prescription = prescriptionMapper.toEntity(createPrescriptionsDto, appointment);
+        appointment.getPrescriptions().add(prescription);
         appointmentRepository.save(appointment);
     }
 

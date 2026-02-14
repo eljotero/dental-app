@@ -1,9 +1,11 @@
 package com.dentalapp.backend.model.treatment.dtos;
 
 import jakarta.validation.constraints.Positive;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class UpdateTreatmentDto {
 
     private String treatmentName;

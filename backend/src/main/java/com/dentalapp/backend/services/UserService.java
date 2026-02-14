@@ -1,12 +1,13 @@
 package com.dentalapp.backend.services;
 
 import com.dentalapp.backend.configuration.JwtService;
-import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.user.dtos.*;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
+import com.dentalapp.backend.model.user.exceptions.UserAuthenticationException;
 import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
 import com.dentalapp.backend.model.user.repostitory.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -31,14 +33,7 @@ public class UserService {
 
     private final EmailSenderService emailSenderService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService, ConfirmationTokenService confirmationTokenService, EmailSenderService emailSenderService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-        this.confirmationTokenService = confirmationTokenService;
-        this.emailSenderService = emailSenderService;
-    }
+    private final UserMapper userMapper;
 
     @Transactional
     public void createUser(CreateUserDto createUserDto) {
@@ -47,8 +42,7 @@ public class UserService {
         }
         createUserDto.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
         createUserDto.setPersonalIdNumber(passwordEncoder.encode(createUserDto.getPersonalIdNumber()));
-        User user = UserMapper.toUser(createUserDto);
-        user.setUserType(UserType.PATIENT);
+        User user = userMapper.toUser(createUserDto);
         userRepository.save(user);
         String tokenCode = confirmationTokenService.saveConfirmationToken(user);
         String link = "http://localhost:8080/api/user/confirm?token=" + tokenCode;
@@ -65,28 +59,42 @@ public class UserService {
 
     public LoginUserDtoResponse loginUser(LoginUserDto loginUserDto) {
         User user = getUser(loginUserDto.getEmail());
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUserDto.getEmail(), loginUserDto.getPassword()));
+        if(!user.isEnabled()) {
+            throw new UserAuthenticationException("User with email " + loginUserDto.getEmail() + " is not enabled");
+        }
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUserDto.getEmail(), loginUserDto.getPassword()));
+        } catch (Exception e) {
+            throw new UserAuthenticationException("Invalid email or password");
+        }
         String token = jwtService.generateToken(user);
-        return UserMapper.toResponse(user, token);
+        return userMapper.toResponse(user, token);
     }
 
     @Transactional
     public void updateUser(UpdateUserDto updateUserDto, String userEmail) {
         User user = getUser(userEmail);
-        User updatedUserData = UserMapper.toUpdateUser(user, updateUserDto);
+        User updatedUserData = userMapper.toUpdateUser(user, updateUserDto);
         userRepository.save(updatedUserData);
+    }
+
+    public GetUserDto getUserData(String userEmail) {
+        User user = getUser(userEmail);
+        return userMapper.toGetUserDto(user);
     }
 
     public User getUser(String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
         if (user.isEmpty()) {
-            throw new UserNotFoundException("User with email " + userEmail + " does not exist");
+            throw new UserNotFoundException("User with em1ail " + userEmail + " does not exist");
         }
         return user.orElse(null);
     }
 
     public List<GetDoctorDto> getDoctors() {
-        return userRepository.findAllDoctors().stream().map(UserMapper::toGetDoctorDto).toList();
+        return userRepository.findAllDoctors().stream()
+                .map(userMapper::toGetDoctorDto)
+                .toList();
     }
 
     public User getPatientById(Long patientId) {
@@ -107,12 +115,17 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("Doctor not found"));
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<GetUserDto> getAllUsers() {
+        return userRepository.findAll().stream().map(userMapper::toGetUserDto).toList();
     }
 
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    public GetUserDto getUserByIdDto(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return userMapper.toGetUserDto(user);
     }
 
     @Transactional

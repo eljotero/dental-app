@@ -4,6 +4,7 @@ import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.ReferralController;
 import com.dentalapp.backend.model.referral.dtos.CreateReferralDto;
 import com.dentalapp.backend.model.referral.dtos.CreateReferralsDto;
+import com.dentalapp.backend.model.referral.dtos.GetReferralDto;
 import com.dentalapp.backend.model.referral.dtos.UpdateReferralDto;
 import com.dentalapp.backend.model.referral.entity.Referral;
 import com.dentalapp.backend.services.ReferralService;
@@ -45,6 +46,8 @@ public class ReferralControllerTests {
 
     private UpdateReferralDto updateReferralDto;
 
+    private GetReferralDto getReferralDto;
+
     private final String token = "Bearer test@mail.com";
 
     private final String email = "test@mail.com";
@@ -73,6 +76,8 @@ public class ReferralControllerTests {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
+
+        getReferralDto = new GetReferralDto();
     }
 
     @Test
@@ -91,25 +96,25 @@ public class ReferralControllerTests {
 
     @Test
     public void testGetAllReferrals() {
-        when(referralService.findAll()).thenReturn(List.of(referral));
-        ResponseEntity<List<Referral>> response = referralController.getAllReferrals();
+        when(referralService.findAll()).thenReturn(List.of(getReferralDto));
+        ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferrals();
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
     }
 
     @Test
     public void testGetReferralById() {
-        when(referralService.findById(1L)).thenReturn(referral);
-        ResponseEntity<Referral> response = referralController.getReferralById(1L);
+        when(referralService.findById(1L)).thenReturn(getReferralDto);
+        ResponseEntity<GetReferralDto> response = referralController.getReferralById(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(referral, response.getBody());
+        Assertions.assertEquals(getReferralDto, response.getBody());
     }
 
     @Test
     public void testGetAllReferralsByPatient() {
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
-        when(referralService.findAllByPatient(email)).thenReturn(List.of(referral));
-        ResponseEntity<List<Referral>> response = referralController.getAllReferralsByPatient(token);
+        when(referralService.findAllByPatient(email)).thenReturn(List.of(getReferralDto));
+        ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferralsByPatient(token);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
     }
@@ -117,8 +122,8 @@ public class ReferralControllerTests {
     @Test
     public void testGetAllReferralsByDoctor() {
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
-        when(referralService.findAllByDoctor(email)).thenReturn(List.of(referral));
-        ResponseEntity<List<Referral>> response = referralController.getAllReferralsByDoctor(token);
+        when(referralService.findAllByDoctor(email)).thenReturn(List.of(getReferralDto));
+        ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferralsByDoctor(token);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
     }

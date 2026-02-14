@@ -7,6 +7,7 @@ import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.FileService;
 import com.dentalapp.backend.services.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,16 +17,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/files")
+@AllArgsConstructor
 public class FileController {
-    private final FileService fileService;
-    private final AppointmentService appointmentService;
-    private final UserService userService;
 
-    public FileController(FileService fileService, AppointmentService appointmentService, UserService userService) {
-        this.fileService = fileService;
-        this.appointmentService = appointmentService;
-        this.userService = userService;
-    }
+    private final FileService fileService;
+
+    private final AppointmentService appointmentService;
+
+    private final UserService userService;
 
     @GetMapping("/{id}")
     public ResponseEntity<GetDownloadFileDto> getFileById(@PathVariable Long id) {

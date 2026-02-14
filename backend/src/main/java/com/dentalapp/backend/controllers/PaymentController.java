@@ -5,6 +5,7 @@ import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.services.InvoiceService;
 import com.dentalapp.backend.services.PaymentService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,16 +15,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
+@AllArgsConstructor
 public class PaymentController {
 
     private final InvoiceService invoiceService;
 
     private final PaymentService paymentService;
-
-    public PaymentController(InvoiceService invoiceService, PaymentService paymentService) {
-        this.invoiceService = invoiceService;
-        this.paymentService = paymentService;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<Invoice>> getAllInvoices(@RequestParam(required = false) String status, @RequestParam(required = false) String method, @RequestParam(required = false) LocalDate date) {

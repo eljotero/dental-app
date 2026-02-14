@@ -12,9 +12,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetAppointmentDtoV3 {
+
     private Long appointmentId;
+
     private String patientInfo;
+
     private LocalDate appointmentDate;
+
     private String appointmentStartTime;
+
     private String appointmentEndTime;
 }

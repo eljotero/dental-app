@@ -5,15 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "treatments", indexes = {
-        @Index(name = "idx_treatment_name", columnList = "treatment_name")
-})
+@Table(name = "treatments")
 @Getter
 @Setter
+@SequenceGenerator(name="treatment_id_seq", sequenceName = "treatment_id_seq")
 public class Treatment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "treatment_id_seq")
-    @SequenceGenerator(name = "treatment_id_seq", sequenceName = "treatment_id_seq", initialValue = 50, allocationSize = 1)
     @Column(name = "treatment_id")
     private Long treatmentId;
 

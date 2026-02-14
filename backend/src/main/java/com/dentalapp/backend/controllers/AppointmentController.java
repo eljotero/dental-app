@@ -2,9 +2,9 @@ package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.appointment.dtos.*;
-import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.services.AppointmentService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,19 +14,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/appointments")
+@AllArgsConstructor
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
     private final JwtService jwtService;
 
-    public AppointmentController(AppointmentService appointmentService, JwtService jwtService) {
-        this.appointmentService = appointmentService;
-        this.jwtService = jwtService;
-    }
-
     @GetMapping("/all")
-    public ResponseEntity<List<Appointment>> getAppointments(@RequestParam(required = false) LocalDate date) {
+    public ResponseEntity<List<GetAppointmentDto>> getAppointments(@RequestParam(required = false) LocalDate date) {
         return ResponseEntity.ok(appointmentService.getAppointments(date));
     }
 

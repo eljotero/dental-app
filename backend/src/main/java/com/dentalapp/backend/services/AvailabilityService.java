@@ -6,6 +6,7 @@ import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyEx
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityNotFoundException;
 import com.dentalapp.backend.model.availability.repository.AvailabilityRepository;
 import com.dentalapp.backend.model.user.entity.User;
+import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,23 +16,21 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class AvailabilityService {
 
     private final AvailabilityRepository availabilityRepository;
 
     private final UserService userService;
 
-    public AvailabilityService(AvailabilityRepository availabilityRepository, UserService userService) {
-        this.availabilityRepository = availabilityRepository;
-        this.userService = userService;
-    }
+    private final AvailabilityMapper availabilityMapper;
 
     public List<GetAvailabilityDto> getAllDoctorsAvailability(Specification<Availability> spec) {
-        return availabilityRepository.findAll(spec).stream().map(AvailabilityMapper::toDto).toList();
+        return availabilityRepository.findAll(spec).stream().map(availabilityMapper::toDto).toList();
     }
 
     public List<GetAvailabilityDto> getDoctorAvailability(Specification<Availability> spec) {
-        return availabilityRepository.findAll(spec).stream().map(AvailabilityMapper::toDto).toList();
+        return availabilityRepository.findAll(spec).stream().map(availabilityMapper::toDto).toList();
     }
 
     public List<Availability> getDoctorAvailability(Long doctorId, LocalDate date) {
@@ -45,7 +44,7 @@ public class AvailabilityService {
         createAvailabilityDto.setDoctor(doctor);
         for (AvailabilityDayDto availabilityDayDto : createAvailabilityDto.getAvailabilityDays()) {
             if (!isAvailabilityExists(availabilityDayDto, doctor)) {
-                Availability availability = AvailabilityMapper.toAvailability(availabilityDayDto, doctor);
+                Availability availability = availabilityMapper.toAvailability(availabilityDayDto, doctor);
                 availabilityRepository.save(availability);
             } else {
                 throw new AvailabilityAlreadyExistsException("Availability already exists");
@@ -63,7 +62,7 @@ public class AvailabilityService {
     @Transactional
     public void updateAvailability(Long id, UpdateAvailabilityDto updateAvailabilityDto) {
         Availability availability = availabilityRepository.findById(id).orElseThrow(() -> new AvailabilityNotFoundException("Availability not found"));
-        Availability updatedAvailability = AvailabilityMapper.updateAvailability(availability, updateAvailabilityDto);
+        Availability updatedAvailability = availabilityMapper.updateAvailability(availability, updateAvailabilityDto);
         availabilityRepository.save(updatedAvailability);
     }
 

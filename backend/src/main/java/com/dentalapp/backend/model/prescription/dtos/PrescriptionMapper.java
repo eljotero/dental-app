@@ -2,40 +2,28 @@ package com.dentalapp.backend.model.prescription.dtos;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
+import org.mapstruct.*;
 
-public class PrescriptionMapper {
-    public static Prescription toEntity(CreatePrescriptionDto createPrescriptionDto, Appointment appointment) {
-        Prescription prescription = new Prescription();
-        prescription.setMedicine(createPrescriptionDto.getMedicineName());
-        prescription.setDosage(createPrescriptionDto.getDosage());
-        prescription.setAppointment(appointment);
-        return prescription;
-    }
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface PrescriptionMapper {
 
-    public static Prescription toUpdateEntity(Prescription prescription, UpdatePrescriptionDto updatePrescriptionDto) {
-        if(updatePrescriptionDto.getDosage() != null && !updatePrescriptionDto.getDosage().equals(prescription.getDosage())) {
-            prescription.setDosage(updatePrescriptionDto.getDosage());
-        }
-        if(updatePrescriptionDto.getMedicineName() != null && !updatePrescriptionDto.getMedicineName().equals(prescription.getMedicine())) {
-            prescription.setMedicine(updatePrescriptionDto.getMedicineName());
-        }
-        return prescription;
-    }
+    @Mapping(source = "createPrescriptionDto.medicineName", target = "medicine")
+    @Mapping(source = "createPrescriptionDto.dosage", target = "dosage")
+    @Mapping(source = "appointment", target = "appointment")
+    Prescription toEntity(CreatePrescriptionDto createPrescriptionDto, Appointment appointment);
 
-    public static GetPrescriptionDto toGetPrescriptionDto(Prescription prescription) {
-        GetPrescriptionDto getPrescriptionDto = new GetPrescriptionDto();
-        getPrescriptionDto.setPrescriptionId(prescription.getPrescriptionId());
-        getPrescriptionDto.setMedicineName(prescription.getMedicine());
-        getPrescriptionDto.setDosage(prescription.getDosage());
-        getPrescriptionDto.setAppointmentId(prescription.getAppointment().getAppointmentId());
-        return getPrescriptionDto;
-    }
+    @Mapping(source = "updatePrescriptionDto.medicineName", target = "medicine")
+    @Mapping(source = "updatePrescriptionDto.dosage", target = "dosage")
+    Prescription toUpdateEntity(@MappingTarget Prescription prescription, UpdatePrescriptionDto updatePrescriptionDto);
 
-    public static GetPrescriptionDtoV2 toGetPrescriptionDtoV2(Prescription prescription) {
-        GetPrescriptionDtoV2 getPrescriptionDtoV2 = new GetPrescriptionDtoV2();
-        getPrescriptionDtoV2.setPrescriptionId(prescription.getPrescriptionId());
-        getPrescriptionDtoV2.setDosage(prescription.getDosage());
-        getPrescriptionDtoV2.setMedicineName(prescription.getMedicine());
-        return getPrescriptionDtoV2;
-    }
+    @Mapping(source = "prescriptionId", target = "prescriptionId")
+    @Mapping(source = "medicine", target = "medicineName")
+    @Mapping(source = "dosage", target = "dosage")
+    @Mapping(source = "appointment.appointmentId", target = "appointmentId")
+    GetPrescriptionDto toGetPrescriptionDto(Prescription prescription);
+
+    @Mapping(source = "prescriptionId", target = "prescriptionId")
+    @Mapping(source = "medicine", target = "medicineName")
+    @Mapping(source = "dosage", target = "dosage")
+    GetPrescriptionDtoV2 toGetPrescriptionDtoV2(Prescription prescription);
 }

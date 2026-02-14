@@ -16,17 +16,30 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetAppointmentDtoV4 {
+
     private String patientName;
+
     private String patientLastName;
+
     private String patientPhoneNumber;
+
     private LocalDate appointmentDate;
+
     private String appointmentStartTime;
+
     private String appointmentEndTime;
+
     private String description;
+
     private boolean isConfirmed;
+
     private boolean isCancelled;
+
     private boolean isPaid;
+
     private ArrayList<GetPrescriptionDtoV2> prescriptions;
+
     private ArrayList<GetReferralDto> referrals;
+
     private ArrayList<GetFileDto> files;
 }

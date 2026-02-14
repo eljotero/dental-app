@@ -2,50 +2,42 @@ package com.dentalapp.backend.model.availability.dtos;
 
 import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.model.user.entity.User;
+import org.mapstruct.*;
 
 import java.time.LocalTime;
 
-public class AvailabilityMapper {
-    public static Availability toAvailability(AvailabilityDayDto availabilityDayDto, User doctor) {
-        Availability availability = new Availability();
-        availability.setAvailabilityDate(availabilityDayDto.getDate());
-        availability.setAvailabilityStartTime(LocalTime.parse(availabilityDayDto.getStartTime()));
-        availability.setAvailabilityEndTime(LocalTime.parse(availabilityDayDto.getEndTime()));
-        availability.setDoctor(doctor);
-        if(availabilityDayDto.getBrakeTimeStart() != null && availabilityDayDto.getBrakeTimeEnd() != null) {
-            availability.setBrakeTimeStart(LocalTime.parse(availabilityDayDto.getBrakeTimeStart()));
-            availability.setBrakeTimeEnd(LocalTime.parse(availabilityDayDto.getBrakeTimeEnd()));
-        }
-        return availability;
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface AvailabilityMapper {
+
+    @Mapping(target = "date", source = "availabilityDate")
+    @Mapping(target = "startTime", source = "availabilityStartTime")
+    @Mapping(target = "endTime", source = "availabilityEndTime")
+    @Mapping(target = "confirmed", source = "isConfirmed")
+    GetAvailabilityDto toDto(Availability availability);
+
+    @Mapping(target = "availabilityStartTime", source = "startTime", qualifiedByName = "stringToLocalTime")
+    @Mapping(target = "availabilityEndTime", source = "endTime", qualifiedByName = "stringToLocalTime")
+    @Mapping(target = "brakeTimeStart", source = "brakeTimeStart", qualifiedByName = "stringToLocalTime")
+    @Mapping(target = "brakeTimeEnd", source = "brakeTimeEnd", qualifiedByName = "stringToLocalTime")
+    @Mapping(target = "availabilityId", ignore = true)
+    @Mapping(target = "availabilityDate", ignore = true)
+    @Mapping(target = "doctor", ignore = true)
+    @Mapping(target = "isConfirmed", ignore = true)
+    Availability updateAvailability(@MappingTarget Availability availability, UpdateAvailabilityDto updateAvailabilityDto);
+
+    @Named("stringToLocalTime")
+    default LocalTime stringToLocalTime(String time) {
+        return time != null ? LocalTime.parse(time) : null;
     }
 
-    public static GetAvailabilityDto toDto(Availability availability) {
-        GetAvailabilityDto availabilityDayDto = new GetAvailabilityDto();
-        availabilityDayDto.setAvailabilityId(availability.getAvailabilityId());
-        availabilityDayDto.setDate(availability.getAvailabilityDate());
-        availabilityDayDto.setStartTime(availability.getAvailabilityStartTime());
-        availabilityDayDto.setEndTime(availability.getAvailabilityEndTime());
-        if(availability.getBrakeTimeStart() != null && availability.getBrakeTimeEnd() != null) {
-            availabilityDayDto.setBrakeTimeStart(availability.getBrakeTimeStart());
-            availabilityDayDto.setBrakeTimeEnd(availability.getBrakeTimeEnd());
-        }
-        availabilityDayDto.setConfirmed(availability.getIsConfirmed());
-        return availabilityDayDto;
-    }
+    @Mapping(target = "availabilityDate", source = "availabilityDayDto.date")
+    @Mapping(target = "availabilityStartTime", source = "availabilityDayDto.startTime", qualifiedByName = "stringToLocalTime")
+    @Mapping(target = "availabilityEndTime", source = "availabilityDayDto.endTime", qualifiedByName = "stringToLocalTime")
+    @Mapping(target = "brakeTimeStart", source = "availabilityDayDto.brakeTimeStart", qualifiedByName = "stringToLocalTime")
+    @Mapping(target = "brakeTimeEnd", source = "availabilityDayDto.brakeTimeEnd", qualifiedByName = "stringToLocalTime")
+    @Mapping(target = "doctor", source = "doctor")
+    @Mapping(target = "availabilityId", ignore = true)
+    @Mapping(target = "isConfirmed", ignore = true)
+    Availability toAvailability(AvailabilityDayDto availabilityDayDto, User doctor);
 
-    public static Availability updateAvailability(Availability availability, UpdateAvailabilityDto updateAvailabilityDto) {
-        if(updateAvailabilityDto.getStartTime() != null) {
-            availability.setAvailabilityStartTime(LocalTime.parse(updateAvailabilityDto.getStartTime()));
-        }
-        if(updateAvailabilityDto.getEndTime() != null) {
-            availability.setAvailabilityEndTime(LocalTime.parse(updateAvailabilityDto.getEndTime()));
-        }
-        if(updateAvailabilityDto.getBrakeTimeStart() != null) {
-            availability.setBrakeTimeStart(LocalTime.parse(updateAvailabilityDto.getBrakeTimeStart()));
-        }
-        if(updateAvailabilityDto.getBrakeTimeEnd() != null) {
-            availability.setBrakeTimeEnd(LocalTime.parse(updateAvailabilityDto.getBrakeTimeEnd()));
-        }
-        return availability;
-    }
 }

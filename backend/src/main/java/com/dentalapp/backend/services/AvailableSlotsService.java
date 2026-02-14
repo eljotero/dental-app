@@ -2,6 +2,7 @@ package com.dentalapp.backend.services;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.availability.entity.Availability;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -12,15 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@AllArgsConstructor
 public class AvailableSlotsService {
 
     private final AppointmentService appointmentService;
-    private final AvailabilityService availabilityService;
 
-    public AvailableSlotsService(AppointmentService appointmentService, AvailabilityService availabilityService) {
-        this.appointmentService = appointmentService;
-        this.availabilityService = availabilityService;
-    }
+    private final AvailabilityService availabilityService;
 
     public Map<LocalDate, Map<String, String>> getAvailableSlots(Long doctorId, LocalDate startDate, LocalDate endDate) {
         Map<LocalDate, Map<String, String>> availableSlots = new LinkedHashMap<>();
