@@ -81,4 +81,11 @@ public class UserController {
         userService.changeLanguage(email, changeLanguageDto.getLanguage());
         return ResponseEntity.ok("Language changed successfully");
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token) {
+        String email = jwtService.extractEmail(token.substring(7));
+        userService.deleteUser(email);
+        return ResponseEntity.ok("User deleted successfully");
+    }
 }

@@ -65,10 +65,9 @@ public class FileService {
     }
 
     public void deleteFile(Long id) {
-        if(fileRepository.findById(id).isEmpty()) {
-            throw new FileNotFoundException("File not found");
-        }
-        fileRepository.deleteById(id);
+        File file = fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));
+        file.onDelete();
+        fileRepository.save(file);
     }
 
     private boolean doesFileNameExist(String fileName) {

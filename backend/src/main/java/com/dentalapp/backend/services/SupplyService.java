@@ -50,9 +50,8 @@ public class SupplyService {
 
     @Transactional
     public void removeSupply(Long id) {
-        if (supplyRepository.findById(id).isEmpty()) {
-            throw new SupplyNotFoundException("Supply with id " + id + " not found");
-        }
-        supplyRepository.deleteById(id);
+        Supply supply = supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException("Supply not found"));
+        supply.onDelete();
+        supplyRepository.save(supply);
     }
 }

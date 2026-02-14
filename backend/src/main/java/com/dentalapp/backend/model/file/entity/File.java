@@ -1,18 +1,19 @@
 package com.dentalapp.backend.model.file.entity;
 
+import com.dentalapp.backend.model.AuditClass;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "files")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @SequenceGenerator(name="file_id_seq", sequenceName = "file_id_seq")
-public class File {
+public class File extends AuditClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_id_seq")
@@ -29,10 +30,4 @@ public class File {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointment_id", nullable = false)
     private Appointment appointment;
-
-    @Column(name = "uploaded_at", nullable = false)
-    private LocalDateTime uploadedAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 }

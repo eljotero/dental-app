@@ -1,9 +1,11 @@
 package com.dentalapp.backend.model.user.entity;
 
+import com.dentalapp.backend.model.AuditClass;
 import com.dentalapp.backend.model.enums.UserType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,10 +16,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @SequenceGenerator(name="user_id_seq", sequenceName = "user_id_seq")
-public class User implements UserDetails {
+public class User extends AuditClass implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")

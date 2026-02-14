@@ -39,9 +39,8 @@ public class PrescriptionService {
 
     @Transactional
     public void deletePrescription(Long id) {
-        if (prescriptionRepository.findById(id).isEmpty()) {
-            throw new PrescriptionNotFoundException();
-        }
-        prescriptionRepository.deleteById(id);
+        Prescription prescription = prescriptionRepository.findById(id).orElseThrow(PrescriptionNotFoundException::new);
+        prescription.onDelete();
+        prescriptionRepository.save(prescription);
     }
 }

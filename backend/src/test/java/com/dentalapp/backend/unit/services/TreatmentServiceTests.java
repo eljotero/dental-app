@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -124,7 +123,7 @@ public class TreatmentServiceTests {
     public void testDeleteTreatment() {
         when(treatmentRepository.findById(1L)).thenReturn(Optional.of(treatment));
         treatmentService.deleteTreatment(1L);
-        verify(treatmentRepository).delete(treatment);
+        verify(treatmentRepository).save(treatment);
     }
 
     @Test

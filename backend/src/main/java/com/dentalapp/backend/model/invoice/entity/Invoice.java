@@ -1,19 +1,22 @@
 package com.dentalapp.backend.model.invoice.entity;
 
+import com.dentalapp.backend.model.AuditClass;
 import com.dentalapp.backend.model.enums.PaymentStatus;
 import com.dentalapp.backend.model.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "invoices")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @SequenceGenerator(name="invoice_id_seq", sequenceName = "invoice_id_seq")
-public class Invoice {
+public class Invoice extends AuditClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "invoice_id_seq")

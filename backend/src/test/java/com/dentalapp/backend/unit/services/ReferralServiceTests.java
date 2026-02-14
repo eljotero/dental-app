@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ReferralServiceTests {
@@ -90,7 +91,8 @@ public class ReferralServiceTests {
 
     @Test
     public void testDeleteReferral() {
+        when(referralRepository.findById(1L)).thenReturn(java.util.Optional.of(referral));
         referralService.deleteReferral(1L);
-        verify(referralRepository).deleteById(1L);
+        verify(referralRepository).save(referral);
     }
 }

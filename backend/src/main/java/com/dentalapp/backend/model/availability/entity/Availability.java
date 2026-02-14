@@ -1,19 +1,22 @@
 package com.dentalapp.backend.model.availability.entity;
 
+import com.dentalapp.backend.model.AuditClass;
 import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "availabilities")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @SequenceGenerator(name="availability_id_seq", sequenceName = "availability_id_seq")
-public class Availability {
+public class Availability extends AuditClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "availability_id_seq")
