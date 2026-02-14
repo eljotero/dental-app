@@ -1,16 +1,19 @@
 package com.dentalapp.backend.model.referral.entity;
 
+import com.dentalapp.backend.model.AuditClass;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "referrals")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @SequenceGenerator(name="referral_id_seq", sequenceName = "referral_id_seq")
-public class Referral {
+public class Referral extends AuditClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "referral_id_seq")

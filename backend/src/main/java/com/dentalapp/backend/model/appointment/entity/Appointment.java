@@ -1,5 +1,6 @@
 package com.dentalapp.backend.model.appointment.entity;
 
+import com.dentalapp.backend.model.AuditClass;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
@@ -19,7 +20,7 @@ import java.util.List;
 @SequenceGenerator(name="appointment_id_seq", sequenceName = "appointment_id_seq")
 @Getter
 @Setter
-public class Appointment {
+public class Appointment extends AuditClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointment_id_seq")

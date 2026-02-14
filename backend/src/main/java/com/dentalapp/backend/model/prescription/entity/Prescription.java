@@ -1,16 +1,19 @@
 package com.dentalapp.backend.model.prescription.entity;
 
+import com.dentalapp.backend.model.AuditClass;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "prescriptions")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @SequenceGenerator(name = "prescription_id_seq", sequenceName = "prescription_id_seq")
-public class Prescription {
+public class Prescription extends AuditClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "prescription_id_seq")

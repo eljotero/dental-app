@@ -15,18 +15,15 @@ public interface FileMapper {
     @Mapping(target = "fileId", ignore = true)
     @Mapping(target = "fileName", expression = "java(multipartFile.getOriginalFilename())")
     @Mapping(target = "fileData", expression = "java(getBytes(multipartFile))")
-    @Mapping(target = "uploadedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "updatedAt", ignore = true)
     File toEntity(MultipartFile multipartFile);
 
     @Mapping(target = "fileId", ignore = true)
     @Mapping(target = "fileName", expression = "java(shouldUpdateFileName(file, multipartFile) ? multipartFile.getOriginalFilename() : file.getFileName())")
     @Mapping(target = "fileData", expression = "java(shouldUpdateFileData(file, multipartFile) ? getBytes(multipartFile) : file.getFileData())")
-    @Mapping(target = "uploadedAt", ignore = true)
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "updatedAt", ignore = true)
     File toUpdateEntity(@MappingTarget File file, MultipartFile multipartFile);
 
-    @Mapping(target = "uploadedAt", expression = "java(String.valueOf(file.getUploadedAt()))")
     GetFileDto toGetFileDto(File file);
 
     GetDownloadFileDto toGetDownloadFileDto(File file);

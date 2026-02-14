@@ -86,7 +86,7 @@ public class UserService {
     public User getUser(String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
         if (user.isEmpty()) {
-            throw new UserNotFoundException("User with em1ail " + userEmail + " does not exist");
+            throw new UserNotFoundException("User with email " + userEmail + " does not exist");
         }
         return user.orElse(null);
     }
@@ -148,6 +148,13 @@ public class UserService {
     public void changeLanguage(String email, String language) {
         User user = getUser(email);
         user.setLanguage(language);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(String email) {
+        User user = getUser(email);
+        user.onDelete();
         userRepository.save(user);
     }
 }

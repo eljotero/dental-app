@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -100,7 +99,7 @@ public class SupplyServiceTests {
     public void testDeleteSupply() {
         when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.of(supply));
         supplyService.removeSupply(1L);
-        verify(supplyRepository).deleteById(1L);
+        verify(supplyRepository).save(supply);
     }
 
     @Test
