@@ -1,10 +1,11 @@
 package com.dentalapp.backend.model.user.entity;
 
-import com.dentalapp.backend.model.AuditClass;
+import com.dentalapp.backend.model.BaseEntityClass;
 import com.dentalapp.backend.model.enums.UserType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,7 +21,8 @@ import java.util.List;
 @Getter
 @Setter
 @SequenceGenerator(name="user_id_seq", sequenceName = "user_id_seq")
-public class User extends AuditClass implements UserDetails {
+@SQLDelete(sql = "UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ? and version ?")
+public class User extends BaseEntityClass implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")

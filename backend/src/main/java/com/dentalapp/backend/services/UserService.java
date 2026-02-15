@@ -154,7 +154,6 @@ public class UserService {
     @Transactional
     public void deleteUser(String email) {
         User user = getUser(email);
-        user.onDelete();
-        userRepository.save(user);
+        userRepository.delete(user);
     }
 }

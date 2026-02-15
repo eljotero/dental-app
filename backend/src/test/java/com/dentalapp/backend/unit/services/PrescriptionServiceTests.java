@@ -82,7 +82,7 @@ public class PrescriptionServiceTests {
         Prescription prescription = new Prescription();
         when(prescriptionRepository.findById(1L)).thenReturn(Optional.of(prescription));
         prescriptionService.deletePrescription(1L);
-        verify(prescriptionRepository, times(1)).save(prescription);
+        verify(prescriptionRepository, times(1)).delete(prescription);
     }
 
     @Test

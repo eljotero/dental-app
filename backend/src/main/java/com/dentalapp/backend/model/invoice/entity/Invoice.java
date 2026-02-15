@@ -1,11 +1,12 @@
 package com.dentalapp.backend.model.invoice.entity;
 
-import com.dentalapp.backend.model.AuditClass;
+import com.dentalapp.backend.model.BaseEntityClass;
 import com.dentalapp.backend.model.enums.PaymentStatus;
 import com.dentalapp.backend.model.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
@@ -16,7 +17,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @SequenceGenerator(name="invoice_id_seq", sequenceName = "invoice_id_seq")
-public class Invoice extends AuditClass {
+@SQLDelete(sql = "UPDATE invoices SET deleted_at = CURRENT_TIMESTAMP WHERE invoice_id = ? AND version = ?")
+public class Invoice extends BaseEntityClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "invoice_id_seq")

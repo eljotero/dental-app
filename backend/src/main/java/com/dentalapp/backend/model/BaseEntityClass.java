@@ -9,7 +9,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @MappedSuperclass
-public class AuditClass {
+public class BaseEntityClass {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -20,6 +20,9 @@ public class AuditClass {
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
+    @Version
+    private Long version;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
@@ -28,10 +31,6 @@ public class AuditClass {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
-    }
-
-    public void onDelete() {
-        this.deletedAt = Instant.now();
     }
 
 }

@@ -181,4 +181,10 @@ public class AppointmentService {
         }
         return false;
     }
+
+    @Transactional
+    public void deleteAppointment(Long appointmentId) {
+        Appointment appointment = getAppointmentById(appointmentId);
+        appointmentRepository.delete(appointment);
+    }
 }

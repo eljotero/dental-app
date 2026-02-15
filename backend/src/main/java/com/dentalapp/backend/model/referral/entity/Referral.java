@@ -1,10 +1,11 @@
 package com.dentalapp.backend.model.referral.entity;
 
-import com.dentalapp.backend.model.AuditClass;
+import com.dentalapp.backend.model.BaseEntityClass;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -13,7 +14,8 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Setter
 @SequenceGenerator(name="referral_id_seq", sequenceName = "referral_id_seq")
-public class Referral extends AuditClass {
+@SQLDelete(sql = "UPDATE referrals SET deleted_at = CURRENT_TIMESTAMP WHERE referral_id = ? and version ?")
+public class Referral extends BaseEntityClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "referral_id_seq")

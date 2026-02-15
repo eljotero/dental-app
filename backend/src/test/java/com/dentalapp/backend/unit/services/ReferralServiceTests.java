@@ -93,6 +93,6 @@ public class ReferralServiceTests {
     public void testDeleteReferral() {
         when(referralRepository.findById(1L)).thenReturn(java.util.Optional.of(referral));
         referralService.deleteReferral(1L);
-        verify(referralRepository).save(referral);
+        verify(referralRepository).delete(referral);
     }
 }

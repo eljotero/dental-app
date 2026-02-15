@@ -99,7 +99,7 @@ public class SupplyServiceTests {
     public void testDeleteSupply() {
         when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.of(supply));
         supplyService.removeSupply(1L);
-        verify(supplyRepository).save(supply);
+        verify(supplyRepository).delete(supply);
     }
 
     @Test

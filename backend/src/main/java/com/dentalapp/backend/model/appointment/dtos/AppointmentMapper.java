@@ -1,11 +1,12 @@
 package com.dentalapp.backend.model.appointment.dtos;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.prescription.dtos.PrescriptionMapper;
 import org.mapstruct.*;
 
 import java.time.LocalTime;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, uses = {PrescriptionMapper.class})
 public interface AppointmentMapper {
 
     @Mapping(target = "appointmentId", ignore = true)

@@ -1,9 +1,10 @@
 package com.dentalapp.backend.model.treatment.entity;
 
-import com.dentalapp.backend.model.AuditClass;
+import com.dentalapp.backend.model.BaseEntityClass;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -12,7 +13,8 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Setter
 @SequenceGenerator(name="treatment_id_seq", sequenceName = "treatment_id_seq")
-public class Treatment extends AuditClass {
+@SQLDelete(sql = "UPDATE treatments SET deleted_at = CURRENT_TIMESTAMP WHERE treatment_id = ? and version ?")
+public class Treatment extends BaseEntityClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "treatment_id_seq")
