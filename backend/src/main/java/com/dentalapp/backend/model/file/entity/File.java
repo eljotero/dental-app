@@ -1,10 +1,11 @@
 package com.dentalapp.backend.model.file.entity;
 
-import com.dentalapp.backend.model.AuditClass;
+import com.dentalapp.backend.model.BaseEntityClass;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -13,7 +14,8 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Setter
 @SequenceGenerator(name="file_id_seq", sequenceName = "file_id_seq")
-public class File extends AuditClass {
+@SQLDelete(sql = "UPDATE files SET deleted_at = CURRENT_TIMESTAMP WHERE file_id = ? AND version = ?")
+public class File extends BaseEntityClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_id_seq")

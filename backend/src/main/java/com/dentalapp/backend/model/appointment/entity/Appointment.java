@@ -1,6 +1,6 @@
 package com.dentalapp.backend.model.appointment.entity;
 
-import com.dentalapp.backend.model.AuditClass;
+import com.dentalapp.backend.model.BaseEntityClass;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
@@ -9,6 +9,8 @@ import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,7 +22,9 @@ import java.util.List;
 @SequenceGenerator(name="appointment_id_seq", sequenceName = "appointment_id_seq")
 @Getter
 @Setter
-public class Appointment extends AuditClass {
+@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE appointments SET deleted_at = CURRENT_TIMESTAMP WHERE appointment_id = ? AND version = ?")
+public class Appointment extends BaseEntityClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointment_id_seq")
@@ -65,7 +69,4 @@ public class Appointment extends AuditClass {
 
     @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<File> files = new ArrayList<>();
-
-    @Version
-    private Long version;
 }

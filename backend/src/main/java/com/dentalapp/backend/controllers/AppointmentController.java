@@ -69,4 +69,10 @@ public class AppointmentController {
         appointmentService.confirmAppointment(id);
         return ResponseEntity.ok("Appointment confirmed");
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteAppointment(@PathVariable Long id) {
+        appointmentService.deleteAppointment(id);
+        return ResponseEntity.ok("Appointment deleted");
+    }
 }

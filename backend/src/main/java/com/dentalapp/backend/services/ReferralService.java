@@ -59,7 +59,6 @@ public class ReferralService {
     @Transactional
     public void deleteReferral(Long referralId) {
         Referral referral = referralRepository.findById(referralId).orElseThrow(() -> new ReferralNotFoundException("Refferal not found"));
-        referral.onDelete();
-        referralRepository.save(referral);
+        referralRepository.delete(referral);
     }
 }

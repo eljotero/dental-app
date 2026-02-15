@@ -1,10 +1,11 @@
 package com.dentalapp.backend.model.availability.entity;
 
-import com.dentalapp.backend.model.AuditClass;
+import com.dentalapp.backend.model.BaseEntityClass;
 import com.dentalapp.backend.model.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
@@ -16,7 +17,8 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @SequenceGenerator(name="availability_id_seq", sequenceName = "availability_id_seq")
-public class Availability extends AuditClass {
+@SQLDelete(sql = "UPDATE availabilities SET deleted_at = CURRENT_TIMESTAMP WHERE availability_id = ? AND version = ?")
+public class Availability extends BaseEntityClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "availability_id_seq")
@@ -44,7 +46,4 @@ public class Availability extends AuditClass {
 
     @Column(name = "brake_time_end")
     private LocalTime brakeTimeEnd;
-
-    @Version
-    private Long version;
 }

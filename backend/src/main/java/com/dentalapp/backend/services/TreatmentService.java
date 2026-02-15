@@ -50,8 +50,7 @@ public class TreatmentService {
     @Transactional
     public void deleteTreatment(Long id) {
         Treatment treatment = getTreatmentById(id);
-        treatment.onDelete();
-        treatmentRepository.save(treatment);
+        treatmentRepository.delete(treatment);
     }
 
     private void doesTreatmentExist(String name) {
