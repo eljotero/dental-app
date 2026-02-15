@@ -1,6 +1,7 @@
 package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.invoice.dtos.InvoiceMapper;
 import com.dentalapp.backend.model.invoice.dtos.PayForAppointmentDto;
 import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
@@ -15,14 +16,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class InvoiceServiceTests {
+class InvoiceServiceTests {
 
     @Mock
     private InvoiceRepository invoiceRepository;
+
+    @Mock
+    private InvoiceMapper invoiceMapper;
 
     @InjectMocks
     private InvoiceService invoiceService;
@@ -36,7 +41,7 @@ public class InvoiceServiceTests {
     private PayForAppointmentDto payForAppointmentDto;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         invoice = new Invoice();
 
         setAppointmentPriceDto = new SetAppointmentPriceDto();
@@ -52,19 +57,19 @@ public class InvoiceServiceTests {
     }
 
     @Test
-    public void testFindAll() {
+    void testFindAll() {
         when(invoiceRepository.findAll((Specification<Invoice>) any())).thenReturn(java.util.List.of(invoice));
         Assertions.assertEquals(1, invoiceService.findAllByQueryParams(null).size());
     }
 
     @Test
-    public void testFindById() {
+    void testFindById() {
         when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.of(invoice));
         Assertions.assertEquals(invoice, invoiceService.findById(1L));
     }
 
     @Test
-    public void testFindByIdNotFound() {
+    void testFindByIdNotFound() {
         when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException.class, () ->
                 invoiceService.findById(1L)
@@ -72,7 +77,7 @@ public class InvoiceServiceTests {
     }
 
     @Test
-    public void testCreateInvoice() {
+    void testCreateInvoice() {
         when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
         Invoice createdInvoice = invoiceService.createInvoice();
         Assertions.assertEquals(invoice.getPrice(), createdInvoice.getPrice());
@@ -83,26 +88,36 @@ public class InvoiceServiceTests {
     }
 
     @Test
-    public void testSetAppointmentPrice() {
-        when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
-        invoiceService.setAppointmentPrice(appointment, setAppointmentPriceDto);
-    }
+    void testUpdateAppointmentPrice() {
+        Long expectedPrice = 100L;
+        setAppointmentPriceDto.setPrice(expectedPrice);
 
-    @Test
-    public void testUpdateAppointmentPrice() {
         when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
+
         invoiceService.updateAppointmentPrice(appointment, setAppointmentPriceDto);
+
+        verify(invoiceRepository).save(any(Invoice.class));
+        Assertions.assertEquals(expectedPrice, appointment.getInvoice().getPrice());
     }
 
-//    @Test
-//    public void testPayInvoice() {
-//        when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.of(invoice));
-//        when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
-//        invoiceService.payInvoice(1L, payForAppointmentDto);
-//    }
 
     @Test
-    public void testPayInvoiceNotFound() {
+    void testPayInvoice() {
+        Invoice updatedInvoice = new Invoice();
+
+        when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.of(invoice));
+        when(invoiceMapper.toDto(eq(invoice), eq(payForAppointmentDto), anyBoolean())).thenReturn(updatedInvoice);
+        when(invoiceRepository.save(updatedInvoice)).thenReturn(updatedInvoice);
+
+        invoiceService.payInvoice(1L, payForAppointmentDto);
+
+        verify(invoiceMapper).toDto(eq(invoice), eq(payForAppointmentDto), anyBoolean());
+        verify(invoiceRepository).save(updatedInvoice);
+    }
+
+
+    @Test
+    void testPayInvoiceNotFound() {
         when(invoiceRepository.findById(1L)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(com.dentalapp.backend.model.invoice.exceptions.InvoiceNotFoundException.class, () ->
                 invoiceService.payInvoice(1L, payForAppointmentDto)
@@ -110,8 +125,10 @@ public class InvoiceServiceTests {
     }
 
     @Test
-    public void testSaveInvoice() {
+    void testSaveInvoice() {
         when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
         invoiceService.saveInvoice(invoice);
+        verify(invoiceRepository).save(invoice);
     }
+
 }

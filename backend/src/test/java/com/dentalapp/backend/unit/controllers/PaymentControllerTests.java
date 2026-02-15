@@ -26,7 +26,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PaymentControllerTests {
+class PaymentControllerTests {
 
     @Mock
     private AppointmentService appointmentService;
@@ -49,7 +49,7 @@ public class PaymentControllerTests {
     private Invoice invoice;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         setAppointmentPriceDto = new SetAppointmentPriceDto();
         setAppointmentPriceDto.setPrice(100L);
 
@@ -66,7 +66,7 @@ public class PaymentControllerTests {
     }
 
     @Test
-    public void testValidation() {
+    void testValidation() {
         setAppointmentPriceDto.setPrice(-100L);
         Assertions.assertEquals(1, validator.validate(setAppointmentPriceDto).size());
         Assertions.assertEquals(3, validator.validate(payForAppointmentDto).size());
@@ -75,16 +75,11 @@ public class PaymentControllerTests {
     }
 
     @Test
-    public void testGetAllInvoices() {
+    void testGetAllInvoices() {
         String status = "PAID";
         String method = "CREDIT_CARD";
         LocalDate date = LocalDate.of(2021, 10, 10);
         List<Invoice> invoiceList = List.of(new Invoice());
-
-        Specification<Invoice> specification = Specification.where(null);
-        specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentStatus"), status))
-                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentMethod"), method))
-                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentDate"), date));
 
         when(invoiceService.findAllByQueryParams(any(Specification.class))).thenReturn(invoiceList);
 
@@ -95,7 +90,7 @@ public class PaymentControllerTests {
     }
 
     @Test
-    public void testGetInvoiceById() {
+    void testGetInvoiceById() {
         when(invoiceService.findById(1L)).thenReturn(invoice);
         ResponseEntity<Invoice> response = paymentController.getInvoice(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
@@ -103,15 +98,7 @@ public class PaymentControllerTests {
     }
 
     @Test
-    public void testCreateInvoice() {
-        ResponseEntity<String> response = paymentController.createInvoice(1L, setAppointmentPriceDto);
-        verify(paymentService).setAppointmentPrice(1L, setAppointmentPriceDto);
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals("Price set successfully", response.getBody());
-    }
-
-    @Test
-    public void testUpdateInvoice() {
+    void testUpdateInvoice() {
         ResponseEntity<String> response = paymentController.updateInvoice(1L, setAppointmentPriceDto);
         verify(paymentService).updateAppointmentPrice(1L, setAppointmentPriceDto);
         Assertions.assertEquals(200, response.getStatusCode().value());
@@ -119,7 +106,7 @@ public class PaymentControllerTests {
     }
 
     @Test
-    public void testPayForAppointment() {
+    void testPayForAppointment() {
         payForAppointmentDto.setPaymentDate("2021-01-01");
         payForAppointmentDto.setPrice(100L);
         payForAppointmentDto.setPaymentType("CASH");

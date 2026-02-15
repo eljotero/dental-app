@@ -26,12 +26,12 @@ import java.util.Objects;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ReferralControllerTests {
+class ReferralControllerTests {
     @Mock
     private ReferralService referralService;
 
     @Mock
-    public JwtService jwtService;
+    JwtService jwtService;
 
     @InjectMocks
     private ReferralController referralController;
@@ -53,7 +53,7 @@ public class ReferralControllerTests {
     private final String email = "test@mail.com";
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         referral = new Referral();
 
         createReferralsDto = new CreateReferralsDto();
@@ -81,7 +81,7 @@ public class ReferralControllerTests {
     }
 
     @Test
-    public void testValidation() {
+    void testValidation() {
         createReferralsDto.setAppointmentId(null);
         createReferralsDto.setCreateReferralDtoList(null);
         Assertions.assertEquals(2, validator.validate(createReferralsDto).size());
@@ -95,7 +95,7 @@ public class ReferralControllerTests {
     }
 
     @Test
-    public void testGetAllReferrals() {
+    void testGetAllReferrals() {
         when(referralService.findAll()).thenReturn(List.of(getReferralDto));
         ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferrals();
         Assertions.assertEquals(200, response.getStatusCode().value());
@@ -103,7 +103,7 @@ public class ReferralControllerTests {
     }
 
     @Test
-    public void testGetReferralById() {
+    void testGetReferralById() {
         when(referralService.findById(1L)).thenReturn(getReferralDto);
         ResponseEntity<GetReferralDto> response = referralController.getReferralById(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
@@ -111,7 +111,7 @@ public class ReferralControllerTests {
     }
 
     @Test
-    public void testGetAllReferralsByPatient() {
+    void testGetAllReferralsByPatient() {
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
         when(referralService.findAllByPatient(email)).thenReturn(List.of(getReferralDto));
         ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferralsByPatient(token);
@@ -120,7 +120,7 @@ public class ReferralControllerTests {
     }
 
     @Test
-    public void testGetAllReferralsByDoctor() {
+    void testGetAllReferralsByDoctor() {
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
         when(referralService.findAllByDoctor(email)).thenReturn(List.of(getReferralDto));
         ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferralsByDoctor(token);
@@ -129,21 +129,21 @@ public class ReferralControllerTests {
     }
 
     @Test
-    public void testCreateReferral() {
+    void testCreateReferral() {
         ResponseEntity<String> response = referralController.createReferral(createReferralDto);
         Assertions.assertEquals(201, response.getStatusCode().value());
         Assertions.assertEquals("Referral created successfully", response.getBody());
     }
 
     @Test
-    public void testUpdateReferral() {
+    void testUpdateReferral() {
         ResponseEntity<String> response = referralController.updateReferral(1L, updateReferralDto);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals("Referral updated successfully", response.getBody());
     }
 
     @Test
-    public void testDeleteReferral() {
+    void testDeleteReferral() {
         ResponseEntity<String> response = referralController.deleteReferral(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals("Referral deleted successfully", response.getBody());

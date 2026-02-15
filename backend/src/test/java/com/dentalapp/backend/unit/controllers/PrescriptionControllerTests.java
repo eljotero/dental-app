@@ -25,7 +25,7 @@ import java.util.Objects;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PrescriptionControllerTests {
+class PrescriptionControllerTests {
     @Mock
     private PrescriptionService prescriptionService;
 
@@ -43,7 +43,7 @@ public class PrescriptionControllerTests {
     private final String email = "test@mail.com";
 
     @Test
-    public void testValidation() {
+    void testValidation() {
         Validator validator;
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
@@ -56,14 +56,14 @@ public class PrescriptionControllerTests {
     }
 
     @Test
-    public void testGetAllPrescriptions() {
+    void testGetAllPrescriptions() {
         ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptions();
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals(0, Objects.requireNonNull(response.getBody()).size());
     }
 
     @Test
-    public void testGetAllPrescriptionsByPatient() {
+    void testGetAllPrescriptionsByPatient() {
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
         when(prescriptionService.findAllByPatient(email)).thenReturn(List.of());
         ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptionsByPatient(token);
@@ -72,7 +72,7 @@ public class PrescriptionControllerTests {
     }
 
     @Test
-    public void testGetAllPrescriptionsByDoctor() {
+    void testGetAllPrescriptionsByDoctor() {
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
         when(prescriptionService.findAllByDoctor(email)).thenReturn(List.of());
         ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptionsByDoctor(token);
@@ -81,7 +81,7 @@ public class PrescriptionControllerTests {
     }
 
     @Test
-    public void testCreatePrescriptions() {
+    void testCreatePrescriptions() {
         CreatePrescriptionDto createPrescriptionDto = new CreatePrescriptionDto();
         createPrescriptionDto.setMedicineName("Medicine");
         createPrescriptionDto.setDosage("Dosage");
@@ -92,7 +92,7 @@ public class PrescriptionControllerTests {
     }
 
     @Test
-    public void testUpdatePrescription() {
+    void testUpdatePrescription() {
         UpdatePrescriptionDto updatePrescriptionDto = new UpdatePrescriptionDto();
         updatePrescriptionDto.setDosage("Dosage");
         updatePrescriptionDto.setMedicineName("Medicine");
@@ -102,7 +102,7 @@ public class PrescriptionControllerTests {
     }
 
     @Test
-    public void testDeletePrescription() {
+    void testDeletePrescription() {
         ResponseEntity<String> response = prescriptionController.deletePrescription(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
         Assertions.assertEquals("Prescription deleted successfully", response.getBody());

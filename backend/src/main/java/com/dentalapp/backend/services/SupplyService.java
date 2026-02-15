@@ -40,10 +40,8 @@ public class SupplyService {
 
     @Transactional
     public void updateSupply(Long id, UpdateSupplyDto updateSupplyDto) {
-        if (supplyRepository.findById(id).isEmpty()) {
-            throw new SupplyNotFoundException("Supply with id " + id + " not found");
-        }
-        Supply supply = supplyRepository.findById(id).get();
+        Supply supply = supplyRepository.findById(id)
+                .orElseThrow(() -> new SupplyNotFoundException("Supply not found"));
         Supply supplyDB = supplyMapper.toEntityUpdate(supply, updateSupplyDto);
         supplyRepository.save(supplyDB);
     }

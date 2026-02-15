@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AppointmentControllerTests {
+class AppointmentControllerTests {
 
     @Mock
     private AppointmentService appointmentService;
@@ -62,7 +62,7 @@ public class AppointmentControllerTests {
     String email;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
@@ -99,7 +99,7 @@ public class AppointmentControllerTests {
     }
 
     @Test
-    public void testValidation() {
+    void testValidation() {
         CreateAppointmentDto createAppointmentDto = new CreateAppointmentDto();
         createAppointmentDto.setDoctorId(null);
         createAppointmentDto.setAppointmentDate(null);
@@ -119,7 +119,7 @@ public class AppointmentControllerTests {
     }
 
     @Test
-    public void testGetAppointments() {
+    void testGetAppointments() {
         GetAppointmentDto expectedDto = new GetAppointmentDto();
         expectedDto.setAppointmentId(1L);
         expectedDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
@@ -138,7 +138,7 @@ public class AppointmentControllerTests {
 
 
     @Test
-    public void testGetAppointmentById() {
+    void testGetAppointmentById() {
         GetAppointmentDtoV2 getAppointmentDtoV2 = new GetAppointmentDtoV2();
         when(appointmentService.getAppointmentByIdDto(1L)).thenReturn(getAppointmentDtoV2);
         ResponseEntity<GetAppointmentDtoV2> response = appointmentController.getAppointmentById(1L);
@@ -148,7 +148,7 @@ public class AppointmentControllerTests {
     }
 
     @Test
-    public void testGetPatientAppointments() {
+    void testGetPatientAppointments() {
         GetAppointmentDto getAppointmentDto = new GetAppointmentDto();
         String patientEmail = "test@mail.com";
         when(jwtService.extractEmail("test")).thenReturn(patientEmail);
@@ -160,7 +160,7 @@ public class AppointmentControllerTests {
     }
 
     @Test
-    public void testGetDoctorAppointments() {
+    void testGetDoctorAppointments() {
         GetAppointmentDtoV3 getAppointmentDtoV3 = new GetAppointmentDtoV3();
         String doctorEmail = "test2@mail.com";
         when(jwtService.extractEmail("test")).thenReturn(doctorEmail);
@@ -175,7 +175,7 @@ public class AppointmentControllerTests {
     }
 
     @Test
-    public void testCancelAppointment() {
+    void testCancelAppointment() {
         ResponseEntity<String> response = appointmentController.cancelAppointment(1L);
         verify(appointmentService).cancelAppointment(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
@@ -183,7 +183,7 @@ public class AppointmentControllerTests {
     }
 
     @Test
-    public void testCreateAppointment() {
+    void testCreateAppointment() {
         CreateAppointmentDto createAppointmentDto = new CreateAppointmentDto();
         createAppointmentDto.setDoctorId(1L);
         createAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
@@ -197,7 +197,7 @@ public class AppointmentControllerTests {
     }
 
     @Test
-    public void testUpdateAppointment() {
+    void testUpdateAppointment() {
         UpdateAppointmentDto updateAppointmentDto = new UpdateAppointmentDto();
         updateAppointmentDto.setDoctorId(1L);
         updateAppointmentDto.setAppointmentDate(LocalDate.of(2021, 1, 1));
@@ -211,7 +211,7 @@ public class AppointmentControllerTests {
     }
 
     @Test
-    public void testConfirmAppointment() {
+    void testConfirmAppointment() {
         ResponseEntity<String> response = appointmentController.confirmAppointment(1L);
         verify(appointmentService).confirmAppointment(1L);
         Assertions.assertEquals(ResponseEntity.ok("Appointment confirmed"), response);

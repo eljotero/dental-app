@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -165,7 +164,7 @@ public class AppointmentService {
     }
 
     @Transactional
-    public void uploadFileToAppointment(Long appointmentId, MultipartFile multipartFile) throws IOException {
+    public void uploadFileToAppointment(Long appointmentId, MultipartFile multipartFile) {
         Appointment appointment = getAppointmentById(appointmentId);
         File file = fileService.saveFile(multipartFile, appointment);
         appointment.getFiles().add(file);

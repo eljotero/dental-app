@@ -15,13 +15,15 @@ public class EmailSenderService {
 
     private final JavaMailSender javaMailSender;
 
+    private static final String ENCODING = "utf-8";
+
     @Async
     @Transactional
     public void sendAccountConfirmationEmail(String to, String name, String link) {
         try {
             String emailText = buildAccountConfirmationEmail(name, link);
             MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, ENCODING);
             helper.setText(emailText, true);
             helper.setTo(to);
             helper.setSubject("Confirm your email");
@@ -37,7 +39,7 @@ public class EmailSenderService {
         try {
             String emailText = buildAppointmentConfirmationEmail(name, appointmentDetails, confirmationLink);
             MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, ENCODING);
             helper.setText(emailText, true);
             helper.setTo(to);
             helper.setSubject("Confirm your appointment");
@@ -53,7 +55,7 @@ public class EmailSenderService {
         try {
             String emailText = buildAppointmentCancellationEmail(name, appointmentDetails);
             MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, ENCODING);
             helper.setText(emailText, true);
             helper.setTo(to);
             helper.setSubject("Appointment Cancellation");
@@ -69,7 +71,7 @@ public class EmailSenderService {
         try {
             String emailText = buildResetPasswordEmail(name, link);
             MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, ENCODING);
             helper.setText(emailText, true);
             helper.setTo(to);
             helper.setSubject("Reset your password");

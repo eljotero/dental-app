@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SupplyControllerTests {
+class SupplyControllerTests {
     @Mock
     private SupplyService supplyService;
 
@@ -36,7 +36,7 @@ public class SupplyControllerTests {
     private Validator validator;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         supply = new Supply();
         supply.setName("Test Supply");
         supply.setQuantity(10.0);
@@ -48,7 +48,7 @@ public class SupplyControllerTests {
     }
 
     @Test
-    public void testValidation() {
+    void testValidation() {
         CreateSupplyDto createSupplyDto = new CreateSupplyDto();
         createSupplyDto.setName("");
         createSupplyDto.setQuantity(-5.0);
@@ -61,7 +61,7 @@ public class SupplyControllerTests {
     }
 
     @Test
-    public void testGetAllSupplies() {
+    void testGetAllSupplies() {
         when(supplyService.findAll()).thenReturn(List.of(supply));
         ResponseEntity<List<Supply>> response = supplyController.getAllSupplies();
         Assertions.assertEquals(200, response.getStatusCode().value());
@@ -70,7 +70,7 @@ public class SupplyControllerTests {
     }
 
     @Test
-    public void testGetSupplyById() {
+    void testGetSupplyById() {
         when(supplyService.findById(1L)).thenReturn(supply);
         ResponseEntity<Supply> response = supplyController.getSupplyById(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
@@ -78,7 +78,7 @@ public class SupplyControllerTests {
     }
 
     @Test
-    public void testAddSupply() {
+    void testAddSupply() {
         CreateSupplyDto createSupplyDto = new CreateSupplyDto();
         createSupplyDto.setName("Test Supply");
         createSupplyDto.setQuantity(10.0);
@@ -89,7 +89,7 @@ public class SupplyControllerTests {
     }
 
     @Test
-    public void testUpdateSupply() {
+    void testUpdateSupply() {
         UpdateSupplyDto updateSupplyDto = new UpdateSupplyDto();
         updateSupplyDto.setName("Test Supply");
         updateSupplyDto.setQuantity(10.0);
@@ -100,7 +100,7 @@ public class SupplyControllerTests {
     }
 
     @Test
-    public void testDeleteSupply() {
+    void testDeleteSupply() {
         ResponseEntity<String> response = supplyController.deleteSupply(1L);
         Assertions.assertEquals(200, response.getStatusCode().value());
         verify(supplyService).removeSupply(1L);

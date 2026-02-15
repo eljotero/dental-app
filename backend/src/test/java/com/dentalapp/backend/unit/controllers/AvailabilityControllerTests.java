@@ -6,7 +6,6 @@ import com.dentalapp.backend.model.availability.dtos.AvailabilityDayDto;
 import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
-import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.services.AvailabilityService;
 import com.dentalapp.backend.services.AvailableSlotsService;
 import jakarta.validation.Validation;
@@ -30,7 +29,7 @@ import java.util.Map;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AvailabilityControllerTests {
+class AvailabilityControllerTests {
 
     @Mock
     private AvailabilityService availabilityService;
@@ -58,7 +57,7 @@ public class AvailabilityControllerTests {
 
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
@@ -80,14 +79,10 @@ public class AvailabilityControllerTests {
     }
 
     @Test
-    public void testGetAllDoctorAvailability() {
+    void testGetAllDoctorAvailability() {
         LocalDate date = LocalDate.of(2021, 10, 10);
         Long id = 1L;
         List<GetAvailabilityDto> availabilityList = List.of(new GetAvailabilityDto());
-
-        Specification<Availability> specification = Specification.where(null);
-        specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("availabilityDate"), date))
-                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("doctor").get("id"), id));
 
         when(availabilityService.getAllDoctorsAvailability(any(Specification.class))).thenReturn(availabilityList);
 
@@ -98,14 +93,9 @@ public class AvailabilityControllerTests {
     }
 
     @Test
-    public void testGetDoctorAvailability() {
+    void testGetDoctorAvailability() {
         LocalDate date = LocalDate.of(2021, 10, 10);
-        String token = "Bearer token";
         List<GetAvailabilityDto> availabilityList = List.of(new GetAvailabilityDto());
-
-        Specification<Availability> specification = Specification.where(null);
-        specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("doctor").get("email"), "doctor@example.com"))
-                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("availabilityDate"), date));
 
         when(availabilityService.getDoctorAvailability(any(Specification.class))).thenReturn(availabilityList);
 
@@ -116,7 +106,7 @@ public class AvailabilityControllerTests {
     }
 
     @Test
-    public void testValidation() {
+    void testValidation() {
         createAvailabilityDto.setAvailabilityDays(null);
         Assertions.assertEquals(1, validator.validate(createAvailabilityDto).size());
 
@@ -132,7 +122,7 @@ public class AvailabilityControllerTests {
     }
 
     @Test
-    public void testAddDoctorAvailability() {
+    void testAddDoctorAvailability() {
         when(jwtService.extractEmail("token")).thenReturn(email);
         ResponseEntity<String> response = availabilityController.addDoctorAvailability(token, createAvailabilityDto);
         verify(availabilityService).addDoctorAvailability(createAvailabilityDto, email);
@@ -140,7 +130,7 @@ public class AvailabilityControllerTests {
     }
 
     @Test
-    public void testConfirmAvailabilityValidation() {
+    void testConfirmAvailabilityValidation() {
         ResponseEntity<String> response = availabilityController.confirmAvailability(1L);
         verify(availabilityService).confirmAvailability(1L);
         Assertions.assertEquals(ResponseEntity.ok("Availability confirmed successfully"), response);
@@ -148,7 +138,7 @@ public class AvailabilityControllerTests {
     }
 
     @Test
-    public void testUpdateAvailabilityValidation() {
+    void testUpdateAvailabilityValidation() {
         ResponseEntity<String> response = availabilityController.updateAvailability(1L, updateAvailabilityDto);
         verify(availabilityService).updateAvailability(1L, updateAvailabilityDto);
         Assertions.assertEquals(ResponseEntity.ok("Availability updated successfully"), response);
@@ -156,7 +146,7 @@ public class AvailabilityControllerTests {
     }
 
     @Test
-    public void testGetAvailableSlots() {
+    void testGetAvailableSlots() {
         Long doctorId = 1L;
         LocalDate startDate = LocalDate.of(2021, 10, 10);
         LocalDate endDate = LocalDate.of(2021, 10, 15);

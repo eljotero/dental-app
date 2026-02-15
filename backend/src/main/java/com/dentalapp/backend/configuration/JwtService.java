@@ -19,7 +19,7 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${SECRET_KEY}")
-    private String SECRET_KEY;
+    private String secretKey;
 
     public boolean isValid(String token, UserDetails account) {
         String email = extractEmail(token);
@@ -73,7 +73,7 @@ public class JwtService {
 
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

@@ -29,7 +29,7 @@ public class AvailableSlotsService {
             Map<String, String> timeSlots = new LinkedHashMap<>();
 
             for (Availability availability : availabilities) {
-                if (!availability.getIsConfirmed()) {
+                if (Boolean.FALSE.equals(availability.getIsConfirmed())) {
                     continue;
                 }
 

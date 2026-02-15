@@ -1,6 +1,7 @@
 package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.supplies.dtos.CreateSupplyDto;
+import com.dentalapp.backend.model.supplies.dtos.SupplyMapper;
 import com.dentalapp.backend.model.supplies.dtos.UpdateSupplyDto;
 import com.dentalapp.backend.model.supplies.entity.Supply;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyAlreadyExistsException;
@@ -21,9 +22,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SupplyServiceTests {
+class SupplyServiceTests {
+
     @Mock
     private SupplyRepository supplyRepository;
+
+    @Mock
+    private SupplyMapper supplyMapper;
 
     @InjectMocks
     private SupplyService supplyService;
@@ -35,7 +40,7 @@ public class SupplyServiceTests {
     private UpdateSupplyDto updateSupplyDto;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         supply = new Supply();
         supply.setSupplyId(1L);
         supply.setName("Name");
@@ -50,60 +55,68 @@ public class SupplyServiceTests {
     }
 
     @Test
-    public void testFindAll() {
+    void testFindAll() {
         when(supplyRepository.findAll()).thenReturn(List.of(supply));
         List<Supply> supplies = supplyService.findAll();
         Assertions.assertEquals(List.of(supply), supplies);
     }
 
     @Test
-    public void testFindById() {
+    void testFindById() {
         when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.of(supply));
         Supply foundSupply = supplyService.findById(1L);
         Assertions.assertEquals(supply, foundSupply);
     }
 
     @Test
-    public void testFindByIdNotFound() {
+    void testFindByIdNotFound() {
         when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(SupplyNotFoundException.class, () -> supplyService.findById(1L));
     }
 
-//    @Test
-//    public void testCreateSupply() {
-//        when(supplyRepository.findByName(createSupplyDto.getName())).thenReturn(java.util.Optional.empty());
-//        supplyService.createSupply(createSupplyDto);
-//        verify(supplyRepository).save(any(Supply.class));
-//    }
+    @Test
+    void testCreateSupply() {
+        Supply expectedSupply = new Supply();
+        when(supplyRepository.findByName(createSupplyDto.getName())).thenReturn(java.util.Optional.empty());
+        when(supplyMapper.toEntityCreate(createSupplyDto)).thenReturn(expectedSupply);
+        supplyService.createSupply(createSupplyDto);
+        verify(supplyMapper).toEntityCreate(createSupplyDto);
+        verify(supplyRepository).save(expectedSupply);
+    }
+
 
     @Test
-    public void testCreateSupplyAlreadyExists() {
+    void testCreateSupplyAlreadyExists() {
         when(supplyRepository.findByName(createSupplyDto.getName())).thenReturn(java.util.Optional.of(supply));
         Assertions.assertThrows(SupplyAlreadyExistsException.class, () -> supplyService.createSupply(createSupplyDto));
     }
 
-//    @Test
-//    public void testUpdateSupply() {
-//        when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.of(supply));
-//        supplyService.updateSupply(1L, updateSupplyDto);
-//        verify(supplyRepository).save(any(Supply.class));
-//    }
+    @Test
+    void testUpdateSupply() {
+        Supply updatedSupply = new Supply();
+        when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.of(supply));
+        when(supplyMapper.toEntityUpdate(supply, updateSupplyDto)).thenReturn(updatedSupply);
+        when(supplyRepository.save(updatedSupply)).thenReturn(updatedSupply);
+        supplyService.updateSupply(1L, updateSupplyDto);
+        verify(supplyRepository).save(updatedSupply);
+    }
+
 
     @Test
-    public void testUpdateSupplyNotFound() {
+    void testUpdateSupplyNotFound() {
         when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(SupplyNotFoundException.class, () -> supplyService.updateSupply(1L, updateSupplyDto));
     }
 
     @Test
-    public void testDeleteSupply() {
+    void testDeleteSupply() {
         when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.of(supply));
         supplyService.removeSupply(1L);
         verify(supplyRepository).delete(supply);
     }
 
     @Test
-    public void testDeleteSupplyNotFound() {
+    void testDeleteSupplyNotFound() {
         when(supplyRepository.findById(1L)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(SupplyNotFoundException.class, () -> supplyService.removeSupply(1L));
     }

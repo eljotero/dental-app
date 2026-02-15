@@ -44,7 +44,7 @@ public class PaymentController {
 
     @PostMapping("/{id}/price")
     public ResponseEntity<String> createInvoice(@PathVariable Long id, @RequestBody SetAppointmentPriceDto setAppointmentPriceDto) {
-        paymentService.setAppointmentPrice(id, setAppointmentPriceDto);
+        paymentService.updateAppointmentPrice(id, setAppointmentPriceDto);
         return ResponseEntity.ok("Price set successfully");
     }
 

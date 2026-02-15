@@ -41,7 +41,7 @@ public class UpdateAppointmentTimesValidator implements ConstraintValidator<Upda
             return false;
         }
 
-        String timePattern = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+        String timePattern = "([01]?\\d|2[0-3]):[0-5]\\d";
         Pattern pattern = Pattern.compile(timePattern);
 
         if (!pattern.matcher(startTimeValue).matches()) {
