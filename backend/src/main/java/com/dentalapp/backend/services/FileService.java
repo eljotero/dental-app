@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -42,7 +41,7 @@ public class FileService {
     }
 
     @Transactional
-    public File saveFile(MultipartFile multipartFile, Appointment appointment) throws IOException {
+    public File saveFile(MultipartFile multipartFile, Appointment appointment) {
         if(multipartFile.isEmpty()) {
             throw new FileIsEmptyException("File is empty");
         }
@@ -55,7 +54,7 @@ public class FileService {
     }
 
     @Transactional
-    public void updateFile(Long id, MultipartFile multipartFile) throws IOException {
+    public void updateFile(Long id, MultipartFile multipartFile) {
         if(multipartFile.isEmpty()) {
             throw new FileIsEmptyException("File is empty");
         }

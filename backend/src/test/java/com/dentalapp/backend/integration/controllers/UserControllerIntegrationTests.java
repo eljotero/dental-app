@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {BackendApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class UserControllerIntegrationTests {
+class UserControllerIntegrationTests {
 
     private final MockMvc mockMvc;
 
@@ -30,12 +30,12 @@ public class UserControllerIntegrationTests {
     private int port;
 
     @Autowired
-    public UserControllerIntegrationTests(MockMvc mockMvc) {
+    UserControllerIntegrationTests(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         baseURI = "https://localhost";
         RestAssured.port = port;
         RestAssured.useRelaxedHTTPSValidation();
@@ -43,7 +43,7 @@ public class UserControllerIntegrationTests {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    public void testGetAllUsers() throws Exception {
+    void testGetAllUsers() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/user/all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));

@@ -38,12 +38,6 @@ public class InvoiceService {
     }
 
     @Transactional
-    public void setAppointmentPrice(Appointment appointment, SetAppointmentPriceDto setAppointmentPriceDto) {
-        appointment.getInvoice().setPrice(setAppointmentPriceDto.getPrice());
-        invoiceRepository.save(appointment.getInvoice());
-    }
-
-    @Transactional
     public void updateAppointmentPrice(Appointment appointment, SetAppointmentPriceDto setAppointmentPriceDto) {
         appointment.getInvoice().setPrice(setAppointmentPriceDto.getPrice());
         invoiceRepository.save(appointment.getInvoice());

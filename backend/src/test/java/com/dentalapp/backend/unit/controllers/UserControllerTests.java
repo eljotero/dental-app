@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class UserControllerTests {
+class UserControllerTests {
 
     @Mock
     private UserService userService;
@@ -55,7 +55,7 @@ public class UserControllerTests {
 
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         createUserDto = new CreateUserDto();
         createUserDto.setFirstName("John");
         createUserDto.setLastName("Doe");
@@ -100,7 +100,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testRegisterUser() {
+    void testRegisterUser() {
         doNothing().when(userService).createUser(createUserDto);
         ResponseEntity<String> response = userController.registerUser(createUserDto);
         verify(userService).createUser(createUserDto);
@@ -108,7 +108,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testValidation() {
+    void testValidation() {
         createUserDto.setFirstName("");
         createUserDto.setLastName("");
         createUserDto.setEmail("");
@@ -134,7 +134,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testLogin() {
+    void testLogin() {
         LoginUserDtoResponse loginUserDtoResponse = new LoginUserDtoResponse();
         loginUserDtoResponse.setLanguage("en");
         loginUserDtoResponse.setRole("PATIENT");
@@ -146,7 +146,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testUpdateUser() {
+    void testUpdateUser() {
         String token = "Bearer test@mail.com";
         String email = token.substring(7);
         when((jwtService).extractEmail(token)).thenReturn(email);
@@ -157,7 +157,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testGetAllUsers() {
+    void testGetAllUsers() {
         when(userService.getAllUsers()).thenReturn(List.of(getUserDto));
         ResponseEntity<List<GetUserDto>> response = userController.getAllUsers();
         verify(userService).getAllUsers();
@@ -165,7 +165,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testGetUserById() {
+    void testGetUserById() {
         when(userService.getUserByIdDto(1L)).thenReturn(getUserDto);
         ResponseEntity<GetUserDto> response = userController.getUserById(1L);
         verify(userService).getUserByIdDto(1L);
@@ -174,7 +174,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testConfirmUser() {
+    void testConfirmUser() {
         doNothing().when(userService).enableUser("token");
         ResponseEntity<String> response = userController.confirmUser("token");
         verify(userService).enableUser("token");
@@ -182,7 +182,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testResetPassword() {
+    void testResetPassword() {
         ResetPasswordDto resetPasswordDto = new ResetPasswordDto();
         resetPasswordDto.setEmail("test@mail.com");
         doNothing().when(userService).resetPassword(resetPasswordDto.getEmail());
@@ -193,7 +193,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testChangePassword() {
+    void testChangePassword() {
         UpdatePasswordDto updatePasswordDto = new UpdatePasswordDto();
         updatePasswordDto.setPassword("password");
         doNothing().when(userService).changePassword("token", updatePasswordDto.getPassword());
@@ -204,7 +204,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testGetMe() {
+    void testGetMe() {
         String token = "Bearer test@mail.com";
         String email = "test@mail.com";
         when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
@@ -216,7 +216,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testGetDoctors() {
+    void testGetDoctors() {
         GetDoctorDto getDoctorDto = new GetDoctorDto();
         when(userService.getDoctors()).thenReturn(List.of(getDoctorDto));
         ResponseEntity<List<GetDoctorDto>> response = userController.getDoctors();

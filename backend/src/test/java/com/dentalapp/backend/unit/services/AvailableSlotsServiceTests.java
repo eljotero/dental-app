@@ -21,7 +21,7 @@ import java.util.Map;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AvailableSlotsServiceTests {
+class AvailableSlotsServiceTests {
 
     @Mock
     private AppointmentService appointmentService;
@@ -43,7 +43,7 @@ public class AvailableSlotsServiceTests {
     private Appointment appointment;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         doctorId = 1L;
         startDate = LocalDate.of(2024, 1, 1);
         endDate = LocalDate.of(2024, 1, 1);
@@ -61,7 +61,7 @@ public class AvailableSlotsServiceTests {
     }
 
     @Test
-    public void testGetAvailableSlots() {
+    void testGetAvailableSlots() {
         when(availabilityService.getDoctorAvailability(doctorId, startDate)).thenReturn(List.of(availability));
         when(appointmentService.getDoctorsAppointmentsByDate(doctorId, startDate)).thenReturn(List.of(appointment));
 
@@ -78,7 +78,7 @@ public class AvailableSlotsServiceTests {
     }
 
     @Test
-    public void testGetAvailableSlotsWithNoAvailability() {
+    void testGetAvailableSlotsWithNoAvailability() {
         when(availabilityService.getDoctorAvailability(doctorId, startDate)).thenReturn(List.of());
         when(appointmentService.getDoctorsAppointmentsByDate(doctorId, startDate)).thenReturn(List.of());
 
@@ -91,7 +91,7 @@ public class AvailableSlotsServiceTests {
     }
 
     @Test
-    public void testGetAvailableSlotsWithNoAppointments() {
+    void testGetAvailableSlotsWithNoAppointments() {
         when(availabilityService.getDoctorAvailability(doctorId, startDate)).thenReturn(List.of(availability));
         when(appointmentService.getDoctorsAppointmentsByDate(doctorId, startDate)).thenReturn(List.of());
 

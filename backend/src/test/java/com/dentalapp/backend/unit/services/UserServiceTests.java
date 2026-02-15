@@ -2,9 +2,7 @@ package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.enums.UserType;
-import com.dentalapp.backend.model.user.dtos.CreateUserDto;
-import com.dentalapp.backend.model.user.dtos.LoginUserDto;
-import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
+import com.dentalapp.backend.model.user.dtos.*;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
 import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
@@ -25,14 +23,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class UserServiceTests {
+class UserServiceTests {
 
     @Mock
     private UserRepository userRepository;
@@ -52,6 +52,9 @@ public class UserServiceTests {
     @Mock
     private EmailSenderService emailSenderService;
 
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private UserService userService;
 
@@ -68,7 +71,7 @@ public class UserServiceTests {
     private User user;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         createUserDto = new CreateUserDto();
         createUserDto.setFirstName("John");
         createUserDto.setLastName("Doe");
@@ -109,69 +112,76 @@ public class UserServiceTests {
     }
 
 
-//    @Test
-//    public void testCreateUser() {
-//        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.empty());
-//        when(passwordEncoder.encode(createUserDto.getPassword())).thenReturn("password");
-//        when(passwordEncoder.encode(createUserDto.getPersonalIdNumber())).thenReturn("123456789");
-//        when(confirmationTokenService.saveConfirmationToken(any())).thenReturn("token");
-//        userService.createUser(createUserDto);
-//    }
+    @Test
+    void testCreateUser() {
+        User newUser = new User();
+        newUser.setFirstName("John");
+        newUser.setEmail(createUserDto.getEmail());
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.empty());
+        when(userMapper.toUser(createUserDto)).thenReturn(newUser);
+        when(passwordEncoder.encode(createUserDto.getPassword())).thenReturn("password");
+        when(passwordEncoder.encode(createUserDto.getPersonalIdNumber())).thenReturn("123456789");
+        when(confirmationTokenService.saveConfirmationToken(any())).thenReturn("token");
+        userService.createUser(createUserDto);
+        verify(userRepository).save(any(User.class));
+    }
+
 
     @Test
-    public void testEnableUser() {
+    void testEnableUser() {
         when(confirmationTokenService.confirmToken(token)).thenReturn(1L);
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
         userService.enableUser(token);
+        verify(confirmationTokenService).confirmToken(token);
+        verify(userRepository).findById(1L);
+        Assertions.assertTrue(user.isEnabled());
     }
 
+
     @Test
-    public void testEnableUserNotFound() {
+    void testEnableUserNotFound() {
         when(confirmationTokenService.confirmToken(token)).thenReturn(1L);
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.enableUser(token));
     }
 
     @Test
-    public void testCreateUserAlreadyExists() {
+    void testCreateUserAlreadyExists() {
         when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.encode(createUserDto.getPassword())).thenReturn("password");
         when(passwordEncoder.encode(createUserDto.getPersonalIdNumber())).thenReturn("123456789");
         Assertions.assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(createUserDto));
     }
 
-//    @Test
-//    public void testLoginUser() {
-//        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(user));
-//        when(authenticationManager.authenticate(any())).thenReturn(null);
-//        when(jwtService.generateToken(user)).thenReturn(token);
-//
-//        LoginUserDtoResponse response = userService.loginUser(loginUserDto);
-//
-//        Assertions.assertNotNull(response);
-//        Assertions.assertEquals(token, response.getToken());
-//    }
 
     @Test
-    public void testLoginUserDoesNotExist() {
+    void testLoginUserDoesNotExist() {
         when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.loginUser(loginUserDto));
     }
 
-//    @Test
-//    public void testUpdateUser() {
-//        when(userRepository.findByEmail(getEmail)).thenReturn(Optional.of(user));
-//        userService.updateUser(updateUserDto, getEmail);
-//    }
+    @Test
+    void testUpdateUser() {
+        User updatedUser = new User();
+        updatedUser.setEmail(getEmail);
+        when(userRepository.findByEmail(getEmail)).thenReturn(Optional.of(user));
+        when(userMapper.toUpdateUser(user, updateUserDto)).thenReturn(updatedUser);
+        when(userRepository.save(updatedUser)).thenReturn(updatedUser);
+        userService.updateUser(updateUserDto, getEmail);
+        verify(userRepository).findByEmail(getEmail);
+        verify(userMapper).toUpdateUser(user, updateUserDto);
+        verify(userRepository).save(updatedUser);
+    }
+
 
     @Test
-    public void testUpdateUserNotFound() {
+    void testUpdateUserNotFound() {
         when(userRepository.findByEmail(getEmail)).thenReturn(Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.updateUser(updateUserDto, getEmail));
     }
 
     @Test
-    public void testGetPatientById() {
+    void testGetPatientById() {
         Long patientId = 1L;
         user.setUserType(UserType.PATIENT);
         when(userRepository.findPatientById(patientId)).thenReturn(java.util.Optional.of(user));
@@ -179,14 +189,14 @@ public class UserServiceTests {
     }
 
     @Test
-    public void testGetPatientByIdNotFound() {
+    void testGetPatientByIdNotFound() {
         Long patientId = 1L;
         when(userRepository.findPatientById(patientId)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getPatientById(patientId));
     }
 
     @Test
-    public void testGetDoctorById() {
+    void testGetDoctorById() {
         Long doctorId = 1L;
         user.setUserType(UserType.DOCTOR);
         when(userRepository.findDoctorById(doctorId)).thenReturn(java.util.Optional.of(user));
@@ -194,80 +204,106 @@ public class UserServiceTests {
     }
 
     @Test
-    public void testGetDoctorByIdNotFound() {
+    void testGetDoctorByIdNotFound() {
         Long doctorId = 1L;
         when(userRepository.findDoctorById(doctorId)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getDoctorById(doctorId));
     }
 
     @Test
-    public void testGetPatientByEmail() {
+    void testGetPatientByEmail() {
         user.setUserType(UserType.PATIENT);
         when(userRepository.findPatientByEmail(getEmail)).thenReturn(java.util.Optional.of(user));
         Assertions.assertEquals(user, userService.getPatientByEmail(getEmail));
     }
 
     @Test
-    public void testGetPatientByEmailNotFound() {
+    void testGetPatientByEmailNotFound() {
         when(userRepository.findPatientByEmail(getEmail)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getPatientByEmail(getEmail));
     }
 
     @Test
-    public void testGetDoctorByEmail() {
+    void testGetDoctorByEmail() {
         user.setUserType(UserType.DOCTOR);
         when(userRepository.findDoctorByEmail(getEmail)).thenReturn(java.util.Optional.of(user));
         Assertions.assertEquals(user, userService.getDoctorByEmail(getEmail));
     }
 
     @Test
-    public void testGetDoctorByEmailNotFound() {
+    void testGetDoctorByEmailNotFound() {
         when(userRepository.findDoctorByEmail(getEmail)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getDoctorByEmail(getEmail));
     }
 
-//    @Test
-//    public void testGetUsers() {
-//        when(userRepository.findAll()).thenReturn(List.of(user));
-//        Assertions.assertEquals(List.of(user), userService.getAllUsers());
-//    }
+    @Test
+    void testGetUsers() {
+        GetUserDto expectedDto = new GetUserDto();
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(userMapper.toGetUserDto(user)).thenReturn(expectedDto);
+
+        List<GetUserDto> result = userService.getAllUsers();
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+        verify(userRepository).findAll();
+        verify(userMapper).toGetUserDto(user);
+    }
+
 
     @Test
-    public void testGetUserById() {
+    void testGetUserById() {
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
         Assertions.assertEquals(user, userService.getUserById(1L));
     }
 
     @Test
-    public void testGetUserByIdNotFound() {
+    void testGetUserByIdNotFound() {
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.empty());
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUserById(1L));
     }
 
     @Test
-    public void testResetPassword() {
+    void testResetPassword() {
         user.setEmail(createUserDto.getEmail());
         when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.of(user));
         when(confirmationTokenService.saveConfirmationToken(any())).thenReturn("token");
         userService.resetPassword(createUserDto.getEmail());
+        verify(userRepository).findByEmail(createUserDto.getEmail());
+        verify(confirmationTokenService).saveConfirmationToken(any());
+        verify(emailSenderService).sendResetPasswordEmail(eq(createUserDto.getEmail()), anyString(), anyString());
     }
 
     @Test
-    public void testResetPasswordUserNotFound() {
-        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.empty());
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.resetPassword(createUserDto.getEmail()));
+    void testResetPasswordUserNotFound() {
+        String email = createUserDto.getEmail();
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        Assertions.assertThrows(UserNotFoundException.class, () -> {
+            userService.resetPassword(email);
+        });
     }
 
     @Test
-    public void testChangePassword() {
+    void testChangePassword() {
+        String newPassword = createUserDto.getPassword();
         when(confirmationTokenService.confirmToken(token)).thenReturn(user.getUserId());
         when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
-        userService.changePassword(token, createUserDto.getPassword());
+        userService.changePassword(token, newPassword);
+        verify(confirmationTokenService).confirmToken(token);
+        verify(userRepository).findById(user.getUserId());
+        verify(userRepository).save(user);
     }
 
+
     @Test
-    public void testChangePasswordUserNotFound() {
-        when(userRepository.findById(user.getUserId())).thenReturn(Optional.empty());
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.changePassword(createUserDto.getEmail(), createUserDto.getPassword()));
+    void testChangePasswordUserNotFound() {
+        String newPassword = createUserDto.getPassword();
+        when(confirmationTokenService.confirmToken(token)).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(UserNotFoundException.class, () -> {
+            userService.changePassword(token, newPassword);
+        });
     }
+
 }

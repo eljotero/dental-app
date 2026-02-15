@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TreatmentControllerTests {
+class TreatmentControllerTests {
 
     @Mock
     private TreatmentService treatmentService;
@@ -40,7 +40,7 @@ public class TreatmentControllerTests {
     private Validator validator;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         treatment = new Treatment();
         treatment.setTreatmentId(1L);
         treatment.setTreatmentName("Treatment 1");
@@ -63,7 +63,7 @@ public class TreatmentControllerTests {
     }
 
     @Test
-    public void testValidation() {
+    void testValidation() {
         createTreatmentDto.setTreatmentName(null);
         createTreatmentDto.setTreatmentDescription(null);
         createTreatmentDto.setTreatmentPrice(-100L);
@@ -77,7 +77,7 @@ public class TreatmentControllerTests {
     }
 
     @Test
-    public void testGetAllTreatments() {
+    void testGetAllTreatments() {
         when(treatmentService.getAllTreatments()).thenReturn(List.of(treatment));
         ResponseEntity<List<Treatment>> response = treatmentController.getTreatments();
         verify(treatmentService).getAllTreatments();
@@ -85,7 +85,7 @@ public class TreatmentControllerTests {
     }
 
     @Test
-    public void testGetTreatmentById() {
+    void testGetTreatmentById() {
         when(treatmentService.getTreatmentById(1L)).thenReturn(treatment);
         ResponseEntity<Treatment> response = treatmentController.getTreatmentById(1L);
         verify(treatmentService).getTreatmentById(1L);
@@ -93,7 +93,7 @@ public class TreatmentControllerTests {
     }
 
     @Test
-    public void testCreateTreatment() {
+    void testCreateTreatment() {
         ResponseEntity<String> response = treatmentController.addTreatment(createTreatmentDto);
         verify(treatmentService).createTreatment(createTreatmentDto);
         Assertions.assertEquals("Treatment added successfully", response.getBody());
@@ -101,14 +101,14 @@ public class TreatmentControllerTests {
     }
 
     @Test
-    public void testUpdateTreatment() {
+    void testUpdateTreatment() {
         ResponseEntity<String> response = treatmentController.updateTreatment(1L, updateTreatmentDto);
         verify(treatmentService).updateTreatment(1L, updateTreatmentDto);
         Assertions.assertEquals("Treatment updated successfully", response.getBody());
     }
 
     @Test
-    public void testDeleteTreatment() {
+    void testDeleteTreatment() {
         ResponseEntity<String> response = treatmentController.deleteTreatment(1L);
         verify(treatmentService).deleteTreatment(1L);
         Assertions.assertEquals("Treatment deleted successfully", response.getBody());

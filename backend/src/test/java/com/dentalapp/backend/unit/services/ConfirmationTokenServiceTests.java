@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ConfirmationTokenServiceTests {
+class ConfirmationTokenServiceTests {
 
     @Mock
     private ConfirmationTokenRepository confirmationTokenRepository;
@@ -34,7 +34,7 @@ public class ConfirmationTokenServiceTests {
     private final String token = "token";
 
     @Test
-    public void testSaveConfirmationToken() {
+    void testSaveConfirmationToken() {
         User user = new User();
         user.setUserId(1L);
 
@@ -53,7 +53,7 @@ public class ConfirmationTokenServiceTests {
     }
 
     @Test
-    public void testConfirmToken() {
+    void testConfirmToken() {
         ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.setExpiresAt(LocalDateTime.of(2030, 1, 1, 1, 1));
         confirmationToken.setUser(new User());
@@ -63,13 +63,13 @@ public class ConfirmationTokenServiceTests {
     }
 
     @Test
-    public void testConfirmTokenNotFound() {
+    void testConfirmTokenNotFound() {
         when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.empty());
         Assertions.assertThrows(InvalidTokenException.class, () -> confirmationTokenService.confirmToken(token));
     }
 
     @Test
-    public void testConfirmTokenAlreadyConfirmed() {
+    void testConfirmTokenAlreadyConfirmed() {
         ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.setConfirmedAt(LocalDateTime.of(2021, 1, 1, 1, 1));
         when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));
@@ -77,7 +77,7 @@ public class ConfirmationTokenServiceTests {
     }
 
     @Test
-    public void testConfirmTokenExpired() {
+    void testConfirmTokenExpired() {
         ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.setExpiresAt(LocalDateTime.of(2022, 1, 1, 1, 1));
         when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));

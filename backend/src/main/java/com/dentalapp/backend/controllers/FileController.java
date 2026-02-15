@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -44,14 +43,13 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("id") Long id) throws IOException {
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("id") Long id) {
         appointmentService.uploadFileToAppointment(id, multipartFile);
         return ResponseEntity.status(201).body("File uploaded successfully");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateFile(@PathVariable Long id, @RequestParam("file") MultipartFile multipartFile) throws IOException {
-        System.out.println(multipartFile);
+    public ResponseEntity<String> updateFile(@PathVariable Long id, @RequestParam("file") MultipartFile multipartFile) {
         fileService.updateFile(id, multipartFile);
         return ResponseEntity.status(200).body("File updated successfully");
     }

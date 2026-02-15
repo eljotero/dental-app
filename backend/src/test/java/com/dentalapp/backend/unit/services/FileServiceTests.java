@@ -1,6 +1,8 @@
 package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.appointment.entity.Appointment;
+import com.dentalapp.backend.model.file.dtos.FileMapper;
+import com.dentalapp.backend.model.file.dtos.GetDownloadFileDto;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.file.exceptions.FileIsEmptyException;
 import com.dentalapp.backend.model.file.exceptions.FileNameAlreadyExists;
@@ -17,17 +19,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class FileServiceTests {
+class FileServiceTests {
+
     @Mock
     private FileRepository fileRepository;
+
+    @Mock
+    private FileMapper fileMapper;
 
     @InjectMocks
     private FileService fileService;
@@ -39,76 +45,102 @@ public class FileServiceTests {
     private MultipartFile emptyFile;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         multipartFile = new MockMultipartFile("file", "test.txt", "text/plain", "test".getBytes());
         appointment = new Appointment();
         emptyFile = new MockMultipartFile("file", "test.txt", "text/plain", new byte[0]);
     }
 
-//    @Test
-//    public void testGetFileById() {
-//        when(fileRepository.findById(anyLong())).thenReturn(Optional.of(new File()));
-//        fileService.getFileById(1L);
-//    }
+    @Test
+    void testGetFileById() {
+        File file = new File();
+        GetDownloadFileDto expectedDto = new GetDownloadFileDto();
+
+        when(fileRepository.findById(1L)).thenReturn(Optional.of(file));
+        when(fileMapper.toGetDownloadFileDto(file)).thenReturn(expectedDto);
+
+        GetDownloadFileDto result = fileService.getFileById(1L);
+
+        Assertions.assertNotNull(result);
+        verify(fileRepository).findById(1L);
+        verify(fileMapper).toGetDownloadFileDto(file);
+    }
+
 
     @Test
-    public void testGetFileByIdNotFound() {
+    void testGetFileByIdNotFound() {
         when(fileRepository.findById(anyLong())).thenReturn(Optional.empty());
         Assertions.assertThrows(FileNotFoundException.class, () -> fileService.getFileById(1L));
     }
 
-//    @Test
-//    public void testGetFilesByAppointmentId() {
-//        when(fileRepository.findFilesByAppointment(appointment)).thenReturn(List.of(new File()));
-//        fileService.getFilesByAppointmentId(appointment);
-//        Assertions.assertNotNull(fileService.getFilesByAppointmentId(appointment));
-//    }
-
-//    @Test
-//    public void testSaveFile() throws IOException {
-//        when(fileRepository.findByFileName(anyString())).thenReturn(Optional.empty());
-//        File savedFile = fileService.saveFile(multipartFile, appointment);
-//        Assertions.assertNotNull(savedFile);
-//    }
+    @Test
+    void testGetFilesByAppointmentId() {
+        when(fileRepository.findFilesByAppointment(appointment)).thenReturn(List.of(new File()));
+        fileService.getFilesByAppointmentId(appointment);
+        Assertions.assertNotNull(fileService.getFilesByAppointmentId(appointment));
+    }
 
     @Test
-    public void testSaveFileEmptyFile() {
+    void testSaveFile() {
+        File file = new File();
+        when(fileRepository.findByFileName(anyString())).thenReturn(Optional.empty());
+        when(fileMapper.toEntity(multipartFile)).thenReturn(file);
+
+        File savedFile = fileService.saveFile(multipartFile, appointment);
+
+        Assertions.assertNotNull(savedFile);
+        Assertions.assertEquals(appointment, savedFile.getAppointment());
+    }
+
+
+    @Test
+    void testSaveFileEmptyFile() {
         Assertions.assertThrows(FileIsEmptyException.class, () -> fileService.saveFile(emptyFile, appointment));
     }
 
     @Test
-    public void testSaveFileNameAlreadyExists() {
+    void testSaveFileNameAlreadyExists() {
         when(fileRepository.findByFileName(anyString())).thenReturn(Optional.of(new File()));
         Assertions.assertThrows(FileNameAlreadyExists.class, () -> fileService.saveFile(multipartFile, appointment));
     }
 
-//    @Test
-//    public void testUpdateFile() throws IOException {
-//        File file = new File();
-//        when(fileRepository.findById(anyLong())).thenReturn(Optional.of(file));
-//        when(fileRepository.save(any(File.class))).thenReturn(new File());
-//        fileService.updateFile(1L, multipartFile);
-//    }
+    @Test
+    void testUpdateFile() {
+        File file = new File();
+        File updatedFile = new File();
+
+        when(fileRepository.findById(1L)).thenReturn(Optional.of(file));
+        when(fileMapper.toUpdateEntity(file, multipartFile)).thenReturn(updatedFile);
+        when(fileRepository.save(updatedFile)).thenReturn(updatedFile);
+
+        fileService.updateFile(1L, multipartFile);
+
+        verify(fileRepository).save(updatedFile);
+    }
+
 
     @Test
-    public void testUpdateFileIsEmpty() {
+    void testUpdateFileIsEmpty() {
         Assertions.assertThrows(FileIsEmptyException.class, () -> fileService.updateFile(1L, emptyFile));
     }
 
     @Test
-    public void testUpdateFileNotFound() {
+    void testUpdateFileNotFound() {
         when(fileRepository.findById(anyLong())).thenReturn(Optional.empty());
         Assertions.assertThrows(FileNotFoundException.class, () -> fileService.updateFile(1L, multipartFile));
     }
 
     @Test
-    public void testDeleteFile() {
-        when(fileRepository.findById(anyLong())).thenReturn(Optional.of(new File()));
+    void testDeleteFile() {
+        File file = new File();
+        when(fileRepository.findById(1L)).thenReturn(Optional.of(file));
         fileService.deleteFile(1L);
+        verify(fileRepository).delete(file);
     }
 
+
     @Test
-    public void testDeleteFileNotFound() {
+    void testDeleteFileNotFound() {
         when(fileRepository.findById(anyLong())).thenReturn(Optional.empty());
         Assertions.assertThrows(FileNotFoundException.class, () -> fileService.deleteFile(1L));
     }

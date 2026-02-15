@@ -26,7 +26,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class FileControllerTests {
+class FileControllerTests {
     @Mock
     private FileService fileService;
 
@@ -46,7 +46,7 @@ public class FileControllerTests {
     private User user;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         multipartFile = new MockMultipartFile("file", "test.txt", "text/plain", "test data".getBytes());
 
         file = new File();
@@ -56,7 +56,7 @@ public class FileControllerTests {
     }
 
     @Test
-    public void testGetFileById(){
+    void testGetFileById() {
         GetDownloadFileDto getDownloadFileDto = new GetDownloadFileDto();
         when(fileService.getFileById(1L)).thenReturn(getDownloadFileDto);
         ResponseEntity<GetDownloadFileDto> response = fileController.getFileById(1L);
@@ -65,7 +65,7 @@ public class FileControllerTests {
     }
 
     @Test
-    public void testGetFilesByAppointmentId() {
+    void testGetFilesByAppointmentId() {
         when(appointmentService.getAppointmentById(1L)).thenReturn(null);
         when(fileService.getFilesByAppointmentId(null)).thenReturn(null);
         ResponseEntity<List<GetFileDto>> response = fileController.getFilesByAppointmentId(1L);
@@ -74,7 +74,7 @@ public class FileControllerTests {
     }
 
     @Test
-    public void testUploadFile() throws IOException {
+    void testUploadFile() {
         doNothing().when(appointmentService).uploadFileToAppointment(1L, multipartFile);
         ResponseEntity<String> response = fileController.uploadFile(multipartFile, 1L);
         Assertions.assertEquals("File uploaded successfully", response.getBody());
@@ -82,7 +82,7 @@ public class FileControllerTests {
     }
 
     @Test
-    public void testUpdateFile() throws IOException {
+    void testUpdateFile() {
         doNothing().when(fileService).updateFile(1L, multipartFile);
         ResponseEntity<String> response = fileController.updateFile(1L, multipartFile);
         Assertions.assertEquals("File updated successfully", response.getBody());
@@ -90,7 +90,7 @@ public class FileControllerTests {
     }
 
     @Test
-    public void testDeleteFile() {
+    void testDeleteFile() {
         doNothing().when(fileService).deleteFile(1L);
         ResponseEntity<String> response = fileController.deleteFile(1L);
         Assertions.assertEquals("File deleted successfully", response.getBody());
@@ -98,7 +98,7 @@ public class FileControllerTests {
     }
 
     @Test
-    public void testGetPatientFiles() {
+    void testGetPatientFiles() {
         GetFileDto getFileDto = new GetFileDto();
         when(userService.getUserById(1L)).thenReturn(user);
         when(fileService.getFilesByUserId(user)).thenReturn(List.of(getFileDto));

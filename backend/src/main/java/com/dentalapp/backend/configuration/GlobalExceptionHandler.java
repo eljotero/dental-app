@@ -39,12 +39,12 @@ import static org.springframework.http.HttpStatus.*;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = UserAlreadyExistsException.class)
-    public ResponseEntity<?> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
         return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = UserNotFoundException.class)
-    public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
@@ -63,112 +63,112 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = UserAuthenticationException.class)
-    public ResponseEntity<?> handleUserAuthenticationException(UserAuthenticationException e) {
+    public ResponseEntity<ErrorResponse> handleUserAuthenticationException(UserAuthenticationException e) {
         return ResponseEntity.status(UNAUTHORIZED).body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = AppointmentNotFoundException.class)
-    public ResponseEntity<?> handleAppointmentNotFoundException(AppointmentNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleAppointmentNotFoundException(AppointmentNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = IllegalAppointmentDate.class)
-    public ResponseEntity<?> handleIllegalAppointmentDate(IllegalAppointmentDate e) {
+    public ResponseEntity<ErrorResponse> handleIllegalAppointmentDate(IllegalAppointmentDate e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = InvalidTokenException.class)
-    public ResponseEntity<?> handleInvalidTokenException(InvalidTokenException e) {
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = TokenAlreadyUsedException.class)
-    public ResponseEntity<?> handleTokenAlreadyUsedException(TokenAlreadyUsedException e) {
+    public ResponseEntity<ErrorResponse> handleTokenAlreadyUsedException(TokenAlreadyUsedException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = TokenExpiredException.class)
-    public ResponseEntity<?> handleTokenExpiredException(TokenExpiredException e) {
+    public ResponseEntity<ErrorResponse> handleTokenExpiredException(TokenExpiredException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = AvailabilityAlreadyExistsException.class)
-    public ResponseEntity<?> handleAvailabilityAlreadyExistsException(AvailabilityAlreadyExistsException e) {
+    public ResponseEntity<ErrorResponse> handleAvailabilityAlreadyExistsException(AvailabilityAlreadyExistsException e) {
         return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = TreatmentNotFoundException.class)
-    public ResponseEntity<?> handleTreatmentNotFoundException(TreatmentNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleTreatmentNotFoundException(TreatmentNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = TreatmentAlreadyExistsException.class)
-    public ResponseEntity<?> handleTreatmentAlreadyExistsException(TreatmentAlreadyExistsException e) {
+    public ResponseEntity<ErrorResponse> handleTreatmentAlreadyExistsException(TreatmentAlreadyExistsException e) {
         return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = SupplyAlreadyExistsException.class)
-    public ResponseEntity<?> handleSupplyAlreadyExistsException(SupplyAlreadyExistsException e) {
+    public ResponseEntity<ErrorResponse> handleSupplyAlreadyExistsException(SupplyAlreadyExistsException e) {
         return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = SupplyNotFoundException.class)
-    public ResponseEntity<?> handleSupplyNotFoundException(SupplyNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleSupplyNotFoundException(SupplyNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = PrescriptionNotFoundException.class)
-    public ResponseEntity<?> handlePrescriptionNotFoundException(PrescriptionNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handlePrescriptionNotFoundException(PrescriptionNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = ReferralNotFoundException.class)
-    public ResponseEntity<?> handleReferralNotFoundException(ReferralNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleReferralNotFoundException(ReferralNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = InvoiceNotFoundException.class)
-    public ResponseEntity<?> handleInvoiceNotFoundException(InvoiceNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleInvoiceNotFoundException(InvoiceNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = AvailabilityNotFoundException.class)
-    public ResponseEntity<?> handleAvailabilityNotFoundException(AvailabilityNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleAvailabilityNotFoundException(AvailabilityNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = UsernameNotFoundException.class)
-    public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = PaymentStatusNotFoundException.class)
-    public ResponseEntity<?> handlePaymentStatusNotFoundException(PaymentStatusNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handlePaymentStatusNotFoundException(PaymentStatusNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = PaymentMethodNotFoundException.class)
-    public ResponseEntity<?> handlePaymentMethodNotFoundException(PaymentMethodNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handlePaymentMethodNotFoundException(PaymentMethodNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = FileNotFoundException.class)
-    public ResponseEntity<?> handleFileNotFoundException(FileNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleFileNotFoundException(FileNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = FileNameAlreadyExists.class)
-    public ResponseEntity<?> handleFileNameAlreadyExists(FileNameAlreadyExists e) {
+    public ResponseEntity<ErrorResponse> handleFileNameAlreadyExists(FileNameAlreadyExists e) {
         return ResponseEntity.status(CONFLICT).body(new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
     @ExceptionHandler(value = MaxUploadSizeExceededException.class)
-    public ResponseEntity<?> handleMaxUploadSizeExceededException() {
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException() {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "File size exceeds the limit"));
     }
 
     @ExceptionHandler(value = FileIsEmptyException.class)
-    public ResponseEntity<?> handleFileIsEmptyException(FileIsEmptyException e) {
+    public ResponseEntity<ErrorResponse> handleFileIsEmptyException(FileIsEmptyException e) {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 }
