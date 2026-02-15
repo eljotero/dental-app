@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
-public interface TreatmentMapperV2 {
+public interface TreatmentMapper {
 
     Treatment toEntityCreate(CreateTreatmentDto createTreatmentDto);
 

@@ -1,6 +1,7 @@
 package com.dentalapp.backend.unit.services;
 
 import com.dentalapp.backend.model.treatment.dtos.CreateTreatmentDto;
+import com.dentalapp.backend.model.treatment.dtos.TreatmentMapper;
 import com.dentalapp.backend.model.treatment.dtos.UpdateTreatmentDto;
 import com.dentalapp.backend.model.treatment.entity.Treatment;
 import com.dentalapp.backend.model.treatment.exceptions.TreatmentAlreadyExistsException;
@@ -27,6 +28,9 @@ class TreatmentServiceTests {
 
     @Mock
     private TreatmentRepository treatmentRepository;
+
+    @Mock
+    private TreatmentMapper treatmentMapper;
 
     @InjectMocks
     private TreatmentService treatmentService;
