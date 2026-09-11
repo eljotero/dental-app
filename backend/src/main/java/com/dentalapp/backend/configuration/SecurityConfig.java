@@ -43,10 +43,10 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(req -> req.requestMatchers("/api/account/**")
-                        .authenticated()
-                        .anyRequest()
-                        .permitAll())
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("/api/user/register", "/api/user/login",
+                                "/api/user/confirm", "/api/user/reset-password").permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

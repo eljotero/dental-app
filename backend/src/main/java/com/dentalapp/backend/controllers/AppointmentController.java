@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -53,6 +54,7 @@ public class AppointmentController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<String> createAppointment(@RequestHeader("Authorization") String token, @Valid @RequestBody CreateAppointmentDto createAppointmentDto) {
         appointmentService.createAppointment(createAppointmentDto, jwtService.extractEmail(token.substring(7)));
         return ResponseEntity.status(HttpStatus.CREATED).body("Appointment created");
