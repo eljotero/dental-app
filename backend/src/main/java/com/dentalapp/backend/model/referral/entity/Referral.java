@@ -14,7 +14,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Setter
 @SequenceGenerator(name="referral_id_seq", sequenceName = "referral_id_seq")
-@SQLDelete(sql = "UPDATE referrals SET deleted_at = CURRENT_TIMESTAMP WHERE referral_id = ? and version ?")
+@SQLDelete(sql = "UPDATE referrals SET deleted_at = CURRENT_TIMESTAMP WHERE referral_id = ? and version = ?")
 public class Referral extends BaseEntityClass {
 
     @Id

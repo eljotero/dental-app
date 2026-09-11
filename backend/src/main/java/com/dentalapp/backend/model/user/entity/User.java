@@ -21,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @SequenceGenerator(name="user_id_seq", sequenceName = "user_id_seq")
-@SQLDelete(sql = "UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ? and version ?")
+@SQLDelete(sql = "UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ? and version = ?")
 public class User extends BaseEntityClass implements UserDetails {
 
     @Id

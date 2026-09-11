@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Setter
 @SequenceGenerator(name="supply_id_seq", sequenceName = "supply_id_seq")
-@SQLDelete(sql = "UPDATE supplies SET deleted_at = CURRENT_TIMESTAMP WHERE supply_id = ? and version ?")
+@SQLDelete(sql = "UPDATE supplies SET deleted_at = CURRENT_TIMESTAMP WHERE supply_id = ? and version = ?")
 public class Supply extends BaseEntityClass {
 
     @Id
