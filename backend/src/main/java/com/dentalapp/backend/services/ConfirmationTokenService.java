@@ -8,6 +8,7 @@ import com.dentalapp.backend.model.token.repository.ConfirmationTokenRepository;
 import com.dentalapp.backend.model.user.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class ConfirmationTokenService {
 
     private final ConfirmationTokenRepository confirmationTokenRepository;

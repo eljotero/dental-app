@@ -4,6 +4,8 @@ import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.availability.entity.Availability;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class AvailableSlotsService {
 
     private final AppointmentService appointmentService;

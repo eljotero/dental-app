@@ -9,6 +9,7 @@ import com.dentalapp.backend.model.user.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class AvailabilityService {
 
     private final AvailabilityRepository availabilityRepository;

@@ -10,12 +10,14 @@ import com.dentalapp.backend.model.referral.exception.ReferralNotFoundException;
 import com.dentalapp.backend.model.referral.repository.ReferralRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class ReferralService {
 
     private final ReferralRepository referralRepository;

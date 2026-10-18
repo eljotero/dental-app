@@ -4,9 +4,12 @@ import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class PaymentService {
 
     private final AppointmentService appointmentService;
