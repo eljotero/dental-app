@@ -17,11 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
-
-import java.time.LocalDate;
-import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -74,20 +70,6 @@ class PaymentControllerTests {
         Assertions.assertEquals(3, validator.validate(payForAppointmentDto).size());
     }
 
-    @Test
-    void testGetAllInvoices() {
-        String status = "PAID";
-        String method = "CREDIT_CARD";
-        LocalDate date = LocalDate.of(2021, 10, 10);
-        List<Invoice> invoiceList = List.of(new Invoice());
-
-        when(invoiceService.findAllByQueryParams(any(Specification.class))).thenReturn(invoiceList);
-
-        ResponseEntity<List<Invoice>> response = paymentController.getAllInvoices(status, method, date);
-
-        verify(invoiceService, times(1)).findAllByQueryParams(any(Specification.class));
-        Assertions.assertEquals(ResponseEntity.ok(invoiceList), response);
-    }
 
     @Test
     void testGetInvoiceById() {

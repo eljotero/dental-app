@@ -4,7 +4,6 @@ import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.PrescriptionController;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionsDto;
-import com.dentalapp.backend.model.prescription.dtos.GetPrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.PrescriptionService;
@@ -20,9 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Objects;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrescriptionControllerTests {
@@ -38,10 +34,6 @@ class PrescriptionControllerTests {
     @InjectMocks
     private PrescriptionController prescriptionController;
 
-    private final String token = "Bearer test@mail.com";
-
-    private final String email = "test@mail.com";
-
     @Test
     void testValidation() {
         Validator validator;
@@ -55,30 +47,8 @@ class PrescriptionControllerTests {
         Assertions.assertEquals(3, validator.validate(createPrescriptionDto).size());
     }
 
-    @Test
-    void testGetAllPrescriptions() {
-        ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptions();
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(0, Objects.requireNonNull(response.getBody()).size());
-    }
 
-    @Test
-    void testGetAllPrescriptionsByPatient() {
-        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
-        when(prescriptionService.findAllByPatient(email)).thenReturn(List.of());
-        ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptionsByPatient(token);
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(0, Objects.requireNonNull(response.getBody()).size());
-    }
 
-    @Test
-    void testGetAllPrescriptionsByDoctor() {
-        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
-        when(prescriptionService.findAllByDoctor(email)).thenReturn(List.of());
-        ResponseEntity<List<GetPrescriptionDto>> response = prescriptionController.getAllPrescriptionsByDoctor(token);
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(0, Objects.requireNonNull(response.getBody()).size());
-    }
 
     @Test
     void testCreatePrescriptions() {

@@ -8,8 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @AllArgsConstructor
 public class PrescriptionService {
@@ -18,16 +16,19 @@ public class PrescriptionService {
 
     private final PrescriptionMapper prescriptionMapper;
 
-    public List<GetPrescriptionDto> findAll() {
-        return prescriptionRepository.findAll().stream().map(prescriptionMapper::toGetPrescriptionDto).toList();
+    public PrescriptionPageResponse<GetPrescriptionDto> findAll(PrescriptionQueryParams params) {
+        return PrescriptionPageResponse.from(prescriptionRepository.findAll(params.toPageable())
+                .map(prescriptionMapper::toGetPrescriptionDto));
     }
 
-    public List<GetPrescriptionDto> findAllByPatient(String email) {
-        return prescriptionRepository.findAllByPatient(email).stream().map(prescriptionMapper::toGetPrescriptionDto).toList();
+    public PrescriptionPageResponse<GetPrescriptionDto> findAllByPatient(String email, PrescriptionQueryParams params) {
+        return PrescriptionPageResponse.from(prescriptionRepository.findAllByPatient(email, params.toPageable())
+                .map(prescriptionMapper::toGetPrescriptionDto));
     }
 
-    public List<GetPrescriptionDto> findAllByDoctor(String email) {
-        return prescriptionRepository.findAllByDoctor(email).stream().map(prescriptionMapper::toGetPrescriptionDto).toList();
+    public PrescriptionPageResponse<GetPrescriptionDto> findAllByDoctor(String email, PrescriptionQueryParams params) {
+        return PrescriptionPageResponse.from(prescriptionRepository.findAllByDoctor(email, params.toPageable())
+                .map(prescriptionMapper::toGetPrescriptionDto));
     }
 
     @Transactional

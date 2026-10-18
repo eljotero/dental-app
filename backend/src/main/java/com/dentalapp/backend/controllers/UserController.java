@@ -1,14 +1,33 @@
 package com.dentalapp.backend.controllers;
 
-import com.dentalapp.backend.configuration.JwtService;
-import com.dentalapp.backend.model.user.dtos.*;
+import com.dentalapp.backend.model.user.dtos.ChangeLanguageDto;
+import com.dentalapp.backend.model.user.dtos.CreateUserDto;
+import com.dentalapp.backend.model.user.dtos.DoctorPageResponse;
+import com.dentalapp.backend.model.user.dtos.GetDoctorDto;
+import com.dentalapp.backend.model.user.dtos.GetUserDto;
+import com.dentalapp.backend.model.user.dtos.LoginUserDto;
+import com.dentalapp.backend.model.user.dtos.LoginUserDtoResponse;
+import com.dentalapp.backend.model.user.dtos.ResetPasswordDto;
+import com.dentalapp.backend.model.user.dtos.UpdatePasswordDto;
+import com.dentalapp.backend.model.user.dtos.UpdateUserDto;
+import com.dentalapp.backend.model.user.dtos.UserPageResponse;
+import com.dentalapp.backend.model.user.dtos.UserQueryParams;
+import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user")
@@ -16,8 +35,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-
-    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody @Valid CreateUserDto createUserDto) {
@@ -31,15 +48,14 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<String> updateUser(@RequestHeader("Authorization") String token, @RequestBody @Valid UpdateUserDto updateUserDto) {
-        String email = jwtService.extractEmail(token.substring(7));
-        userService.updateUser(updateUserDto, email);
+    public ResponseEntity<String> updateUser(@AuthenticationPrincipal User user, @RequestBody @Valid UpdateUserDto updateUserDto) {
+        userService.updateUser(updateUserDto, user.getEmail());
         return ResponseEntity.ok("User updated successfully");
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<GetUserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<UserPageResponse<GetUserDto>> getAllUsers(@Valid @ModelAttribute UserQueryParams params) {
+        return ResponseEntity.ok(userService.getAllUsers(params));
     }
 
     @GetMapping("/{id}")
@@ -48,13 +64,13 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<GetUserDto> getMe(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(userService.getUserData(jwtService.extractEmail(token.substring(7))));
+    public ResponseEntity<GetUserDto> getMe(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getUserData(user.getEmail()));
     }
 
     @GetMapping("/doctors")
-    public ResponseEntity<List<GetDoctorDto>> getDoctors() {
-        return ResponseEntity.ok(userService.getDoctors());
+    public ResponseEntity<DoctorPageResponse<GetDoctorDto>> getDoctors(@Valid @ModelAttribute UserQueryParams params) {
+        return ResponseEntity.ok(userService.getDoctors(params));
     }
 
     @GetMapping("/confirm")
@@ -76,16 +92,14 @@ public class UserController {
     }
 
     @PostMapping("/change-language")
-    public ResponseEntity<String> changeLanguage(@RequestHeader("Authorization") String token, @RequestBody @Valid ChangeLanguageDto changeLanguageDto) {
-        String email = jwtService.extractEmail(token.substring(7));
-        userService.changeLanguage(email, changeLanguageDto.getLanguage());
+    public ResponseEntity<String> changeLanguage(@AuthenticationPrincipal User user, @RequestBody @Valid ChangeLanguageDto changeLanguageDto) {
+        userService.changeLanguage(user.getEmail(), changeLanguageDto.getLanguage());
         return ResponseEntity.ok("Language changed successfully");
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token) {
-        String email = jwtService.extractEmail(token.substring(7));
-        userService.deleteUser(email);
+    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal User user) {
+        userService.deleteUser(user.getEmail());
         return ResponseEntity.ok("User deleted successfully");
     }
 }

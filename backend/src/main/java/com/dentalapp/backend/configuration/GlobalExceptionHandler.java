@@ -25,13 +25,21 @@ import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -48,18 +56,65 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        Map<String, String> errorMap = new HashMap<>();
-        if (!e.getBindingResult().getFieldErrors().isEmpty()) {
-            e.getBindingResult().getFieldErrors().forEach(error -> errorMap.put(error.getField(), error.getDefaultMessage()));
-            String errorMessage = String.join(", ", errorMap.values());
-            return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(BAD_REQUEST.value(), errorMessage));
-        } else {
-            e.getBindingResult().getAllErrors().forEach(error -> errorMap.put(error.getObjectName(), error.getDefaultMessage()));
-            String errorMessage = String.join(", ", errorMap.values());
-            return ResponseEntity.status(BAD_REQUEST).body(new ErrorResponse(BAD_REQUEST.value(), errorMessage));
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponse> handleBindingException(BindException e) {
+        BindingResult result = e.getBindingResult();
+        String message = result.getAllErrors().stream().map(error -> {
+            if (error instanceof FieldError fieldError) {
+                if (fieldError.isBindingFailure()) {
+                    return invalidParameterMessage(fieldError.getField(), result.getFieldType(fieldError.getField()));
+                }
+                return fieldError.getField() + ": " + Objects.requireNonNullElse(fieldError.getDefaultMessage(), "invalid value");
+            }
+            return Objects.requireNonNullElse(error.getDefaultMessage(), "Invalid request parameters");
+        }).distinct().collect(Collectors.joining("; "));
+
+        return badRequest(message.isBlank() ? "Invalid request parameters" : message);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleParameterTypeMismatch(MethodArgumentTypeMismatchException e) {
+        return badRequest(invalidParameterMessage(e.getName(), e.getRequiredType()));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestParameter(MissingServletRequestParameterException e) {
+        return badRequest("Parameter '" + e.getParameterName() + "' is required");
+    }
+
+    private ResponseEntity<ErrorResponse> badRequest(String message) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(BAD_REQUEST.value(), message));
+    }
+
+    private String invalidParameterMessage(String name, Class<?> requiredType) {
+        String prefix = "Invalid parameter '" + name + "'. ";
+
+        if (requiredType == null) {
+            return prefix + "Check the value and format";
         }
+        if (requiredType.isEnum()) {
+            String allowedValues = Arrays.stream(requiredType.getEnumConstants()).map(value -> ((Enum<?>) value).name()).collect(Collectors.joining(", "));
+            return prefix + "Allowed values: " + allowedValues;
+        }
+        if (requiredType == LocalDate.class) {
+            return prefix + "Expected a date in yyyy-MM-dd format";
+        }
+        if (requiredType == LocalTime.class) {
+            return prefix + "Expected a time in HH:mm or HH:mm:ss format";
+        }
+        if (requiredType == LocalDateTime.class) {
+            return prefix + "Expected a date and time in yyyy-MM-dd'T'HH:mm:ss format";
+        }
+        if (requiredType == Boolean.class || requiredType == boolean.class) {
+            return prefix + "Allowed values: true, false";
+        }
+        if (requiredType == Byte.class || requiredType == byte.class || requiredType == Short.class || requiredType == short.class || requiredType == Integer.class || requiredType == int.class || requiredType == Long.class || requiredType == long.class || requiredType == java.math.BigInteger.class) {
+            return prefix + "Expected a whole number within the supported range";
+        }
+        if (Number.class.isAssignableFrom(requiredType) || requiredType == float.class || requiredType == double.class) {
+            return prefix + "Expected a number within the supported range";
+        }
+        return prefix + "Check the value and format";
     }
 
     @ExceptionHandler(value = UserAuthenticationException.class)

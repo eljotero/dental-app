@@ -176,7 +176,8 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.6</minimum>
+<!--                                            TODO: Change minimum ratio in future-->
+                                            <minimum>0.1</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

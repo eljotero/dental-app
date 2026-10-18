@@ -2,16 +2,15 @@ package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.model.invoice.dtos.PayForAppointmentDto;
 import com.dentalapp.backend.model.invoice.dtos.SetAppointmentPriceDto;
+import com.dentalapp.backend.model.invoice.dtos.InvoicePageResponse;
+import com.dentalapp.backend.model.invoice.dtos.InvoiceQueryParams;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.services.InvoiceService;
 import com.dentalapp.backend.services.PaymentService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -23,18 +22,8 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Invoice>> getAllInvoices(@RequestParam(required = false) String status, @RequestParam(required = false) String method, @RequestParam(required = false) LocalDate date) {
-        Specification<Invoice> specification = Specification.where(null);
-        if(status != null) {
-            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentStatus"), status));
-        }
-        if(method != null) {
-            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentMethod"), method));
-        }
-        if(date != null) {
-            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("paymentDate"), date));
-        }
-        return ResponseEntity.ok(invoiceService.findAllByQueryParams(specification));
+    public ResponseEntity<InvoicePageResponse<Invoice>> getAllInvoices(@Valid @ModelAttribute InvoiceQueryParams params) {
+        return ResponseEntity.ok(invoiceService.findAllByQueryParams(params));
     }
 
     @GetMapping("/{id}")

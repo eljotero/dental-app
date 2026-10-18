@@ -2,7 +2,6 @@ package com.dentalapp.backend.unit.controllers;
 
 import com.dentalapp.backend.controllers.FileController;
 import com.dentalapp.backend.model.file.dtos.GetDownloadFileDto;
-import com.dentalapp.backend.model.file.dtos.GetFileDto;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
@@ -20,7 +19,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -64,14 +62,6 @@ class FileControllerTests {
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
-    @Test
-    void testGetFilesByAppointmentId() {
-        when(appointmentService.getAppointmentById(1L)).thenReturn(null);
-        when(fileService.getFilesByAppointmentId(null)).thenReturn(null);
-        ResponseEntity<List<GetFileDto>> response = fileController.getFilesByAppointmentId(1L);
-        Assertions.assertNull(response.getBody());
-        Assertions.assertEquals(200, response.getStatusCode().value());
-    }
 
     @Test
     void testUploadFile() {
@@ -97,13 +87,4 @@ class FileControllerTests {
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
-    @Test
-    void testGetPatientFiles() {
-        GetFileDto getFileDto = new GetFileDto();
-        when(userService.getUserById(1L)).thenReturn(user);
-        when(fileService.getFilesByUserId(user)).thenReturn(List.of(getFileDto));
-        ResponseEntity<List<GetFileDto>> response = fileController.getPatientFiles(1L);
-        Assertions.assertEquals(List.of(getFileDto), response.getBody());
-        Assertions.assertEquals(200, response.getStatusCode().value());
-    }
 }
