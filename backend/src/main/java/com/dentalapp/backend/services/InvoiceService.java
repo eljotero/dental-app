@@ -12,10 +12,12 @@ import com.dentalapp.backend.model.invoice.repository.InvoiceRepository;
 import com.dentalapp.backend.model.invoice.repository.InvoiceSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;

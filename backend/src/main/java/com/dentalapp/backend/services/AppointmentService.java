@@ -33,6 +33,9 @@ import java.util.Objects;
 @Transactional(propagation = Propagation.SUPPORTS)
 public class AppointmentService {
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     private final AppointmentRepository appointmentRepository;
 
     private final UserService userService;
@@ -129,7 +132,7 @@ public class AppointmentService {
         List<Appointment> appointmentList = appointmentRepository.findUnconfirmedAppointments();
         for (Appointment appointment : appointmentList) {
             String appointmentDetails = "Appointment with " + appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName() + " on " + appointment.getAppointmentDate() + " at " + appointment.getAppointmentStartTime();
-            String confirmationLink = "http://localhost:8080/api/appointments/confirm/" + appointment.getAppointmentId();
+            String confirmationLink = baseUrl + "/api/appointments/confirm/" + appointment.getAppointmentId();
             emailSenderService.sendAppointmentConfirmationEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointmentDetails, confirmationLink);
         }
     }

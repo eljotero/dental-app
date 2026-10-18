@@ -11,10 +11,12 @@ import com.dentalapp.backend.model.treatment.exceptions.TreatmentNotFoundExcepti
 import com.dentalapp.backend.model.treatment.repository.TreatmentRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class TreatmentService {
 
     private final TreatmentRepository treatmentRepository;

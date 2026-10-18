@@ -7,18 +7,24 @@ import com.dentalapp.backend.model.user.exceptions.UserAlreadyExistsException;
 import com.dentalapp.backend.model.user.exceptions.UserAuthenticationException;
 import com.dentalapp.backend.model.user.exceptions.UserNotFoundException;
 import com.dentalapp.backend.model.user.repostitory.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class UserService {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     private final UserRepository userRepository;
 
@@ -44,7 +50,7 @@ public class UserService {
         User user = userMapper.toUser(createUserDto);
         userRepository.save(user);
         String tokenCode = confirmationTokenService.saveConfirmationToken(user);
-        String link = "http://localhost:8080/api/user/confirm?token=" + tokenCode;
+        String link = baseUrl + "/api/user/confirm?token=" + tokenCode;
         String userName = user.getFirstName() + user.getLastName();
         emailSenderService.sendAccountConfirmationEmail(user.getEmail(), userName, link);
     }
@@ -127,7 +133,7 @@ public class UserService {
     public void resetPassword(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
         String tokenCode = confirmationTokenService.saveConfirmationToken(user);
-        String link = "http://localhost:8080/api/user/reset-password?token=" + tokenCode;
+        String link = baseUrl + "/api/user/reset-password?token=" + tokenCode;
         String userName = user.getFirstName() + user.getLastName();
         emailSenderService.sendResetPasswordEmail(user.getEmail(), userName, link);
     }

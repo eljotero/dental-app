@@ -11,10 +11,12 @@ import com.dentalapp.backend.model.supplies.exceptions.SupplyNotFoundException;
 import com.dentalapp.backend.model.supplies.repository.SupplyRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class SupplyService {
 
     private final SupplyRepository supplyRepository;

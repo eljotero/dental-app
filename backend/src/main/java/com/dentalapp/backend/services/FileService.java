@@ -14,11 +14,13 @@ import com.dentalapp.backend.model.file.repository.FileRepository;
 import com.dentalapp.backend.model.user.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @AllArgsConstructor
+@Transactional(propagation = Propagation.SUPPORTS)
 public class FileService {
 
     private final FileRepository fileRepository;
