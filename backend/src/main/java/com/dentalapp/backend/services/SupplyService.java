@@ -29,13 +29,13 @@ public class SupplyService {
     }
 
     public Supply findById(Long id) {
-        return supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException("Supply with id " + id + " not found"));
+        return supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException(id));
     }
 
     @Transactional
     public void createSupply(CreateSupplyDto createSupplyDto) {
         if (supplyRepository.findByName(createSupplyDto.getName()).isPresent()) {
-            throw new SupplyAlreadyExistsException("Supply with name " + createSupplyDto.getName() + " already exists");
+            throw new SupplyAlreadyExistsException(createSupplyDto.getName());
         }
         Supply supply = supplyMapper.toEntityCreate(createSupplyDto);
         supplyRepository.save(supply);
@@ -43,14 +43,14 @@ public class SupplyService {
 
     @Transactional
     public void updateSupply(Long id, UpdateSupplyDto updateSupplyDto) {
-        Supply supply = supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException("Supply not found"));
+        Supply supply = supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException(id));
         Supply supplyDB = supplyMapper.toEntityUpdate(supply, updateSupplyDto);
         supplyRepository.save(supplyDB);
     }
 
     @Transactional
     public void removeSupply(Long id) {
-        Supply supply = supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException("Supply not found"));
+        Supply supply = supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException(id));
         supplyRepository.delete(supply);
     }
 }

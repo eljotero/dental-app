@@ -24,11 +24,11 @@ public class TreatmentService {
     private final TreatmentMapper treatmentMapper;
 
     public Treatment getTreatmentById(Long id) {
-        return treatmentRepository.findById(id).orElseThrow(() -> new TreatmentNotFoundException("Treatment with id " + id + " not found"));
+        return treatmentRepository.findById(id).orElseThrow(() -> TreatmentNotFoundException.byId(id));
     }
 
     public Treatment getTreatmentByName(String name) {
-        return treatmentRepository.findByName(name).orElseThrow(() -> new TreatmentNotFoundException("Treatment with name " + name + " not found"));
+        return treatmentRepository.findByName(name).orElseThrow(() -> TreatmentNotFoundException.byName(name));
     }
 
     public TreatmentPageResponse<Treatment> getAllTreatments(TreatmentQueryParams params) {
@@ -57,7 +57,7 @@ public class TreatmentService {
 
     private void doesTreatmentExist(String name) {
         treatmentRepository.findByName(name).ifPresent(treatment -> {
-            throw new TreatmentAlreadyExistsException("Treatment with name " + name + " already exists");
+            throw new TreatmentAlreadyExistsException(name);
         });
     }
 }

@@ -37,12 +37,12 @@ public class ConfirmationTokenService {
     @Transactional
     public Long confirmToken(String token) {
         ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new InvalidTokenException("Token not found"));
+                .orElseThrow(InvalidTokenException::new);
         if (confirmationToken.getConfirmedAt() != null) {
-            throw new TokenAlreadyUsedException("Token already confirmed");
+            throw new TokenAlreadyUsedException();
         }
         if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new TokenExpiredException("Token expired");
+            throw new TokenExpiredException();
         }
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         confirmationTokenRepository.save(confirmationToken);

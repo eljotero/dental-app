@@ -56,21 +56,21 @@ public class AvailabilityService {
                 Availability availability = availabilityMapper.toAvailability(availabilityDayDto, doctor);
                 availabilityRepository.save(availability);
             } else {
-                throw new AvailabilityAlreadyExistsException("Availability already exists");
+                throw new AvailabilityAlreadyExistsException();
             }
         }
     }
 
     @Transactional
     public void confirmAvailability(Long id) {
-        Availability availability = availabilityRepository.findById(id).orElseThrow(() -> new AvailabilityNotFoundException("Availability not found"));
+        Availability availability = availabilityRepository.findById(id).orElseThrow(AvailabilityNotFoundException::new);
         availability.setIsConfirmed(true);
         availabilityRepository.save(availability);
     }
 
     @Transactional
     public void updateAvailability(Long id, UpdateAvailabilityDto updateAvailabilityDto) {
-        Availability availability = availabilityRepository.findById(id).orElseThrow(() -> new AvailabilityNotFoundException("Availability not found"));
+        Availability availability = availabilityRepository.findById(id).orElseThrow(AvailabilityNotFoundException::new);
         Availability updatedAvailability = availabilityMapper.updateAvailability(availability, updateAvailabilityDto);
         availabilityRepository.save(updatedAvailability);
     }

@@ -31,7 +31,7 @@ public class ReferralService {
     }
 
     public GetReferralDto findById(Long id) {
-        return referralRepository.findById(id).map(referralMapper::toGetReferralDto).orElseThrow(() -> new ReferralNotFoundException("Referral not found"));
+        return referralRepository.findById(id).map(referralMapper::toGetReferralDto).orElseThrow(ReferralNotFoundException::new);
     }
 
     public ReferralPageResponse<GetReferralDto> findAllByPatient(String patientEmail, ReferralQueryParams params) {
@@ -53,14 +53,14 @@ public class ReferralService {
 
     @Transactional
     public void updateReferral(Long referralId, UpdateReferralDto updateReferralDto) {
-        Referral referral = referralRepository.findById(referralId).orElseThrow(() -> new ReferralNotFoundException("Referral not found"));
+        Referral referral = referralRepository.findById(referralId).orElseThrow(ReferralNotFoundException::new);
         Referral updatedReferral = referralMapper.toUpdateEntity(referral, updateReferralDto);
         referralRepository.save(updatedReferral);
     }
 
     @Transactional
     public void deleteReferral(Long referralId) {
-        Referral referral = referralRepository.findById(referralId).orElseThrow(() -> new ReferralNotFoundException("Refferal not found"));
+        Referral referral = referralRepository.findById(referralId).orElseThrow(ReferralNotFoundException::new);
         referralRepository.delete(referral);
     }
 }

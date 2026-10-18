@@ -28,7 +28,7 @@ public class FileService {
     private final FileMapper fileMapper;
 
     public GetDownloadFileDto getFileById(Long id) {
-        File file = fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));
+        File file = fileRepository.findById(id).orElseThrow(FileNotFoundException::new);
         return fileMapper.toGetDownloadFileDto(file);
     }
 
@@ -43,10 +43,10 @@ public class FileService {
     @Transactional
     public File saveFile(MultipartFile multipartFile, Appointment appointment) {
         if (multipartFile.isEmpty()) {
-            throw new FileIsEmptyException("File is empty");
+            throw new FileIsEmptyException();
         }
         if (doesFileNameExist(multipartFile.getOriginalFilename())) {
-            throw new FileNameAlreadyExists("File with this name already exists");
+            throw new FileNameAlreadyExists();
         }
         File file = fileMapper.toEntity(multipartFile);
         file.setAppointment(appointment);
@@ -56,15 +56,15 @@ public class FileService {
     @Transactional
     public void updateFile(Long id, MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
-            throw new FileIsEmptyException("File is empty");
+            throw new FileIsEmptyException();
         }
-        File file = fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));
+        File file = fileRepository.findById(id).orElseThrow(FileNotFoundException::new);
         File updateFile = fileMapper.toUpdateEntity(file, multipartFile);
         fileRepository.save(updateFile);
     }
 
     public void deleteFile(Long id) {
-        File file = fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));
+        File file = fileRepository.findById(id).orElseThrow(FileNotFoundException::new);
         fileRepository.delete(file);
     }
 

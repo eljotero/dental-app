@@ -29,7 +29,7 @@ public class InvoiceService {
     }
 
     public Invoice findById(Long id) {
-        return invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
+        return invoiceRepository.findById(id).orElseThrow(InvoiceNotFoundException::new);
     }
 
     @Transactional
@@ -47,7 +47,7 @@ public class InvoiceService {
 
     @Transactional
     public void payInvoice(Long id, PayForAppointmentDto payForAppointmentDto) {
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(InvoiceNotFoundException::new);
         boolean isPriceSet = invoice.getPrice() != null;
         Invoice invoiceDB = invoiceMapper.toDto(invoice, payForAppointmentDto, isPriceSet);
         invoiceRepository.save(invoiceDB);

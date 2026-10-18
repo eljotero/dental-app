@@ -83,7 +83,7 @@ public class AppointmentService {
     }
 
     public Appointment getAppointmentById(Long appointmentId) {
-        return appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
+        return appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException(appointmentId));
     }
 
     @Transactional
@@ -91,10 +91,10 @@ public class AppointmentService {
         User patient = userService.getPatientByEmail(patientEmail);
         User doctor = userService.getDoctorById(createAppointmentDto.getDoctorId());
         if (hasDoctorAppointmentAtTime(doctor, createAppointmentDto.getAppointmentDate(), LocalTime.parse(createAppointmentDto.getAppointmentStartTime()), LocalTime.parse(createAppointmentDto.getAppointmentEndTime()))) {
-            throw new IllegalAppointmentDate("Doctor already has an appointment at this time");
+            throw IllegalAppointmentDate.slotAlreadyBooked();
         }
         if (!availabilityService.isDoctorAvailable(doctor, createAppointmentDto.getAppointmentDate(), LocalTime.parse(createAppointmentDto.getAppointmentStartTime()), LocalTime.parse(createAppointmentDto.getAppointmentEndTime()))) {
-            throw new IllegalAppointmentDate("Doctor is not available at this time");
+            throw IllegalAppointmentDate.doctorUnavailable();
         }
         createAppointmentDto.setPatient(patient);
         createAppointmentDto.setDoctor(doctor);
@@ -111,7 +111,7 @@ public class AppointmentService {
         List<Appointment> appointments = appointmentRepository.findAllByDoctorAndDate(doctor, appointment.getAppointmentDate());
         appointments.stream().filter(a -> !Objects.equals(a.getAppointmentId(), appointment.getAppointmentId())).forEach(a -> {
             if (a.getAppointmentDate().equals(updateAppointmentDto.getAppointmentDate())) {
-                throw new IllegalAppointmentDate("Doctor already has an appointment at this time");
+                throw IllegalAppointmentDate.slotAlreadyBooked();
             }
         });
         appointment.setDoctor(doctor);

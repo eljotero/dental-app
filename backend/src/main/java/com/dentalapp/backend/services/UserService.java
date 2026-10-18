@@ -43,7 +43,7 @@ public class UserService {
     @Transactional
     public void createUser(CreateUserDto createUserDto) {
         if (userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("User with email " + createUserDto.getEmail() + " already exists");
+            throw new UserAlreadyExistsException(createUserDto.getEmail());
         }
         createUserDto.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
         createUserDto.setPersonalIdNumber(passwordEncoder.encode(createUserDto.getPersonalIdNumber()));
@@ -57,7 +57,7 @@ public class UserService {
 
     @Transactional
     public void enableUser(String token) {
-        User user = userRepository.findById(confirmationTokenService.confirmToken(token)).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(confirmationTokenService.confirmToken(token)).orElseThrow(UserNotFoundException::new);
         user.setIsEnabled(true);
         userRepository.save(user);
     }
@@ -65,12 +65,12 @@ public class UserService {
     public LoginUserDtoResponse loginUser(LoginUserDto loginUserDto) {
         User user = getUser(loginUserDto.getEmail());
         if (!user.isEnabled()) {
-            throw new UserAuthenticationException("User with email " + loginUserDto.getEmail() + " is not enabled");
+            throw UserAuthenticationException.accountDisabled(loginUserDto.getEmail());
         }
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUserDto.getEmail(), loginUserDto.getPassword()));
         } catch (Exception e) {
-            throw new UserAuthenticationException("Invalid email or password");
+            throw UserAuthenticationException.invalidCredentials();
         }
         String token = jwtService.generateToken(user);
         return userMapper.toResponse(user, token);
@@ -91,7 +91,7 @@ public class UserService {
     public User getUser(String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
         if (user.isEmpty()) {
-            throw new UserNotFoundException("User with email " + userEmail + " does not exist");
+            throw UserNotFoundException.byEmail(userEmail);
         }
         return user.orElse(null);
     }
@@ -101,19 +101,19 @@ public class UserService {
     }
 
     public User getPatientById(Long patientId) {
-        return userRepository.findPatientById(patientId).orElseThrow(() -> new UserNotFoundException("Patient not found"));
+        return userRepository.findPatientById(patientId).orElseThrow(UserNotFoundException::patientNotFound);
     }
 
     public User getDoctorById(Long doctorId) {
-        return userRepository.findDoctorById(doctorId).orElseThrow(() -> new UserNotFoundException("Doctor not found"));
+        return userRepository.findDoctorById(doctorId).orElseThrow(UserNotFoundException::doctorNotFound);
     }
 
     public User getPatientByEmail(String email) {
-        return userRepository.findPatientByEmail(email).orElseThrow(() -> new UserNotFoundException("Patient not found"));
+        return userRepository.findPatientByEmail(email).orElseThrow(UserNotFoundException::patientNotFound);
     }
 
     public User getDoctorByEmail(String email) {
-        return userRepository.findDoctorByEmail(email).orElseThrow(() -> new UserNotFoundException("Doctor not found"));
+        return userRepository.findDoctorByEmail(email).orElseThrow(UserNotFoundException::doctorNotFound);
     }
 
     public UserPageResponse<GetUserDto> getAllUsers(UserQueryParams params) {
@@ -121,17 +121,17 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 
     public GetUserDto getUserByIdDto(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         return userMapper.toGetUserDto(user);
     }
 
     @Transactional
     public void resetPassword(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         String tokenCode = confirmationTokenService.saveConfirmationToken(user);
         String link = baseUrl + "/api/user/reset-password?token=" + tokenCode;
         String userName = user.getFirstName() + user.getLastName();
@@ -140,7 +140,7 @@ public class UserService {
 
     @Transactional
     public void changePassword(String token, String password) {
-        User user = userRepository.findById(confirmationTokenService.confirmToken(token)).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(confirmationTokenService.confirmToken(token)).orElseThrow(UserNotFoundException::new);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
