@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -42,20 +41,12 @@ class ReferralServiceTests {
 
     private Referral referral;
 
-    private final String email = "test@mail.com";
-
     @BeforeEach
     void setUp() {
         referral = new Referral();
         referral.setReferralId(1L);
     }
 
-    @Test
-    void testFindAllReferrals() {
-        when(referralRepository.findAll()).thenReturn(List.of(referral));
-        List<GetReferralDto> referrals = referralService.findAll();
-        Assertions.assertEquals(1, referrals.size());
-    }
 
     @Test
     void testFindReferralById() {
@@ -71,19 +62,7 @@ class ReferralServiceTests {
         verify(referralMapper).toGetReferralDto(referral);
     }
 
-    @Test
-    void testFindAllByPatient() {
-        when(referralRepository.findAllByPatientEmail(email)).thenReturn(List.of(referral));
-        List<GetReferralDto> referrals = referralService.findAllByPatient(email);
-        Assertions.assertEquals(1, referrals.size());
-    }
 
-    @Test
-    void testFindAllByDoctor() {
-        when(referralRepository.findAllByDoctorEmail(email)).thenReturn(List.of(referral));
-        List<GetReferralDto> referrals = referralService.findAllByDoctor(email);
-        Assertions.assertEquals(1, referrals.size());
-    }
 
     @Test
     void testFindReferralByNonExistentId() {

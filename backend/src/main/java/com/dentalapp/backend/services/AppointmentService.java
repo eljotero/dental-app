@@ -5,14 +5,18 @@ import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.appointment.exceptions.AppointmentNotFoundException;
 import com.dentalapp.backend.model.appointment.exceptions.IllegalAppointmentDate;
 import com.dentalapp.backend.model.appointment.repository.AppointmentRepository;
+import com.dentalapp.backend.model.appointment.repository.AppointmentSpecification;
+import com.dentalapp.backend.model.appointment.repository.MyAppointmentsSpecification;
+import com.dentalapp.backend.model.enums.UserType;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.invoice.entity.Invoice;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.PrescriptionMapper;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.user.entity.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Transactional(propagation = Propagation.SUPPORTS)
 public class AppointmentService {
 
@@ -48,53 +52,37 @@ public class AppointmentService {
 
     private final PrescriptionMapper prescriptionMapper;
 
-    public List<GetAppointmentDto> getAppointments(LocalDate date) {
-        if (date == null) {
-            return appointmentRepository.findAll().stream().map(appointmentMapper::toGetAppointmentDto).toList();
-        }
-        return appointmentRepository.findAllByDate(date).stream().map(appointmentMapper::toGetAppointmentDto).toList();
+    public AppointmentPageResponse<GetAppointmentDto> getAppointments(AppointmentQueryParams params) {
+        AppointmentSpecification specification = new AppointmentSpecification(params);
+        Page<GetAppointmentDto> result = appointmentRepository.findAll(specification, params.toPageable()).map(appointmentMapper::toGetAppointmentDto);
+        return AppointmentPageResponse.from(result);
     }
 
-    public List<GetAppointmentDto> getPatientAppointments(String patientEmail) {
-        Long patientId = userService.getPatientByEmail(patientEmail).getUserId();
-        return appointmentRepository.findAllByPatientId(patientId).stream().map(appointmentMapper::toGetAppointmentDto).toList();
-    }
-
-    public List<GetAppointmentDtoV3> getDoctorAppointments(String doctorEmail, LocalDate date) {
-        Long doctorId = userService.getDoctorByEmail(doctorEmail).getUserId();
-        if(date == null) {
-            return appointmentRepository.findAllByDoctorId(doctorId).stream().map(appointmentMapper::toGetAppointmentDtoV3).toList();
-        }
-        return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date).stream().map(appointmentMapper::toGetAppointmentDtoV3).toList();
-    }
-
-    public List<Appointment> getDoctorAppointmentsByDate(String doctorEmail, LocalDate date) {
-        Long doctorId = userService.getDoctorByEmail(doctorEmail).getUserId();
-        return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date);
+    public AppointmentPageResponse<MyAppointmentResponse> getMyAppointments(Long userId, UserType userType, MyAppointmentsQueryParams params) {
+        MyAppointmentsSpecification specification = new MyAppointmentsSpecification(userId, userType, params.getDate());
+        boolean includePatientInfo = userType == UserType.DOCTOR;
+        Page<MyAppointmentResponse> result = appointmentRepository.findAll(specification, params.toPageable()).map(appointment -> appointmentMapper.toMyAppointmentResponse(appointment, includePatientInfo));
+        return AppointmentPageResponse.from(result);
     }
 
     public List<Appointment> getDoctorsAppointmentsByDate(Long doctorId, LocalDate date) {
         return appointmentRepository.findAllByDoctorIdAndDate(doctorId, date);
     }
 
-    @Transactional
-    public GetAppointmentDtoV2 getAppointmentByIdDto(Long appointmentId) {
-        Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
-        return appointmentMapper.toGetAppointmentDtoV2(appointment);
-    }
+    public AppointmentDetailsResponse getAppointmentDetails(Long appointmentId, Long userId, UserType userType) {
+        Appointment appointment = getAppointmentById(appointmentId);
+        boolean isPatient = userType == UserType.PATIENT && Objects.equals(userId, appointment.getPatient().getUserId());
+        boolean isDoctor = userType == UserType.DOCTOR && Objects.equals(userId, appointment.getDoctor().getUserId());
 
-    @Transactional
-    public GetAppointmentDtoV4 getAppointmentByIdDtoV4(Long appointmentId) {
-        Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
-        return appointmentMapper.toGetAppointmentDtoV4(appointment);
+        if (!isPatient && !isDoctor) {
+            throw new AccessDeniedException("You cannot access this appointment");
+        }
+
+        return appointmentMapper.toAppointmentDetailsResponse(appointment, isDoctor);
     }
 
     public Appointment getAppointmentById(Long appointmentId) {
         return appointmentRepository.findById(appointmentId).orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
-    }
-
-    public List<Appointment> getAppointmentsByDate(LocalDate date) {
-        return appointmentRepository.findByDate(date);
     }
 
     @Transactional

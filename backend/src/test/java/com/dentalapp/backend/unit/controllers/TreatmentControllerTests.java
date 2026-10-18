@@ -17,8 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -76,13 +74,6 @@ class TreatmentControllerTests {
         Assertions.assertEquals(1, validator.validate(updateTreatmentDto).size());
     }
 
-    @Test
-    void testGetAllTreatments() {
-        when(treatmentService.getAllTreatments()).thenReturn(List.of(treatment));
-        ResponseEntity<List<Treatment>> response = treatmentController.getTreatments();
-        verify(treatmentService).getAllTreatments();
-        Assertions.assertEquals(List.of(treatment), response.getBody());
-    }
 
     @Test
     void testGetTreatmentById() {

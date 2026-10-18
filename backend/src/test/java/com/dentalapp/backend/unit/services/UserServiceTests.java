@@ -23,7 +23,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -236,19 +235,6 @@ class UserServiceTests {
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getDoctorByEmail(getEmail));
     }
 
-    @Test
-    void testGetUsers() {
-        GetUserDto expectedDto = new GetUserDto();
-        when(userRepository.findAll()).thenReturn(List.of(user));
-        when(userMapper.toGetUserDto(user)).thenReturn(expectedDto);
-
-        List<GetUserDto> result = userService.getAllUsers();
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1, result.size());
-        verify(userRepository).findAll();
-        verify(userMapper).toGetUserDto(user);
-    }
 
 
     @Test

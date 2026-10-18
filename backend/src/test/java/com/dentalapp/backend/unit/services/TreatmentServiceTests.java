@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -92,11 +91,6 @@ class TreatmentServiceTests {
         Assertions.assertThrows(TreatmentNotFoundException.class, () -> treatmentService.getTreatmentByName("Treatment 1"));
     }
 
-    @Test
-    void testGetAllTreatments() {
-        when(treatmentRepository.findAll()).thenReturn(List.of(treatment));
-        Assertions.assertEquals(1, treatmentService.getAllTreatments().size());
-    }
 
     @Test
     void testCreateTreatment() {

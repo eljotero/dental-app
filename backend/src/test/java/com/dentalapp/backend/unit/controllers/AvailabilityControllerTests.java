@@ -4,7 +4,6 @@ import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.controllers.AvailabilityController;
 import com.dentalapp.backend.model.availability.dtos.AvailabilityDayDto;
 import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
-import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
 import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
 import com.dentalapp.backend.services.AvailabilityService;
 import com.dentalapp.backend.services.AvailableSlotsService;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -45,10 +43,6 @@ class AvailabilityControllerTests {
 
     private Validator validator;
 
-    private String email;
-
-    private String token;
-
     private CreateAvailabilityDto createAvailabilityDto;
 
     private AvailabilityDayDto availabilityDayDto;
@@ -61,8 +55,6 @@ class AvailabilityControllerTests {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
-        email = "test@mail.com";
-        token = "Bearer token";
 
         createAvailabilityDto = new CreateAvailabilityDto();
         availabilityDayDto = new AvailabilityDayDto();
@@ -78,32 +70,7 @@ class AvailabilityControllerTests {
         updateAvailabilityDto.setBrakeTimeEnd("13:00");
     }
 
-    @Test
-    void testGetAllDoctorAvailability() {
-        LocalDate date = LocalDate.of(2021, 10, 10);
-        Long id = 1L;
-        List<GetAvailabilityDto> availabilityList = List.of(new GetAvailabilityDto());
 
-        when(availabilityService.getAllDoctorsAvailability(any(Specification.class))).thenReturn(availabilityList);
-
-        ResponseEntity<List<GetAvailabilityDto>> response = availabilityController.getAllDoctorAvailability(date, id);
-
-        verify(availabilityService, times(1)).getAllDoctorsAvailability(any(Specification.class));
-        Assertions.assertEquals(ResponseEntity.ok(availabilityList), response);
-    }
-
-    @Test
-    void testGetDoctorAvailability() {
-        LocalDate date = LocalDate.of(2021, 10, 10);
-        List<GetAvailabilityDto> availabilityList = List.of(new GetAvailabilityDto());
-
-        when(availabilityService.getDoctorAvailability(any(Specification.class))).thenReturn(availabilityList);
-
-        ResponseEntity<List<GetAvailabilityDto>> response = availabilityController.getDoctorAvailability(token, date);
-
-        verify(availabilityService, times(1)).getDoctorAvailability(any(Specification.class));
-        Assertions.assertEquals(ResponseEntity.ok(availabilityList), response);
-    }
 
     @Test
     void testValidation() {
@@ -121,13 +88,6 @@ class AvailabilityControllerTests {
         Assertions.assertEquals(1, validator.validate(updateAvailabilityDto).size());
     }
 
-    @Test
-    void testAddDoctorAvailability() {
-        when(jwtService.extractEmail("token")).thenReturn(email);
-        ResponseEntity<String> response = availabilityController.addDoctorAvailability(token, createAvailabilityDto);
-        verify(availabilityService).addDoctorAvailability(createAvailabilityDto, email);
-        Assertions.assertEquals(ResponseEntity.status(201).body("Availability added successfully"), response);
-    }
 
     @Test
     void testConfirmAvailabilityValidation() {

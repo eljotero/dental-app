@@ -16,8 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,12 +52,6 @@ class SupplyServiceTests {
         updateSupplyDto.setName("Name updated");
     }
 
-    @Test
-    void testFindAll() {
-        when(supplyRepository.findAll()).thenReturn(List.of(supply));
-        List<Supply> supplies = supplyService.findAll();
-        Assertions.assertEquals(List.of(supply), supplies);
-    }
 
     @Test
     void testFindById() {

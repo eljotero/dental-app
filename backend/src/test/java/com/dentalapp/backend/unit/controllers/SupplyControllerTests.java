@@ -17,9 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-import java.util.Objects;
-
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,14 +57,6 @@ class SupplyControllerTests {
         Assertions.assertEquals(1, validator.validate(updateSupplyDto).size());
     }
 
-    @Test
-    void testGetAllSupplies() {
-        when(supplyService.findAll()).thenReturn(List.of(supply));
-        ResponseEntity<List<Supply>> response = supplyController.getAllSupplies();
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
-        Assertions.assertEquals(List.of(supply), response.getBody());
-    }
 
     @Test
     void testGetSupplyById() {

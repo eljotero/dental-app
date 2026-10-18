@@ -5,6 +5,8 @@ import com.dentalapp.backend.model.referral.dtos.CreateReferralDto;
 import com.dentalapp.backend.model.referral.dtos.GetReferralDto;
 import com.dentalapp.backend.model.referral.dtos.ReferralMapper;
 import com.dentalapp.backend.model.referral.dtos.UpdateReferralDto;
+import com.dentalapp.backend.model.referral.dtos.ReferralPageResponse;
+import com.dentalapp.backend.model.referral.dtos.ReferralQueryParams;
 import com.dentalapp.backend.model.referral.entity.Referral;
 import com.dentalapp.backend.model.referral.exception.ReferralNotFoundException;
 import com.dentalapp.backend.model.referral.repository.ReferralRepository;
@@ -12,8 +14,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -26,20 +26,20 @@ public class ReferralService {
 
     private final ReferralMapper referralMapper;
 
-    public List<GetReferralDto> findAll() {
-        return referralRepository.findAll().stream().map(referralMapper::toGetReferralDto).toList();
+    public ReferralPageResponse<GetReferralDto> findAll(ReferralQueryParams params) {
+        return ReferralPageResponse.from(referralRepository.findAll(params.toPageable()).map(referralMapper::toGetReferralDto));
     }
 
     public GetReferralDto findById(Long id) {
         return referralRepository.findById(id).map(referralMapper::toGetReferralDto).orElseThrow(() -> new ReferralNotFoundException("Referral not found"));
     }
 
-    public List<GetReferralDto> findAllByPatient(String patientEmail) {
-        return referralRepository.findAllByPatientEmail(patientEmail).stream().map(referralMapper::toGetReferralDto).toList();
+    public ReferralPageResponse<GetReferralDto> findAllByPatient(String patientEmail, ReferralQueryParams params) {
+        return ReferralPageResponse.from(referralRepository.findAllByPatientEmail(patientEmail, params.toPageable()).map(referralMapper::toGetReferralDto));
     }
 
-    public List<GetReferralDto> findAllByDoctor(String doctorEmail) {
-        return referralRepository.findAllByDoctorEmail(doctorEmail).stream().map(referralMapper::toGetReferralDto).toList();
+    public ReferralPageResponse<GetReferralDto> findAllByDoctor(String doctorEmail, ReferralQueryParams params) {
+        return ReferralPageResponse.from(referralRepository.findAllByDoctorEmail(doctorEmail, params.toPageable()).map(referralMapper::toGetReferralDto));
     }
 
     @Transactional

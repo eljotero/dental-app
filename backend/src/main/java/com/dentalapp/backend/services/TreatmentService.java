@@ -3,6 +3,8 @@ package com.dentalapp.backend.services;
 import com.dentalapp.backend.model.treatment.dtos.CreateTreatmentDto;
 import com.dentalapp.backend.model.treatment.dtos.TreatmentMapper;
 import com.dentalapp.backend.model.treatment.dtos.UpdateTreatmentDto;
+import com.dentalapp.backend.model.treatment.dtos.TreatmentPageResponse;
+import com.dentalapp.backend.model.treatment.dtos.TreatmentQueryParams;
 import com.dentalapp.backend.model.treatment.entity.Treatment;
 import com.dentalapp.backend.model.treatment.exceptions.TreatmentAlreadyExistsException;
 import com.dentalapp.backend.model.treatment.exceptions.TreatmentNotFoundException;
@@ -11,8 +13,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -31,8 +31,8 @@ public class TreatmentService {
         return treatmentRepository.findByName(name).orElseThrow(() -> new TreatmentNotFoundException("Treatment with name " + name + " not found"));
     }
 
-    public List<Treatment> getAllTreatments() {
-        return treatmentRepository.findAll();
+    public TreatmentPageResponse<Treatment> getAllTreatments(TreatmentQueryParams params) {
+        return TreatmentPageResponse.from(treatmentRepository.findAll(params.toPageable()));
     }
 
     @Transactional

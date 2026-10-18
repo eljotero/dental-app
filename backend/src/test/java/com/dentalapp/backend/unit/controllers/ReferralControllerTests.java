@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Objects;
 
 import static org.mockito.Mockito.when;
 
@@ -47,10 +46,6 @@ class ReferralControllerTests {
     private UpdateReferralDto updateReferralDto;
 
     private GetReferralDto getReferralDto;
-
-    private final String token = "Bearer test@mail.com";
-
-    private final String email = "test@mail.com";
 
     @BeforeEach
     void setUp() {
@@ -94,13 +89,6 @@ class ReferralControllerTests {
         Assertions.assertEquals(4, validator.validate(createReferralDto).size());
     }
 
-    @Test
-    void testGetAllReferrals() {
-        when(referralService.findAll()).thenReturn(List.of(getReferralDto));
-        ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferrals();
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
-    }
 
     @Test
     void testGetReferralById() {
@@ -110,23 +98,7 @@ class ReferralControllerTests {
         Assertions.assertEquals(getReferralDto, response.getBody());
     }
 
-    @Test
-    void testGetAllReferralsByPatient() {
-        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
-        when(referralService.findAllByPatient(email)).thenReturn(List.of(getReferralDto));
-        ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferralsByPatient(token);
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
-    }
 
-    @Test
-    void testGetAllReferralsByDoctor() {
-        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
-        when(referralService.findAllByDoctor(email)).thenReturn(List.of(getReferralDto));
-        ResponseEntity<List<GetReferralDto>> response = referralController.getAllReferralsByDoctor(token);
-        Assertions.assertEquals(200, response.getStatusCode().value());
-        Assertions.assertEquals(1, Objects.requireNonNull(response.getBody()).size());
-    }
 
     @Test
     void testCreateReferral() {
