@@ -2,14 +2,14 @@ package com.dentalapp.backend.controllers;
 
 import com.dentalapp.backend.model.supplies.dtos.CreateSupplyDto;
 import com.dentalapp.backend.model.supplies.dtos.UpdateSupplyDto;
+import com.dentalapp.backend.model.supplies.dtos.SupplyPageResponse;
+import com.dentalapp.backend.model.supplies.dtos.SupplyQueryParams;
 import com.dentalapp.backend.model.supplies.entity.Supply;
 import com.dentalapp.backend.services.SupplyService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/supply")
@@ -19,8 +19,8 @@ public class SupplyController {
     private final SupplyService supplyService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Supply>> getAllSupplies() {
-        return ResponseEntity.ok(supplyService.findAll());
+    public ResponseEntity<SupplyPageResponse<Supply>> getAllSupplies(@Valid @ModelAttribute SupplyQueryParams params) {
+        return ResponseEntity.ok(supplyService.findAll(params));
     }
 
     @GetMapping("/{id}")

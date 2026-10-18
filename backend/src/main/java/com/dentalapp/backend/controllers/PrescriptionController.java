@@ -1,17 +1,18 @@
 package com.dentalapp.backend.controllers;
 
-import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.GetPrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.UpdatePrescriptionDto;
+import com.dentalapp.backend.model.prescription.dtos.PrescriptionPageResponse;
+import com.dentalapp.backend.model.prescription.dtos.PrescriptionQueryParams;
+import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.PrescriptionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/prescriptions")
@@ -22,21 +23,19 @@ public class PrescriptionController {
 
     private final AppointmentService appointmentService;
 
-    private final JwtService jwtService;
-
     @GetMapping("/all")
-    public ResponseEntity<List<GetPrescriptionDto>> getAllPrescriptions() {
-        return ResponseEntity.ok(prescriptionService.findAll());
+    public ResponseEntity<PrescriptionPageResponse<GetPrescriptionDto>> getAllPrescriptions(@Valid @ModelAttribute PrescriptionQueryParams params) {
+        return ResponseEntity.ok(prescriptionService.findAll(params));
     }
 
     @GetMapping("/patient")
-    public ResponseEntity<List<GetPrescriptionDto>> getAllPrescriptionsByPatient(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(prescriptionService.findAllByPatient(jwtService.extractEmail(token.substring(7))));
+    public ResponseEntity<PrescriptionPageResponse<GetPrescriptionDto>> getAllPrescriptionsByPatient(@AuthenticationPrincipal User user, @Valid @ModelAttribute PrescriptionQueryParams params) {
+        return ResponseEntity.ok(prescriptionService.findAllByPatient(user.getEmail(), params));
     }
 
     @GetMapping("/doctor")
-    public ResponseEntity<List<GetPrescriptionDto>> getAllPrescriptionsByDoctor(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(prescriptionService.findAllByDoctor(jwtService.extractEmail(token.substring(7))));
+    public ResponseEntity<PrescriptionPageResponse<GetPrescriptionDto>> getAllPrescriptionsByDoctor(@AuthenticationPrincipal User user, @Valid @ModelAttribute PrescriptionQueryParams params) {
+        return ResponseEntity.ok(prescriptionService.findAllByDoctor(user.getEmail(), params));
     }
 
     @PostMapping("/add")

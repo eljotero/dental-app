@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,7 +58,7 @@ public class UserService {
 
     public LoginUserDtoResponse loginUser(LoginUserDto loginUserDto) {
         User user = getUser(loginUserDto.getEmail());
-        if(!user.isEnabled()) {
+        if (!user.isEnabled()) {
             throw new UserAuthenticationException("User with email " + loginUserDto.getEmail() + " is not enabled");
         }
         try {
@@ -91,10 +90,8 @@ public class UserService {
         return user.orElse(null);
     }
 
-    public List<GetDoctorDto> getDoctors() {
-        return userRepository.findAllDoctors().stream()
-                .map(userMapper::toGetDoctorDto)
-                .toList();
+    public DoctorPageResponse<GetDoctorDto> getDoctors(UserQueryParams params) {
+        return DoctorPageResponse.from(userRepository.findAllDoctors(params.toPageable()).map(userMapper::toGetDoctorDto));
     }
 
     public User getPatientById(Long patientId) {
@@ -106,17 +103,15 @@ public class UserService {
     }
 
     public User getPatientByEmail(String email) {
-        return userRepository.findPatientByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Patient not found"));
+        return userRepository.findPatientByEmail(email).orElseThrow(() -> new UserNotFoundException("Patient not found"));
     }
 
     public User getDoctorByEmail(String email) {
-        return userRepository.findDoctorByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Doctor not found"));
+        return userRepository.findDoctorByEmail(email).orElseThrow(() -> new UserNotFoundException("Doctor not found"));
     }
 
-    public List<GetUserDto> getAllUsers() {
-        return userRepository.findAll().stream().map(userMapper::toGetUserDto).toList();
+    public UserPageResponse<GetUserDto> getAllUsers(UserQueryParams params) {
+        return UserPageResponse.from(userRepository.findAll(params.toPageable()).map(userMapper::toGetUserDto));
     }
 
     public User getUserById(Long id) {

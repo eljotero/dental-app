@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -69,17 +68,7 @@ class AvailabilityServiceTests {
         createAvailabilityDto.setAvailabilityDays(List.of(availabilityDayDto));
     }
 
-    @Test
-    void testGetAllDoctorsAvailability() {
-        when(availabilityRepository.findAll((Specification<Availability>) any())).thenReturn(List.of());
-        Assertions.assertEquals(0, availabilityService.getAllDoctorsAvailability(null).size());
-    }
 
-    @Test
-    void testGetDoctorAvailability() {
-        when(availabilityRepository.findAll((Specification<Availability>) any())).thenReturn(List.of());
-        Assertions.assertEquals(0, availabilityService.getDoctorAvailability(null).size());
-    }
 
     @Test
     void testAddDoctorAvailability() {

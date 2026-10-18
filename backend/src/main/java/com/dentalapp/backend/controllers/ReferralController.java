@@ -1,16 +1,17 @@
 package com.dentalapp.backend.controllers;
 
-import com.dentalapp.backend.configuration.JwtService;
 import com.dentalapp.backend.model.referral.dtos.CreateReferralDto;
 import com.dentalapp.backend.model.referral.dtos.GetReferralDto;
 import com.dentalapp.backend.model.referral.dtos.UpdateReferralDto;
+import com.dentalapp.backend.model.referral.dtos.ReferralPageResponse;
+import com.dentalapp.backend.model.referral.dtos.ReferralQueryParams;
+import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.ReferralService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/referrals")
@@ -19,11 +20,9 @@ public class ReferralController {
 
     private final ReferralService referralService;
 
-    private final JwtService jwtService;
-
     @GetMapping("/all")
-    public ResponseEntity<List<GetReferralDto>> getAllReferrals() {
-        return ResponseEntity.ok(referralService.findAll());
+    public ResponseEntity<ReferralPageResponse<GetReferralDto>> getAllReferrals(@Valid @ModelAttribute ReferralQueryParams params) {
+        return ResponseEntity.ok(referralService.findAll(params));
     }
 
     @GetMapping("/{id}")
@@ -32,13 +31,15 @@ public class ReferralController {
     }
 
     @GetMapping("/patient")
-    public ResponseEntity<List<GetReferralDto>> getAllReferralsByPatient(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(referralService.findAllByPatient(jwtService.extractEmail(token.substring(7))));
+    public ResponseEntity<ReferralPageResponse<GetReferralDto>> getAllReferralsByPatient(
+            @AuthenticationPrincipal User user, @Valid @ModelAttribute ReferralQueryParams params) {
+        return ResponseEntity.ok(referralService.findAllByPatient(user.getEmail(), params));
     }
 
     @GetMapping("/doctor")
-    public ResponseEntity<List<GetReferralDto>> getAllReferralsByDoctor(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(referralService.findAllByDoctor(jwtService.extractEmail(token.substring(7))));
+    public ResponseEntity<ReferralPageResponse<GetReferralDto>> getAllReferralsByDoctor(
+            @AuthenticationPrincipal User user, @Valid @ModelAttribute ReferralQueryParams params) {
+        return ResponseEntity.ok(referralService.findAllByDoctor(user.getEmail(), params));
     }
 
     @PostMapping("/add")

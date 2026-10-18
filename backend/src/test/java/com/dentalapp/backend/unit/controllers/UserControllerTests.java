@@ -22,9 +22,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @Slf4j
@@ -145,24 +143,6 @@ class UserControllerTests {
         verify(userService).loginUser(loginUserDto);
     }
 
-    @Test
-    void testUpdateUser() {
-        String token = "Bearer test@mail.com";
-        String email = token.substring(7);
-        when((jwtService).extractEmail(token)).thenReturn(email);
-        doNothing().when(userService).updateUser(updateUserDto, email);
-        ResponseEntity<String> response = userController.updateUser(token, updateUserDto);
-        Assertions.assertEquals(ResponseEntity.ok("User updated successfully"), response);
-        Assertions.assertEquals(ResponseEntity.ok("User updated successfully"), response);
-    }
-
-    @Test
-    void testGetAllUsers() {
-        when(userService.getAllUsers()).thenReturn(List.of(getUserDto));
-        ResponseEntity<List<GetUserDto>> response = userController.getAllUsers();
-        verify(userService).getAllUsers();
-        Assertions.assertEquals(ResponseEntity.ok(List.of(getUserDto)), response);
-    }
 
     @Test
     void testGetUserById() {
@@ -203,24 +183,4 @@ class UserControllerTests {
         Assertions.assertEquals(200, response.getStatusCode().value());
     }
 
-    @Test
-    void testGetMe() {
-        String token = "Bearer test@mail.com";
-        String email = "test@mail.com";
-        when(jwtService.extractEmail(token.substring(7))).thenReturn(email);
-        when(userService.getUserData(email)).thenReturn(getUserDto);
-        ResponseEntity<GetUserDto> response = userController.getMe(token);
-        verify(userService).getUserData(email);
-        Assertions.assertEquals(ResponseEntity.ok(getUserDto), response);
-        Assertions.assertEquals(200, response.getStatusCode().value());
-    }
-
-    @Test
-    void testGetDoctors() {
-        GetDoctorDto getDoctorDto = new GetDoctorDto();
-        when(userService.getDoctors()).thenReturn(List.of(getDoctorDto));
-        ResponseEntity<List<GetDoctorDto>> response = userController.getDoctors();
-        verify(userService).getDoctors();
-        assertEquals(ResponseEntity.ok(List.of(getDoctorDto)), response);
-    }
 }

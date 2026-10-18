@@ -4,6 +4,8 @@ import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.file.dtos.FileMapper;
 import com.dentalapp.backend.model.file.dtos.GetDownloadFileDto;
 import com.dentalapp.backend.model.file.dtos.GetFileDto;
+import com.dentalapp.backend.model.file.dtos.FilePageResponse;
+import com.dentalapp.backend.model.file.dtos.FileQueryParams;
 import com.dentalapp.backend.model.file.entity.File;
 import com.dentalapp.backend.model.file.exceptions.FileIsEmptyException;
 import com.dentalapp.backend.model.file.exceptions.FileNameAlreadyExists;
@@ -15,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Service
 @AllArgsConstructor
 public class FileService {
@@ -26,23 +26,21 @@ public class FileService {
     private final FileMapper fileMapper;
 
     public GetDownloadFileDto getFileById(Long id) {
-        File file =  fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));
+        File file = fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));
         return fileMapper.toGetDownloadFileDto(file);
     }
 
-    @Transactional
-    public List<GetFileDto> getFilesByAppointmentId(Appointment appointment) {
-        return fileRepository.findFilesByAppointment(appointment).stream().map(fileMapper::toGetFileDto).toList();
+    public FilePageResponse<GetFileDto> getFilesByAppointmentId(Appointment appointment, FileQueryParams params) {
+        return FilePageResponse.from(fileRepository.findFilesByAppointment(appointment, params.toPageable()).map(fileMapper::toGetFileDto));
     }
 
-    @Transactional
-    public List<GetFileDto> getFilesByUserId(User user) {
-        return fileRepository.findFilesByUser(user).stream().map(fileMapper::toGetFileDto).toList();
+    public FilePageResponse<GetFileDto> getFilesByUserId(User user, FileQueryParams params) {
+        return FilePageResponse.from(fileRepository.findFilesByUser(user, params.toPageable()).map(fileMapper::toGetFileDto));
     }
 
     @Transactional
     public File saveFile(MultipartFile multipartFile, Appointment appointment) {
-        if(multipartFile.isEmpty()) {
+        if (multipartFile.isEmpty()) {
             throw new FileIsEmptyException("File is empty");
         }
         if (doesFileNameExist(multipartFile.getOriginalFilename())) {
@@ -55,7 +53,7 @@ public class FileService {
 
     @Transactional
     public void updateFile(Long id, MultipartFile multipartFile) {
-        if(multipartFile.isEmpty()) {
+        if (multipartFile.isEmpty()) {
             throw new FileIsEmptyException("File is empty");
         }
         File file = fileRepository.findById(id).orElseThrow(() -> new FileNotFoundException("File not found"));

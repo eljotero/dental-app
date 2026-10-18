@@ -3,6 +3,8 @@ package com.dentalapp.backend.services;
 import com.dentalapp.backend.model.supplies.dtos.CreateSupplyDto;
 import com.dentalapp.backend.model.supplies.dtos.SupplyMapper;
 import com.dentalapp.backend.model.supplies.dtos.UpdateSupplyDto;
+import com.dentalapp.backend.model.supplies.dtos.SupplyPageResponse;
+import com.dentalapp.backend.model.supplies.dtos.SupplyQueryParams;
 import com.dentalapp.backend.model.supplies.entity.Supply;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyAlreadyExistsException;
 import com.dentalapp.backend.model.supplies.exceptions.SupplyNotFoundException;
@@ -10,8 +12,6 @@ import com.dentalapp.backend.model.supplies.repository.SupplyRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -21,8 +21,9 @@ public class SupplyService {
 
     private final SupplyMapper supplyMapper;
 
-    public List<Supply> findAll() {
-        return supplyRepository.findAll();
+    @Transactional(readOnly = true)
+    public SupplyPageResponse<Supply> findAll(SupplyQueryParams params) {
+        return SupplyPageResponse.from(supplyRepository.findAll(params.toPageable()));
     }
 
     public Supply findById(Long id) {
@@ -40,8 +41,7 @@ public class SupplyService {
 
     @Transactional
     public void updateSupply(Long id, UpdateSupplyDto updateSupplyDto) {
-        Supply supply = supplyRepository.findById(id)
-                .orElseThrow(() -> new SupplyNotFoundException("Supply not found"));
+        Supply supply = supplyRepository.findById(id).orElseThrow(() -> new SupplyNotFoundException("Supply not found"));
         Supply supplyDB = supplyMapper.toEntityUpdate(supply, updateSupplyDto);
         supplyRepository.save(supplyDB);
     }

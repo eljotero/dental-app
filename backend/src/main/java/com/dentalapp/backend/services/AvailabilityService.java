@@ -1,13 +1,20 @@
 package com.dentalapp.backend.services;
 
-import com.dentalapp.backend.model.availability.dtos.*;
+import com.dentalapp.backend.model.availability.dtos.AvailabilityDayDto;
+import com.dentalapp.backend.model.availability.dtos.AvailabilityMapper;
+import com.dentalapp.backend.model.availability.dtos.AvailabilityPageResponse;
+import com.dentalapp.backend.model.availability.dtos.AvailabilityQueryParams;
+import com.dentalapp.backend.model.availability.dtos.CreateAvailabilityDto;
+import com.dentalapp.backend.model.availability.dtos.DoctorAvailabilityQueryParams;
+import com.dentalapp.backend.model.availability.dtos.GetAvailabilityDto;
+import com.dentalapp.backend.model.availability.dtos.UpdateAvailabilityDto;
 import com.dentalapp.backend.model.availability.entity.Availability;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityAlreadyExistsException;
 import com.dentalapp.backend.model.availability.exceptions.AvailabilityNotFoundException;
 import com.dentalapp.backend.model.availability.repository.AvailabilityRepository;
+import com.dentalapp.backend.model.availability.repository.AvailabilitySpecification;
 import com.dentalapp.backend.model.user.entity.User;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +32,12 @@ public class AvailabilityService {
 
     private final AvailabilityMapper availabilityMapper;
 
-    public List<GetAvailabilityDto> getAllDoctorsAvailability(Specification<Availability> spec) {
-        return availabilityRepository.findAll(spec).stream().map(availabilityMapper::toDto).toList();
+    public AvailabilityPageResponse<GetAvailabilityDto> getAllDoctorsAvailability(AvailabilityQueryParams params) {
+        return AvailabilityPageResponse.from(availabilityRepository.findAll(new AvailabilitySpecification(params), params.toPageable()).map(availabilityMapper::toDto));
     }
 
-    public List<GetAvailabilityDto> getDoctorAvailability(Specification<Availability> spec) {
-        return availabilityRepository.findAll(spec).stream().map(availabilityMapper::toDto).toList();
+    public AvailabilityPageResponse<GetAvailabilityDto> getDoctorAvailability(Long doctorId, DoctorAvailabilityQueryParams params) {
+        return AvailabilityPageResponse.from(availabilityRepository.findAll(new AvailabilitySpecification(doctorId, params), params.toPageable()).map(availabilityMapper::toDto));
     }
 
     public List<Availability> getDoctorAvailability(Long doctorId, LocalDate date) {
@@ -70,7 +77,6 @@ public class AvailabilityService {
     public boolean isDoctorAvailable(User doctor, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return availabilityRepository.isDeclared(doctor, date, startTime, endTime);
     }
-
 
     private boolean isAvailabilityExists(AvailabilityDayDto availabilityDayDto, User doctor) {
         return availabilityRepository.hasDoctorAvailability(doctor, availabilityDayDto.getDate());

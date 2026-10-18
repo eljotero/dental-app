@@ -22,7 +22,7 @@ public class CreateItemLoggingAspect {
     @Before("createItemMethods()")
     public void beforeCreateItem(JoinPoint joinPoint) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-        log.info("Attempting to create a new item = " + methodSignature.getMethod().getName());
+        log.info("Attempting to create a new item = {}", methodSignature.getMethod().getName());
     }
 
     @AfterReturning("createItemMethods()")

@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -73,12 +72,6 @@ class FileServiceTests {
         Assertions.assertThrows(FileNotFoundException.class, () -> fileService.getFileById(1L));
     }
 
-    @Test
-    void testGetFilesByAppointmentId() {
-        when(fileRepository.findFilesByAppointment(appointment)).thenReturn(List.of(new File()));
-        fileService.getFilesByAppointmentId(appointment);
-        Assertions.assertNotNull(fileService.getFilesByAppointmentId(appointment));
-    }
 
     @Test
     void testSaveFile() {

@@ -45,28 +45,21 @@ public interface AppointmentMapper {
     @Mapping(target = "appointmentEndTime", expression = "java(appointment.getAppointmentEndTime().toString())")
     GetAppointmentDto toGetAppointmentDto(Appointment appointment);
 
-    @Mapping(target = "doctorName", source = "doctor.firstName")
-    @Mapping(target = "doctorLastName", source = "doctor.lastName")
-    @Mapping(target = "doctorPhoneNumber", source = "doctor.phoneNumber")
+    @Mapping(target = "patientInfo", expression = "java(includePatientInfo ? appointment.getPatient().getFirstName() + \" \" + appointment.getPatient().getLastName() : null)")
     @Mapping(target = "appointmentStartTime", expression = "java(appointment.getAppointmentStartTime().toString())")
     @Mapping(target = "appointmentEndTime", expression = "java(appointment.getAppointmentEndTime().toString())")
-    @Mapping(target = "confirmed", source = "isConfirmed")
-    @Mapping(target = "cancelled", source = "isCancelled")
-    @Mapping(target = "paid", source = "invoice.isPaid")
-    GetAppointmentDtoV2 toGetAppointmentDtoV2(Appointment appointment);
+    MyAppointmentResponse toMyAppointmentResponse(Appointment appointment, boolean includePatientInfo);
 
-    @Mapping(target = "patientInfo", expression = "java(appointment.getPatient().getFirstName() + \" \" + appointment.getPatient().getLastName())")
+    @Mapping(target = "doctorName", source = "appointment.doctor.firstName")
+    @Mapping(target = "doctorLastName", source = "appointment.doctor.lastName")
+    @Mapping(target = "doctorPhoneNumber", source = "appointment.doctor.phoneNumber")
+    @Mapping(target = "patientName", expression = "java(includePatientInfo ? appointment.getPatient().getFirstName() : null)")
+    @Mapping(target = "patientLastName", expression = "java(includePatientInfo ? appointment.getPatient().getLastName() : null)")
+    @Mapping(target = "patientPhoneNumber", expression = "java(includePatientInfo ? appointment.getPatient().getPhoneNumber() : null)")
     @Mapping(target = "appointmentStartTime", expression = "java(appointment.getAppointmentStartTime().toString())")
     @Mapping(target = "appointmentEndTime", expression = "java(appointment.getAppointmentEndTime().toString())")
-    GetAppointmentDtoV3 toGetAppointmentDtoV3(Appointment appointment);
-
-    @Mapping(target = "patientName", source = "patient.firstName")
-    @Mapping(target = "patientLastName", source = "patient.lastName")
-    @Mapping(target = "patientPhoneNumber", source = "patient.phoneNumber")
-    @Mapping(target = "appointmentStartTime", expression = "java(appointment.getAppointmentStartTime().toString())")
-    @Mapping(target = "appointmentEndTime", expression = "java(appointment.getAppointmentEndTime().toString())")
-    @Mapping(target = "confirmed", source = "isConfirmed")
-    @Mapping(target = "cancelled", source = "isCancelled")
-    @Mapping(target = "paid", source = "invoice.isPaid")
-    GetAppointmentDtoV4 toGetAppointmentDtoV4(Appointment appointment);
+    @Mapping(target = "confirmed", source = "appointment.isConfirmed")
+    @Mapping(target = "cancelled", source = "appointment.isCancelled")
+    @Mapping(target = "paid", source = "appointment.invoice.isPaid")
+    AppointmentDetailsResponse toAppointmentDetailsResponse(Appointment appointment, boolean includePatientInfo);
 }

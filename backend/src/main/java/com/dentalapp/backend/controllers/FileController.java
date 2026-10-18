@@ -3,16 +3,17 @@ package com.dentalapp.backend.controllers;
 import com.dentalapp.backend.model.appointment.entity.Appointment;
 import com.dentalapp.backend.model.file.dtos.GetDownloadFileDto;
 import com.dentalapp.backend.model.file.dtos.GetFileDto;
+import com.dentalapp.backend.model.file.dtos.FilePageResponse;
+import com.dentalapp.backend.model.file.dtos.FileQueryParams;
 import com.dentalapp.backend.model.user.entity.User;
 import com.dentalapp.backend.services.AppointmentService;
 import com.dentalapp.backend.services.FileService;
 import com.dentalapp.backend.services.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/files")
@@ -31,15 +32,15 @@ public class FileController {
     }
 
     @GetMapping("/appointment/{id}")
-    public ResponseEntity<List<GetFileDto>> getFilesByAppointmentId(@PathVariable Long id) {
+    public ResponseEntity<FilePageResponse<GetFileDto>> getFilesByAppointmentId(@PathVariable Long id, @Valid @ModelAttribute FileQueryParams params) {
         Appointment appointment = appointmentService.getAppointmentById(id);
-        return ResponseEntity.ok(fileService.getFilesByAppointmentId(appointment));
+        return ResponseEntity.ok(fileService.getFilesByAppointmentId(appointment, params));
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<GetFileDto>> getPatientFiles(@PathVariable Long id) {
+    public ResponseEntity<FilePageResponse<GetFileDto>> getPatientFiles(@PathVariable Long id, @Valid @ModelAttribute FileQueryParams params) {
         User user = userService.getUserById(id);
-        return ResponseEntity.ok(fileService.getFilesByUserId(user));
+        return ResponseEntity.ok(fileService.getFilesByUserId(user, params));
     }
 
     @PostMapping("/upload")
