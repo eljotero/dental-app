@@ -1,6 +1,7 @@
 package com.dentalapp.backend.configuration;
 
 import com.dentalapp.backend.model.user.UserDetailService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,9 @@ import java.util.List;
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     private final UserDetailService userDetailService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -76,7 +80,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    private static CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
@@ -85,7 +89,7 @@ public class SecurityConfig {
                 HttpHeaders.CONTENT_TYPE,
                 HttpHeaders.IF_MATCH,
                 HttpHeaders.ACCEPT));
-        corsConfiguration.setAllowedOriginPatterns(List.of("https://localhost:5173"));
+        corsConfiguration.setAllowedOrigins(List.of(frontendUrl));
         corsConfiguration.addExposedHeader("Access-Token");
         corsConfiguration.addExposedHeader("Uid");
         corsConfiguration.addExposedHeader("ETag");

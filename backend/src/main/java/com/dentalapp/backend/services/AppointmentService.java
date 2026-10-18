@@ -11,7 +11,8 @@ import com.dentalapp.backend.model.prescription.dtos.CreatePrescriptionDto;
 import com.dentalapp.backend.model.prescription.dtos.PrescriptionMapper;
 import com.dentalapp.backend.model.prescription.entity.Prescription;
 import com.dentalapp.backend.model.user.entity.User;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +24,11 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AppointmentService {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     private final AppointmentRepository appointmentRepository;
 
@@ -138,7 +142,7 @@ public class AppointmentService {
         List<Appointment> appointmentList = appointmentRepository.findUnconfirmedAppointments();
         for (Appointment appointment : appointmentList) {
             String appointmentDetails = "Appointment with " + appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName() + " on " + appointment.getAppointmentDate() + " at " + appointment.getAppointmentStartTime();
-            String confirmationLink = "http://localhost:8080/api/appointments/confirm/" + appointment.getAppointmentId();
+            String confirmationLink = baseUrl + "/api/appointments/confirm/" + appointment.getAppointmentId();
             emailSenderService.sendAppointmentConfirmationEmail(appointment.getPatient().getEmail(), appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName(), appointmentDetails, confirmationLink);
         }
     }
